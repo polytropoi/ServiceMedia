@@ -1,3 +1,6 @@
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+
 const express = require("express");
 const webxr_router = express.Router();
 const entities = require("entities");
@@ -9,9 +12,11 @@ const jwt = require("jsonwebtoken");
 const requireText = require('require-text');
 const { Console } = require("console");
 const minio = require('minio');
-// let minio = app.get('minio');
-let db = app.get('db');
-let s3 = app.get('s3'); 
+
+import { db } from "../server.js";
+// import { s3 } from "../server.js";
+import { ReturnPresignedUrl, ReturnObjectMetadata, ReturnObjectExists, CopyObject } from "../server.js";
+
 
 var minioClient = null;
 if (process.env.MINIOKEY && process.env.MINIOKEY != "" && process.env.MINIOENDPOINT && process.env.MINIOENDPOINT != "") {
@@ -67,44 +72,44 @@ function hexToRgb(c){
 function HexToRgbValues (c) {
     var aRgbHex = '1502BE'.match(/.{1,2}/g);
     var aRgb = parseInt(aRgbHex[0], 16) + " " + parseInt(aRgbHex[1], 16) + " " +  parseInt(aRgbHex[2], 16);
-console.log(aRgb); //[21, 2, 190]
+    console.log(aRgb); //[21, 2, 190]
     return aRgb;
 }
 
-function ReturnPresignedUrlSync (bucket, key, time) {
-    if (minioClient) {
-        minioClient.presignedGetObject(bucket, key, time, function(err, presignedUrl) { //use callback version here, can't await?
-            if (err) {
-                console.log(err);
-                return "err";
-            } else {
-                console.log("minio sync url " + presignedUrl)
-               return presignedUrl;
+// function ReturnPresignedUrlSync (bucket, key, time) {
+//     if (minioClient) {
+//         minioClient.presignedGetObject(bucket, key, time, function(err, presignedUrl) { //use callback version here, can't await?
+//             if (err) {
+//                 console.log(err);
+//                 return "err";
+//             } else {
+//                 console.log("minio sync url " + presignedUrl)
+//                return presignedUrl;
                 
-            }
-        });
-    } else {
-        let url = s3.getSignedUrl('getObject', {Bucket: bucket, Key: key, Expires: time});
-        console.log("s3 sync url" + url);
-        return url;
-    }
-}
-async function ReturnPresignedUrl(bucket, key, time) {
+//             }
+//         });
+//     } else {
+//         let url = s3.getSignedUrl('getObject', {Bucket: bucket, Key: key, Expires: time});
+//         console.log("s3 sync url" + url);
+//         return url;
+//     }
+// }
+// async function ReturnPresignedUrl(bucket, key, time) {
     
-    if (minioClient) {
-        try {
-            return minioClient.presignedGetObject(bucket, key, time);
-        } catch (error) {
-            return error
-        }
-    } else {
-        try {
-            return s3.getSignedUrl('getObject', {Bucket: bucket, Key: key, Expires: time}); //returns a promise if called in async function?
-        } catch (error) {
-            return error;
-        } 
-    }
-}
+//     if (minioClient) {
+//         try {
+//             return minioClient.presignedGetObject(bucket, key, time);
+//         } catch (error) {
+//             return error
+//         }
+//     } else {
+//         try {
+//             return s3.getSignedUrl('getObject', {Bucket: bucket, Key: key, Expires: time}); //returns a promise if called in async function?
+//         } catch (error) {
+//             return error;
+//         } 
+//     }
+// }
 
 function saveDomainTraffic (domain) { //hrm... 
     let timestamp = Date.now();
@@ -530,7 +535,7 @@ webxr_router.get('/:_id', function (req, res) {
     let aframeExtrasScript = "<script src=\x22https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.5.2/dist/aframe-extras.min.js\x22 defer=\x22defer\x22></script>";
     
     let logScripts = "";
-    enviromentScript = ""; //for aframe env component
+    let enviromentScript = ""; //for aframe env component
     
 
     let aframeScript = "<script src=\x22https://aframe.io/releases/1.6.0/aframe.min.js\x22></script>";
@@ -863,13 +868,13 @@ webxr_router.get('/:_id', function (req, res) {
                     skyboxEnvMap = "skybox-env-map";   
                     // console.log("skyboxEnvMap is " + skyboxEnvMap);
                 }
-
+                    // console.log(JSON.stringify(sceneResponse));
                         sceneOwnerID = sceneData.user_id;
                         short_id = sceneData.short_id;
                         sceneResponse = sceneData;
-                        sceneNextScene = sceneResponse.sceneNextScene;
+                        // sceneNextScene = sceneResponse.sceneNextScene;
                         let poiIndex = 0;
-                        scenePreviousScene = sceneResponse.scenePreviousScene;
+                        // scenePreviousScene = sceneResponse.scenePreviousScene;
                         //////////////networked aframe below, rem for now... 
                         /*
                                     console.log("sceneResponse.sceneNetworking " + sceneResponse.sceneNetworking); //for networked aframe, baybe bring it back
@@ -1041,7 +1046,7 @@ webxr_router.get('/:_id', function (req, res) {
                                     // console.log("pushinbg model locaition " + sceneResponse.sceneLocations[i]);
                                     sceneModelLocations.push(sceneResponse.sceneLocations[i]);
                                     if (sceneResponse.sceneLocations[i].eventData != null && sceneResponse.sceneLocations[i].eventData.length > 4) {
-                                        animationComponent = "<script src=\x22https://unpkg.com/aframe-animation-component@5.1.2/dist/aframe-animation-component.min.js\x22></script>"; //unused !NEEDS FIXING - this component could be added more than once
+                                        // animationComponent = "<script src=\x22https://unpkg.com/aframe-animation-component@5.1.2/dist/aframe-animation-component.min.js\x22></script>"; //unused !NEEDS FIXING - this component could be added more than once
                                     }
                                 }
                                 if (sceneResponse.sceneLocations[i].markerType != undefined && sceneResponse.sceneLocations[i].markerType == "navmesh") { 
@@ -1172,9 +1177,9 @@ webxr_router.get('/:_id', function (req, res) {
                                 if (sceneResponse.sceneLocations[i].markerType == "car") {
                                     carLocation = sceneResponse.sceneLocations[i].x + " " + sceneResponse.sceneLocations[i].y + " " + zFix;
                                 }
-                                if (sceneResponse.sceneLocations[i].markerType != undefined && sceneResponse.sceneLocations[i].markerType.toLowerCase().includes('picture')) {
-                                    pictureLocation = sceneResponse.sceneLocations[i].x + " " + sceneResponse.sceneLocations[i].y + " " + zFix;
-                                }
+                                // if (sceneResponse.sceneLocations[i].markerType != undefined && sceneResponse.sceneLocations[i].markerType.toLowerCase().includes('picture')) {
+                                //     pictureLocation = sceneResponse.sceneLocations[i].x + " " + sceneResponse.sceneLocations[i].y + " " + zFix;
+                                // }
                                 if (sceneResponse.sceneLocations[i].markerType == "picture group") {
                                     if (sceneResponse.sceneLocations[i].tags && 
                                         (sceneResponse.sceneLocations[i].tags.includes("camera") ||  
@@ -1275,7 +1280,7 @@ webxr_router.get('/:_id', function (req, res) {
                                         scrollDirection = '-x';
                                     }
                                     if (sceneResponse.sceneLocations[i].eventData && sceneResponse.sceneLocations[i].eventData.toLowerCase().includes('speed')) {
-                                        speedSplit = sceneResponse.sceneLocations[i].eventData.toLowerCase().split('~');
+                                        const speedSplit = sceneResponse.sceneLocations[i].eventData.toLowerCase().split('~');
                                         if (speedSplit.length > 1) {
                                             scrollSpeed = speedSplit[1];
                                         } else {
@@ -1499,13 +1504,13 @@ webxr_router.get('/:_id', function (req, res) {
                                     "<div class=\x22previous_button\x22 style=\x22color: rgba(255, 255, 255, 0.75); float: right; margin: 5px 5px;\x22 onclick=\x22PreviousButton()\x22><i class=\x22fas fa-step-backward fa-2x\x22></i></div>"+
                                     "<div id=\x22transportStats\x22 style=\x22color: rgba(255, 255, 255, 0.75); float: right; margin: 5px 5px; text-align: left\x22></div></div>";                                
 
-                                    transportButtonsWithSlider = "<div class=\x22transport_buttons\x22><div class=\x22sslidecontainer\x22><input type=\x22range\x22 min=\x221\x22 max=\x22100\x22 value=\x221\x22 class=\x22sslider\x22 id=\x22mainTransportSlider\x22>"+
-                                    "</div><div id=\x22transportStats\x22 style=\x22color: rgba(255, 255, 255, 0.75); float: left; margin: 5px 5px; text-align: left\x22></div>"+
-                                    "<div class=\x22next_button\x22 style=\x22color: rgba(255, 255, 255, 0.75); float: right; margin: 5px 5px;\x22 onclick=\x22NextButton()\x22><i class=\x22fas fa-step-forward fa-2x\x22></i></div>"+
-                                    "<div class=\x22ffwd_button\x22 style=\x22color: rgba(255, 255, 255, 0.75); float: right; margin: 5px 5px;\x22 onclick=\x22FastForwardButton()\x22><i class=\x22fas fa-forward fa-2x\x22></i></div>"+
-                                    "<div class=\x22play_button\x22 id=\x22transportPlayButton\x22 style=\x22color: rgba(255, 255, 255, 0.75); float: right; margin: 5px 5px;\x22 onclick=\x22TransportPlayButton()\x22><i class=\x22fas fa-play-circle fa-2x\x22></i></div>" +
-                                    "<div class=\x22rewind_button\x22 style=\x22color: rgba(255, 255, 255, 0.75); float: right; margin: 5px 5px;\x22 onclick=\x22RewindButton()\x22><i class=\x22fas fa-backward fa-2x\x22></i></div>"+
-                                    "<div class=\x22previous_button\x22 style=\x22color: rgba(255, 255, 255, 0.75); float: right; margin: 5px 5px;\x22 onclick=\x22PreviousButton()\x22><i class=\x22fas fa-step-backward fa-2x\x22></i></div></div>";
+                                    // transportButtonsWithSlider = "<div class=\x22transport_buttons\x22><div class=\x22sslidecontainer\x22><input type=\x22range\x22 min=\x221\x22 max=\x22100\x22 value=\x221\x22 class=\x22sslider\x22 id=\x22mainTransportSlider\x22>"+
+                                    // "</div><div id=\x22transportStats\x22 style=\x22color: rgba(255, 255, 255, 0.75); float: left; margin: 5px 5px; text-align: left\x22></div>"+
+                                    // "<div class=\x22next_button\x22 style=\x22color: rgba(255, 255, 255, 0.75); float: right; margin: 5px 5px;\x22 onclick=\x22NextButton()\x22><i class=\x22fas fa-step-forward fa-2x\x22></i></div>"+
+                                    // "<div class=\x22ffwd_button\x22 style=\x22color: rgba(255, 255, 255, 0.75); float: right; margin: 5px 5px;\x22 onclick=\x22FastForwardButton()\x22><i class=\x22fas fa-forward fa-2x\x22></i></div>"+
+                                    // "<div class=\x22play_button\x22 id=\x22transportPlayButton\x22 style=\x22color: rgba(255, 255, 255, 0.75); float: right; margin: 5px 5px;\x22 onclick=\x22TransportPlayButton()\x22><i class=\x22fas fa-play-circle fa-2x\x22></i></div>" +
+                                    // "<div class=\x22rewind_button\x22 style=\x22color: rgba(255, 255, 255, 0.75); float: right; margin: 5px 5px;\x22 onclick=\x22RewindButton()\x22><i class=\x22fas fa-backward fa-2x\x22></i></div>"+
+                                    // "<div class=\x22previous_button\x22 style=\x22color: rgba(255, 255, 255, 0.75); float: right; margin: 5px 5px;\x22 onclick=\x22PreviousButton()\x22><i class=\x22fas fa-step-backward fa-2x\x22></i></div></div>";
                                 // }
                                 dialogButton = "<div class=\x22dialog_button\x22 style=\x22color: rgba(255, 255, 255, 0.75); float: left; margin: 10px 10px;\x22 onclick=\x22SceneManglerModal('Welcome')\x22><i class=\x22fas fa-info-circle fa-2x\x22></i></div>";
                                
@@ -2228,39 +2233,97 @@ webxr_router.get('/:_id', function (req, res) {
             
                 function (callback) {
                     var modelz = [];
-                   console.log("sceneModels : " + JSON.stringify(sceneResponse.sceneModels));
+                   console.log("sceneModelss : " + JSON.stringify(sceneResponse.sceneModels));
                     if (sceneResponse.sceneModels != null) {
+                        // (async () => {
+                        //     for (const objID of sceneResponse.sceneModels) {
+                        //         var oo_id = ObjectID(objID);
+                        //         // console.log("13904 tryna get sceneObject: " + objID);
+                                
+                        //         db.models.findOne({"_id": oo_id}, function (err, model) {
+                        //             if (err || !model) {
+                        //                 console.log("error getting model: " + objID); //todo - report? //TODO remove from sceneModels!
+                        //                 callbackz();
+                        //             } else {
+                        //                 // console.log("got user model:" + model.filename);
+                        //                 // (async () => {
+                        //                     if (minioClient) {
+
+                        //                         minioClient.presignedGetObject(process.env.S3_ROOT_BUCKET_NAME, 'users/' + model.userID + "/gltf/" + model.filename, 6000, function(err, presignedUrl) { //use callback version here, can't await?
+                        //                             if (err) {
+                        //                                 console.log(err);
+                        //                                 callbackz(err);
+                        //                             } else {
+                        //                                 model.url = presignedUrl;
+                        //                                 modelz.push(model);
+                        //                                 callbackz();
+                        //                             }
+                        //                         });    
+                        //                     } else { 
+                        //                         // let url = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: 'users/' + model.userID + "/gltf/" + model.filename, Expires: 6000});
+                        //                         // (async () => {
+                        //                             console.log("pushing model " + JSON.stringify(model))
+                        //                         const url = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + model.userID + "/gltf/" + model.filename, 6000);
+                        //                         model.url = url;
+                        //                         console.log("pushing modelz " + model.url);
+                        //                         modelz.push(model);
+
+                        //                         callbackz();
+                        //                         // });
+                        //                     }
+                        //                 // });
+                        //             }
+                        //         });
+                            
+                        //     }
+                        //     console.log('modelz have been added to scene ' + JSON.stringify(modelz));
+                        //             // objectResponse = modelz;
+                        //             // sceneResponse.sceneModelz = objectResponse;
+                        //     var buff = Buffer.from(JSON.stringify(modelz)).toString("base64");
+                        //     modelData = "<div id=\x22sceneModels\x22 data-models='"+buff+"'></div>";
+                        //     callback(null);
+
+
+                        // });
                         async.each (sceneResponse.sceneModels, function (objID, callbackz) { //nested async-ery!
                             var oo_id = ObjectID(objID);
                             // console.log("13904 tryna get sceneObject: " + objID);
-                            db.models.findOne({"_id": oo_id}, function (err, model) {
-                                if (err || !model) {
-                                    console.log("error getting model: " + objID); //todo - report? //TODO remove from sceneModels!
-                                    callbackz();
-                                } else {
-                                    // console.log("got user model:" + model.filename);
-                                    if (minioClient) {
-
-                                        minioClient.presignedGetObject(process.env.S3_ROOT_BUCKET_NAME, 'users/' + model.userID + "/gltf/" + model.filename, 6000, function(err, presignedUrl) { //use callback version here, can't await?
-                                            if (err) {
-                                                console.log(err);
-                                                callbackz(err);
-                                            } else {
-                                                model.url = presignedUrl;
-                                                modelz.push(model);
-                                                callbackz();
-                                            }
-                                        });    
-                                    } else { 
-                                        let url = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: 'users/' + model.userID + "/gltf/" + model.filename, Expires: 6000});
-                                        model.url = url;
-                                        // console.log("pushing model " + JSON.stringify(model))
-                                        modelz.push(model);
-
+                            
+                                db.models.findOne({"_id": oo_id}, function (err, model) {
+                                    if (err || !model) {
+                                        console.log("error getting model: " + objID); //todo - report? //TODO remove from sceneModels!
                                         callbackz();
+                                    } else {
+                                        // console.log("got user model:" + model.filename);
+                                        // (async () => {
+                                            if (minioClient) {
+
+                                                minioClient.presignedGetObject(process.env.S3_ROOT_BUCKET_NAME, 'users/' + model.userID + "/gltf/" + model.filename, 6000, function(err, presignedUrl) { //use callback version here, can't await?
+                                                    if (err) {
+                                                        console.log(err);
+                                                        callbackz(err);
+                                                    } else {
+                                                        model.url = presignedUrl;
+                                                        modelz.push(model);
+                                                        callbackz();
+                                                    }
+                                                });    
+                                            } else { 
+                                                // let url = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: 'users/' + model.userID + "/gltf/" + model.filename, Expires: 6000});
+                                                (async () => {
+                                                    // console.log("pushing model " + JSON.stringify(model));
+                                                const url = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + model.userID + "/gltf/" + model.filename, 6000);
+                                                model.url = url;
+                                                // console.log("pushing modelz " + model.url);
+                                                modelz.push(model);
+
+                                                callbackz();
+                                                })();
+                                            }
+                                        // });
                                     }
-                                }
-                            });
+                                });
+                            
                         }, function(err) {
                            
                             if (err) {
@@ -2276,6 +2339,8 @@ webxr_router.get('/:_id', function (req, res) {
                                 callback(null);
                             }
                         });
+                    
+                        
                     } else {
                         callback(null);
                     }
@@ -2294,7 +2359,7 @@ webxr_router.get('/:_id', function (req, res) {
                     var availableScenes = [];
                     availableScenesResponse.availableScenes = availableScenes;
                         async.each(scenes, function (scene, cb) {
-                            availableScene = {};
+                            let availableScene = {};
                             if (scene.scenePostcards != null && scene.scenePostcards.length > 0) { //cain't show without no postcard
                                 var postcardIndex = Math.floor(Math.random()*scene.scenePostcards.length);
                                 var oo_id = ObjectID(scene.scenePostcards[postcardIndex]); //TODO randomize? or ensure latest?  or use assigned default?
@@ -2429,15 +2494,15 @@ webxr_router.get('/:_id', function (req, res) {
                                     }
 
                                     index++;
-                                    // (async () => {
-                                        var urlStandard = ReturnPresignedUrlSync(process.env.S3_WEBSCRAPE_BUCKET_NAME, weblink._id +"/"+ weblink._id + ".standard.jpg", 6000);
+                                    (async () => {
+                                        var urlStandard = await ReturnPresignedUrl(process.env.S3_WEBSCRAPE_BUCKET_NAME, weblink._id +"/"+ weblink._id + ".standard.jpg", 6000);
 
                                         weblinkAssets = weblinkAssets + "<img id=\x22wlimage" + index + "\x22 crossorigin=\x22anonymous\x22 src='" + urlStandard + "'>";
                                         let link = "basic-link=\x22href: "+weblink.link_url+";\x22 class=\x22activeObjexGrab activeObjexRay\x22";
                                         let caption = "<a-troika-text class=\x22pCap\x22 align=\x22center\x22 rotation=\x220 0 0\x22 font=\x22../fonts/web/Acme.woff\x22 outlineWidth=\x222%\x22 outlineColor=\x22black\x22  fontSize=\x221\x22 anchor=\x22top\x22 maxWidth=\x2210\x22 position=\x220 1.1 .1\x22 value=\x22"+weblink.link_title+"\x22></a-troika-text>";
                                         weblinkEntities = weblinkEntities + "<a-entity "+link+" position=\x22"+position+"\x22 weblink-materials=\x22index:"+index+"\x22 look-at=\x22#player\x22 gltf-model=\x22#flatsquare\x22 scale=\x22"+scale+"\x22 material=\x22shader: flat; src: #wlimage" + index + "; alphaTest: 0.5;\x22"+
                                         " visible='true'>"+caption+"</a-entity>";   
-                                    // })();
+                                    })();
                                     }
                                 });
                             }
@@ -2543,7 +2608,7 @@ webxr_router.get('/:_id', function (req, res) {
                                             } else {      
                                                 // console.log("founda matching model: " + JSON.stringify(asset));
                                                 if (asset.item_type == "glb") {
-                                                    assetUserID = asset.userID;
+                                                    const assetUserID = asset.userID;
                                                     // var sourcePath =   "servicemedia/users/" + assetUserID + "/gltf/" + locMdl.gltf; //this should be "model" or "filename"
                                                     (async () => {
                                                         // let modelURL = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + assetUserID + "/gltf/" + asset.filename, Expires: 6000});
@@ -2608,7 +2673,7 @@ webxr_router.get('/:_id', function (req, res) {
                             } else {      
                                 // console.log("founda matching model: " + JSON.stringify(asset));
                                 if (asset.item_type == "glb") {
-                                    // let assetUserID = asset.userID;
+                                    const assetUserID = asset.userID;
                                     // var sourcePath =   "servicemedia/users/" + assetUserID + "/gltf/" + locMdl.gltf; //this should be "model" or "filename"
                                     (async () => {
                                         // let modelURL = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + asset.userID + "/gltf/" + asset.filename, Expires: 6000});
@@ -2928,7 +2993,7 @@ webxr_router.get('/:_id', function (req, res) {
                                                     let physicsMod = "";
                                                     let shape = 'hull';
                                                     let groundMod = "";
-                                                    console.log("locMdl " + JSON.stringify(locMdl));
+                                                    // console.log("locMdl deets " + JSON.stringify(locMdl));
                                                     if (locMdl.eventData.toLowerCase().includes('physics')){ //ammo for now // no add in mod_model (where model isloaded)
                                                         //hrm, maybe 
                                                     }
@@ -3151,12 +3216,12 @@ webxr_router.get('/:_id', function (req, res) {
                                 // console.log("didn't find next scene");
                             } else {
                                 nextLink = "href=\x22../" + scene.short_id + "\x22";    
-                                sceneNextScene = scene.short_id;
+                                // sceneNextScene = scene.short_id;
                             }
                         }); 
                     } else {
                         nextLink = "href=\x22../4K94Gjtw7\x22";    
-                        sceneNextScene = "4K94Gjtw7";
+                        // sceneNextScene = "4K94Gjtw7";
                     }
                     if (sceneResponse.scenePreviousScene != null && sceneResponse.scenePreviousScene != "") {
                         db.scenes.findOne({$or: [ { short_id: sceneResponse.scenePreviousScene }, { sceneTitle: sceneResponse.scenePreviousScene } ]}, function (err, scene) {
@@ -3520,7 +3585,7 @@ webxr_router.get('/:_id', function (req, res) {
                                     "src: [\x22"+ambientOggUrl+"\x22,\x22"+ambientMp3Url+"\x22], volume: 0, loop: true" + 
                                 "});" +
                             "ambientAudioHowl.load();</script>";
-                            ambientAudioControl = "<script src=\x22../main/src/component/ambient-audio-control.js\x22></script>";
+                            //ambientAudioControl = "<script src=\x22../main/src/component/ambient-audio-control.js\x22></script>";
                             let ambientPosAnim = "animation__yoyo=\x22property: position; to: -25 1 0; dur: 60000; dir: alternate; easing: easeInSine; loop: true;\x22 ";
                             let ambientRotAnim = "animation__rot=\x22property:rotation; dur:60000; to: 0 360 0; loop: true; easing:linear;\x22 ";        
                             // posAnim = "animation__pos=\x22property: position; to: random-position; dur: 15000; loop: true;";  
@@ -3569,7 +3634,7 @@ webxr_router.get('/:_id', function (req, res) {
                 },
 
                 function (video_items, callback) { //add the signed URLs to the obj array
-                    preloadVideo = true; //FOR NOW - testing on ios, need to set a toggle for this...
+                    // let preloadVideo = true; //FOR NOW - testing on ios, need to set a toggle for this...
               
                     if (video_items != null && video_items[0] != null) { //only single vid for now, need to loop array
 
@@ -3693,7 +3758,7 @@ webxr_router.get('/:_id', function (req, res) {
                                     } else {
                                         async.each(videos, function(video, cbimage) { //jack in a signed url for each
                                             // video.url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + video.userID + "/video/" + video._id + "/" + video._id + "." + video.filename, Expires: 6000}); //TODO: puthemsina video folder!
-                                            video.url = ReturnPresignedUrlSync(process.env.S3_ROOT_BUCKET_NAME, 'users/' + video.userID + "/video/" + video._id + "/" + video._id + "." + video.filename, 6000);
+                                            video.url = ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + video.userID + "/video/" + video._id + "/" + video._id + "." + video.filename, 6000);
                                             
                                             cbimage();
                                         }, 
@@ -3821,7 +3886,7 @@ webxr_router.get('/:_id', function (req, res) {
                         if (hasTriggerAudio) {
                             triggerAudioSliderChunk = "<span id=\x22triggerAudioVolume\x22>Trigger Volume</span><div class=\x22slidecontainer\x22><input type=\x22range\x22 min=\x22-80\x22 max=\x2220\x22 value=\x22"+sceneTriggerVolume+"\x22 class=\x22slider\x22 id=\x22triggerAudioVolumeSlider\x22></div>";
                         }
-                        userText = "<div class=\x22smallfont\x22><span id=\x22userName\x22 class=\x22\x22>Welcome " + avatarName+ "</span>!&nbsp;&nbsp;<button onclick=\x22Disconnect()\x22 type=\x22button\x22 class=\x22btn\x22>Disconnect</button></div><hr>";
+                        let userText = "<div class=\x22smallfont\x22><span id=\x22userName\x22 class=\x22\x22>Welcome " + avatarName+ "</span>!&nbsp;&nbsp;<button onclick=\x22Disconnect()\x22 type=\x22button\x22 class=\x22btn\x22>Disconnect</button></div><hr>";
                         if (isGuest) {
                             userText = "<div><span id=\x22userName\x22 class=\x22smallfont\x22>Welcome Guest known as " + avatarName+ "</span>"+
                             //loginLink +
@@ -3918,7 +3983,8 @@ webxr_router.get('/:_id', function (req, res) {
                                     console.log("error getting postcard " + postcard._id + err);
                                     callback(err);
                                 } else {
-                                    // postcard1 = ReturnPresignedUrlSync(process.env.S3_ROOT_BUCKET_NAME, 'users/' + picture_item.userID +"/pictures/"+ picture_item._id + ".standard." + picture_item.filename, 6000); //just return a single 
+                                    (async () => {
+                                    postcard1 = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + picture_item.userID +"/pictures/"+ picture_item._id + ".standard." + picture_item.filename, 6000); //just return a single 
                                     // // console.log("postcard1 " + postcard1);
                                     // callback(null);
                                     var params = {
@@ -3926,31 +3992,62 @@ webxr_router.get('/:_id', function (req, res) {
                                         Key: "postcards/" + sceneResponse.short_id + "/"+ postcard + ".standard." + picture_item.filename //put in postcards folder instead of root, duh
                                     }
                                     //todo - MINIO support
-                                    s3.headObject(params, function(err, data) { //check that the postcard is pushed to static route
-                                        if (err) {
-                                            console.log("postcard missing from static route, tryna copy to " + sceneResponse.sceneDomain);
-                                            s3.copyObject({Bucket: bucketFolder, CopySource: 'servicemedia/users/' + picture_item.userID +"/pictures/"+ picture_item._id + ".standard." + picture_item.filename,
-                                                Key: "postcards/" + sceneResponse.short_id + "/"+ picture_item._id + ".standard." + picture_item.filename}, function (err, data) {
-                                                if (err) {
-                                                    console.log("ERROR copyObject" + err);
-                                                    callback();
-                                                } else {
-                                                    console.log('SUCCESS copyObject');
+                                    
+                                    // const headCommand = new HeadObjectCommand({
+                                    //     Bucket: bucketFolder,
+                                    //     Key: "postcards/" + sceneResponse.short_id + "/"+ postcard + ".standard." + picture_item.filename
+                                    // });
+                                    
+                                    // try {
+                                    //     const data = s3.send(headCommand);
+                                    //     console.log(data)
+                                    // } catch (error) {
+                                    //     console.log(error);
+                                    // }
+
+                                    //v3 way?
+                                    // (async () => {
+                                        // const fileData = ReturnObjectExists(bucketFolder, "postcards/" + sceneResponse.short_id + "/"+ postcard + ".standard." + picture_item.filename);
+                                        // if (fileData.exists == true) { //s3 headObject
+                                        //     console.log("head yes");
+                                        //     callback();
+                                                                                
+                                        // } else {
+                                        //     console.log("head no, copying postcard to static route...");
+                                        //     const data = CopyObject(bucketFolder, 
+                                        //         process.env.S3_ROOT_BUCKET_NAME + "users/" + picture_item.userID +"/pictures/"+ picture_item._id + ".standard." + picture_item.filename, 
+                                        //         "postcards/" + sceneResponse.short_id + "/"+ picture_item._id + ".standard." + picture_item.filename);
+                                        //     console.log("head no, copying postcard to static route...");
+                                        //     callback();
+                                        // }
+                                    // });
+                                    callback();
+                                    // s3.headObject(params, function(err, data) { //check that the postcard is pushed to static route
+                                    //     if (err) {
+                                    //         console.log("postcard missing from static route, tryna copy to " + sceneResponse.sceneDomain);
+                                    //         s3.copyObject({Bucket: bucketFolder, CopySource: 'servicemedia/users/' + picture_item.userID +"/pictures/"+ picture_item._id + ".standard." + picture_item.filename,
+                                    //             Key: "postcards/" + sceneResponse.short_id + "/"+ picture_item._id + ".standard." + picture_item.filename}, function (err, data) {
+                                    //             if (err) {
+                                    //                 console.log("ERROR copyObject" + err);
+                                    //                 callback();
+                                    //             } else {
+                                    //                 console.log('SUCCESS copyObject');
                                                     
                                                    
-                                                    postcard1 = sceneResponse.sceneDomain +"/postcards/"+sceneResponse.short_id +"/"+ picture_item._id + ".standard." + picture_item.filename;
+                                    //                 postcard1 = sceneResponse.sceneDomain +"/postcards/"+sceneResponse.short_id +"/"+ picture_item._id + ".standard." + picture_item.filename;
                                                    
-                                                    callback();
-                                                }
-                                            });
-                                        } else {
+                                    //                 callback();
+                                    //             }
+                                    //         });
+                                    //     } else {
                                             
-                                            postcard1 = "http://" + bucketFolder +"/postcards/"+sceneResponse.short_id +"/"+ picture_item._id + ".standard." + picture_item.filename;
-                                            console.log("gotsa postcard " + postcard1 );
-                                            callback();
-                                        }
+                                    //         postcard1 = "http://" + bucketFolder +"/postcards/"+sceneResponse.short_id +"/"+ picture_item._id + ".standard." + picture_item.filename;
+                                    //         console.log("gotsa postcard " + postcard1 );
+                                    //         callback();
+                                    //     }
                                         
-                                    });
+                                    // });
+                                    })();
                                 }
                             });
                         //             }
@@ -4202,7 +4299,7 @@ webxr_router.get('/:_id', function (req, res) {
                                             }
                                             if (picture_item.useTarget != undefined && picture_item.useTarget != "") { //used by mindar - good stuff!
                                                 console.log("GOTSA urlTarget " + picture_item.urlTarget);
-                                                const targetURL = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + picture_item.userID + "/pictures/targets/" + picture_item._id + ".mind", Expires: 6000});
+                                                const targetURL = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + picture_item.userID + "/pictures/targets/" + picture_item._id + ".mind");
                                                 arImageTargets.push(targetURL);
                                             
 
@@ -4281,39 +4378,54 @@ webxr_router.get('/:_id', function (req, res) {
                                 callback(null);
                             } else {
                                 let theKey = 'users/' + picture_item.userID + '/pictures/originals/' + picture_item._id + '.original.' + picture_item.filename; //TODO cook smaller equirect versions?
-                                // console.log("theKey " + theKey);
-                                const params = {
-                                    Bucket: process.env.S3_ROOT_BUCKET_NAME, 
-                                    Key: theKey
-                                };
-                                s3.headObject(params, function(err, data) { //some old skyboxen aren't saved with .original. in filename, check for that
-                                    
-                                    if (err) {
-                                        // console.log("din't find skybox: " + err);
-                                        theKey = 'users/' + picture_item.userID + '/pictures/originals/' + picture_item.filename;
+                                
+                                //some old skyboxen aren't saved with .original. in filename, check for that
+                                // if (!ReturnObjectExists(process.env.S3_ROOT_BUCKET_NAME, theKey)) {
+                                //     theKey = 'users/' + picture_item.userID + '/pictures/originals/' + picture_item.filename;
+                                // } 
+                                (async () => {
+                                    skyboxUrl = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, theKey, 6000);
+                                    skyboxAsset = "<img id=\x22sky\x22 crossorigin=\x22anonymous\x22 src='" + skyboxUrl + "'>";
+                                    if (sceneResponse.sceneUseSkybox) {
+                                        skySettings = "<a-sky id=\x22a_sky\x22 crossorigin=\x22anonymous\x22 hide-on-enter-ar skybox_dynamic></a-sky>";
                                     }
+                                    callback(null);
+                                })();
+                                    
+                                // console.log("theKey " + theKey);
+                                // const params = {
+                                //     Bucket: process.env.S3_ROOT_BUCKET_NAME, 
+                                //     Key: theKey
+                                // };
+                                
+                                // s3.headObject(params, function(err, data) { /
+                                    
+                                //     if (err) {
+                                //         // console.log("din't find skybox: " + err);
+                                //         theKey = 'users/' + picture_item.userID + '/pictures/originals/' + picture_item.filename;
+                                //     }
                                
-                                // let skyboxUrl = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: theKey, Expires: 6000});
-                                    (async () => {
-                                        skyboxUrl = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, theKey, 6000);
-                                        // console.log("skyboxURL is " + skyboxUrl);
-                                        skyboxAsset = "<img id=\x22sky\x22 crossorigin=\x22anonymous\x22 src='" + skyboxUrl + "'>";
+                                // // let skyboxUrl = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: theKey, Expires: 6000});
+                                //     (async () => {
+                                //         skyboxUrl = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, theKey, 6000);
+                                //         // console.log("skyboxURL is " + skyboxUrl);
+                                //         skyboxAsset = "<img id=\x22sky\x22 crossorigin=\x22anonymous\x22 src='" + skyboxUrl + "'>";
 
-                                        if (sceneResponse.sceneUseSkybox) {
-                                            // theKey = 'users/' + picture_item.userID + '/pictures/originals/' + picture_item.filename;
-                                            // skyboxUrl = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: theKey, Expires: 6000});
-                                            // skyboxAsset = "<img id=\x22sky\x22 crossorigin=\x22anonymous\x22 src='" + skyboxUrl + "'>";
+                                //         if (sceneResponse.sceneUseSkybox) {
+                                //             // theKey = 'users/' + picture_item.userID + '/pictures/originals/' + picture_item.filename;
+                                //             // skyboxUrl = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: theKey, Expires: 6000});
+                                //             // skyboxAsset = "<img id=\x22sky\x22 crossorigin=\x22anonymous\x22 src='" + skyboxUrl + "'>";
                                         
-                                            // let envMap = sceneResponse.sceneUseDynCubeMap ? "convert-to-envmap" : "";
-                                            skySettings = "<a-sky id=\x22a_sky\x22 crossorigin=\x22anonymous\x22 hide-on-enter-ar skybox_dynamic></a-sky>";
-                                            // aframeEnvironment = "";
-                                            // hemiLight = "<a-light id=\x22hemi-light\x22 type=\x22hemisphere\x22 color=\x22" + sceneResponse.sceneColor1 + "\x22 groundColor=\x22" + sceneResponse.sceneColor2 + "\x22 intensity=\x221\x22 position\x220 0 0\x22>"+
-                                            // "</a-light>";
-                                        }
-                                        callback(null);
-                                    })();
+                                //             // let envMap = sceneResponse.sceneUseDynCubeMap ? "convert-to-envmap" : "";
+                                //             skySettings = "<a-sky id=\x22a_sky\x22 crossorigin=\x22anonymous\x22 hide-on-enter-ar skybox_dynamic></a-sky>";
+                                //             // aframeEnvironment = "";
+                                //             // hemiLight = "<a-light id=\x22hemi-light\x22 type=\x22hemisphere\x22 color=\x22" + sceneResponse.sceneColor1 + "\x22 groundColor=\x22" + sceneResponse.sceneColor2 + "\x22 intensity=\x221\x22 position\x220 0 0\x22>"+
+                                //             // "</a-light>";
+                                //         }
+                                //         callback(null);
+                                //     })();
 
-                                });
+                                // });
                             }
                         });
                     } else {
@@ -4450,8 +4562,7 @@ webxr_router.get('/:_id', function (req, res) {
                     // }
 
 
-                    // settings.sceneAmbientAudioGroups = sceneResponse.sceneAmbientAudioGroups;
-                    // settings.scenePrimaryAudioGroups = sceneResponse.scenePrimaryAudioGroups;
+                 
                     var sbuff = Buffer.from(JSON.stringify(settings)).toString("base64");
                     settingsData = "<div id=\x22settingsDataElement\x22 data-settings=\x22"+sbuff+"\x22></div>";
 
@@ -4459,7 +4570,7 @@ webxr_router.get('/:_id', function (req, res) {
                         var tebuff = Buffer.from(JSON.stringify(sceneResponse.sceneTimedEvents)).toString("base64");
                         sceneTimedEventsData = "<div id=\x22timedEventsDataElement\x22 data-timedevents=\x22"+tebuff+"\x22></div>";
                     }
-                    // settingsDataEntity = "<a-entity id=\x22settingsDataEntity\x22 data-settings=\x22"+sbuff+"\x22></a-entity>"; ? maybe
+
 
                     let grabMix = "<a-mixin id=\x22grabmix\x22" + //mixin for grabbable objex
                         "event-set__grab=\x22material.color: #FFEF4F\x22" +
@@ -4472,8 +4583,7 @@ webxr_router.get('/:_id', function (req, res) {
                         "event-set__mouseup=\x22material.color: #F2E646\x22" +
                         "geometry=\x22primitive: box; height: 0.30; width: 0.30; depth: 0.30\x22" +
                         "material=\x22color: #EF2D5E;\x22></a-mixin>";
-                    // let primaryAudioScript = ""
-                    // <a-assets>
+
                     let playerAvatarTemplate = "";
                     if (sceneResponse.sceneWebType != undefined && (sceneResponse.sceneWebType.toLowerCase() == "aframe" || sceneResponse.sceneWebType.toLowerCase() == "default")) { // and what else?  networking isOn?
                         playerAvatarTemplate = "<template id=\x22avatar-template\x22>"+ 
@@ -4491,11 +4601,7 @@ webxr_router.get('/:_id', function (req, res) {
                     let handsTemplate = "";
                     // let aframeRenderSettings = "renderer=\x22antialias: true; logarithmicDepthBuffer: true; colorManagement: true; sortObjects: true; physicallyCorrectLights: true; alpha: true; maxCanvasWidth: 1920; maxCanvasHeight: 1920;\x22";
                     let aframeRenderSettings = "renderer=\x22colorManagement: true; physicallyCorrectLights: true; exposure: .2; sortObjects: true; maxCanvasWidth: 1920; maxCanvasHeight: 1920;\x22";
-                    // let aframeRenderSettings = "renderer=\x22exposure: 2\x22";
-                   
-                    // if (arMode == "spawn") {
-                    //     arHitTest = "<a-entity show-in-ar-mode visible=\x22false\x22 id=\x22reticleEntity\x22 gltf-model=\x22#reticle2\x22 scale=\x220.8 0.8 0.8\x22 ar-hit-test-spawn=\x22mode: "+arMode+"\x22></a-entity>\n"; //for ar spawning...
-                    // }    
+     
                     //scenetype filters below...
 
                     console.log("sceneWebType: "+ sceneResponse.sceneWebType); 
@@ -4521,7 +4627,7 @@ webxr_router.get('/:_id', function (req, res) {
                             // xrmode = "xr";
                         }
                         if (sceneResponse.sceneTags && sceneResponse.sceneTags.includes("hand controls") || sceneResponse.sceneTags.includes("hand controllers")) {
-                            meshUtilsScript = meshUtilsScript + "<script src=\x22../main/src/component/hand_equip.js\x22>";
+                            meshUtilsScript = meshUtilsScript + "<script src=\x22../main/src/component/hand_equip.js\x22></script>";
                         }
                         // webxrFeatures = " webxr=\x22requiredFeatures: dom-overlay; optionalFeatures: hit-test; overlayElement: #ar_overlay;\x22 ar-hit-test=\x22enabled: true; target: #ar_parent;\x22 "; //otherwise hit-test breaks everythign!
                         // requiredFeatures: hit-test,local-floor; optionalFeatures: dom-overlay,unbounded; overlayElement: #ar_overlay;"
@@ -5543,6 +5649,6 @@ webxr_router.get('/:_id', function (req, res) {
 ///// END PRIMARY SERVERSIDE /webxr/ ROUTE //////////////////////
 
 
+export default webxr_router;
 
-
-module.exports = webxr_router;
+// module.exports = webxr_router;

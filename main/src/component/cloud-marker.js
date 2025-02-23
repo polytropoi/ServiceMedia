@@ -1079,21 +1079,21 @@ AFRAME.registerComponent('cloud_marker', { //special items saved upstairs
               const picBuffer = localData.localFiles[key].data;
               const picBlob = new Blob([picBuffer]);
               picUrl = URL.createObjectURL(picBlob);
-              const obj = this.el.getObject3D('mesh');
+              let obj = this.el.getObject3D('mesh');
               
               var texture = new THREE.TextureLoader().load(picUrl);
               texture.colorSpace = THREE.SRGBColorSpace;
               // UVs use the convention that (0, 0) corresponds to the upper left corner of a texture.
               texture.flipY = false; 
               // immediately use the texture for material creation
-              var material = new THREE.MeshStandardMaterial( { map: texture, transparent: this.picData.hasAlphaChannel, envMapIntensity: .1 } );  
+              var material = new THREE.MeshStandardMaterial( { map: texture, transparent: false, envMapIntensity: .1 } );  
               // Go over the submeshes and modify materials we want.
               material.needsUpdate = true;
-              obj.traverse(node => {
-                node.material = material;
-                
-
-              });
+              if (obj) {
+                  obj.traverse(node => {
+                  node.material = material;
+                });
+              }
               if (!this.data.tags.includes("fixed")) {
                 this.el.setAttribute("look-at", "#player");
               } else {

@@ -1,3 +1,8 @@
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+
+
+// import { app } from '../server.js'; 
 const express = require("express");
 const landing_router = express.Router();
 const entities = require("entities");
@@ -9,11 +14,16 @@ const jwt = require("jsonwebtoken");
 const requireText = require('require-text');
 const { Console } = require("console");
 const minio = require('minio');
-// let minio = app.get('minio');
-let db = app.get('db');
-let s3 = app.get('s3'); 
+
+
+import { db } from "../server.js";
+// import { s3 } from "../server.js";
+import { ReturnPresignedUrl, ReturnObjectMetadata, ReturnObjectExists, CopyObject } from "../server.js";
+
 const stripe = require('stripe')(process.env.STRIPE_KEY);
 const endpointSecret = process.env.STRIPE_ENDPOINT_SECRET;
+
+
 
 var minioClient = null;
 if (process.env.MINIOKEY && process.env.MINIOKEY != "" && process.env.MINIOENDPOINT && process.env.MINIOENDPOINT != "") {
@@ -103,68 +113,68 @@ console.log(aRgb); //[21, 2, 190]
     return aRgb;
 }
 
-function ReturnPresignedUrlSync (bucket, key, time) {
-    if (minioClient) {
-        minioClient.presignedGetObject(bucket, key, time, function(err, presignedUrl) { //use callback version here, can't await?
-            if (err) {
-                console.log(err);
-                return "err";
-            } else {
-                console.log("minio sync url " + presignedUrl)
-               return presignedUrl;
+// function ReturnPresignedUrlSync (bucket, key, time) {
+//     if (minioClient) {
+//         minioClient.presignedGetObject(bucket, key, time, function(err, presignedUrl) { //use callback version here, can't await?
+//             if (err) {
+//                 console.log(err);
+//                 return "err";
+//             } else {
+//                 console.log("minio sync url " + presignedUrl)
+//                return presignedUrl;
                 
-            }
-        });
-    } else {
-        let url = s3.getSignedUrl('getObject', {Bucket: bucket, Key: key, Expires: time});
-        console.log("s3 sync url" + url);
-        return url;
-    }
-}
-async function ReturnPresignedUrl(bucket, key, time) {
+//             }
+//         });
+//     } else {
+//         let url = s3.getSignedUrl('getObject', {Bucket: bucket, Key: key, Expires: time});
+//         console.log("s3 sync url" + url);
+//         return url;
+//     }
+// }
+// async function ReturnPresignedUrl(bucket, key, time) {
     
-    if (minioClient) {
-        try {
-            return minioClient.presignedGetObject(bucket, key, time);
-        } catch (error) {
-            return error
-        }
-    } else {
-        try {
-            return s3.getSignedUrl('getObject', {Bucket: bucket, Key: key, Expires: time}); //returns a promise if called in async function?
-        } catch (error) {
-            return error;
-        } 
-    }
-}
-app.post('/create-checkout-session', async (req, res) => {
-    const session = await stripe.checkout.sessions.create({
+//     if (minioClient) {
+//         try {
+//             return minioClient.presignedGetObject(bucket, key, time);
+//         } catch (error) {
+//             return error
+//         }
+//     } else {
+//         try {
+//             return s3.getSignedUrl('getObject', {Bucket: bucket, Key: key, Expires: time}); //returns a promise if called in async function?
+//         } catch (error) {
+//             return error;
+//         } 
+//     }
+// }
+// app.post('/create-checkout-session', async (req, res) => {
+//     const session = await stripe.checkout.sessions.create({
   
-      line_items: [
-        {
-          price_data: {
-            currency: 'usd',
-            product_data: {
-              name: 'super cool immersive rock show',
-            },
-            unit_amount: 2000,
-          },
-          quantity: 1,
-        },
-      ],
-      mode: 'payment',
-      success_url: process.env.ROOT_HOST +'/stripe_events',
-      cancel_url: process.env.ROOT_HOST +'/static/cancel.html',
-      payment_intent_data: {
-        metadata: {
-          product_id: '1000',
-          product_name: 'super cool immersive rock show!'
-        }
-      }
-    });
+//       line_items: [
+//         {
+//           price_data: {
+//             currency: 'usd',
+//             product_data: {
+//               name: 'super cool immersive rock show',
+//             },
+//             unit_amount: 2000,
+//           },
+//           quantity: 1,
+//         },
+//       ],
+//       mode: 'payment',
+//       success_url: process.env.ROOT_HOST +'/stripe_events',
+//       cancel_url: process.env.ROOT_HOST +'/static/cancel.html',
+//       payment_intent_data: {
+//         metadata: {
+//           product_id: '1000',
+//           product_name: 'super cool immersive rock show!'
+//         }
+//       }
+//     });
   
-    res.redirect(303, session.url);
-  });
+//     res.redirect(303, session.url);
+//   });
 
 
 //   function saveTraffic (req, res, next) {
@@ -517,7 +527,7 @@ landing_router.get('/:_id', function (req, res) {
     let aframeExtrasScript = "<script src=\x22../main/vendor/aframe/animation-mixer.js\x22></script>"; //swapped with full aframe-extras lib (that includes animation-mixer) for physics and navmesh if needed
     // let aframeExtrasScript = "<script src=\x22../main/src/component/aframe-extras.min.js\x22></script>"; 
     let logScripts = "";
-    enviromentScript = ""; //for aframe env component
+    let enviromentScript = ""; //for aframe env component
     
     // let aframeScriptVersion = "<script src=\x22https://aframe.io/releases/1.3.0/aframe.min.js\x22></script>";
     let aframeScriptVersion = "<script src=\x22https://aframe.io/releases/1.4.2/aframe.min.js\x22></script>";
@@ -780,38 +790,10 @@ landing_router.get('/:_id', function (req, res) {
                         sceneOwnerID = sceneData.user_id;
                         short_id = sceneData.short_id;
                         sceneResponse = sceneData;
-                        sceneNextScene = sceneResponse.sceneNextScene;
-                        let poiIndex = 0;
-                        scenePreviousScene = sceneResponse.scenePreviousScene;
-                        //////////////networked aframe below, rem for now... 
-                        /*
-                                    console.log("sceneResponse.sceneNetworking " + sceneResponse.sceneNetworking); //for networked aframe, baybe bring it back
-                                    if (sceneResponse.sceneNetworking == "SocketIO")
-                                    networkedscene = "networked-scene=\x22serverURL: "+socketHost+"; app: "+sceneData.sceneDomain+" ; room: "+sceneData.short_id+"; connectOnLoad: true; onConnect: onConnect; adapter: socketio; audio: false; debug: false;\x22";
-                                    if (sceneResponse.sceneNetworking == "WebRTC")
-                                    networkedscene = "networked-scene=\x22serverURL: "+socketHost+"; app: "+sceneData.sceneDomain+" ; room: "+sceneData.short_id+"; connectOnLoad: true; onConnect: onConnect; adapter: webrtc; audio: false; debug: false;\x22";
-                                    if (sceneResponse.sceneNetworking == "AudioChat")
-                                    networkedscene = "networked-scene=\x22serverURL: "+socketHost+"; app: "+sceneData.sceneDomain+" ; room: "+sceneData.short_id+"; connectOnLoad: true; onConnect: onConnect; adapter: webrtc; audio: true; debug: false;\x22";
-                                    if (sceneResponse.sceneNetworking != "None") {
-                                    networkingEntity = "<a-entity look-at=\x22#player\x22 position=\x22-8 1.1 -12\x22>" +
-                                    "<a-entity naf-connect=\x22avatarName:"+avatarName+"\x22 class=\x22gltf\x22 gltf-model=\x22#groupicon\x22 material=\x22shader: noise;\x22 class=\x22activeObjexGrab activeObjexRay\x22>"+
-                                        // "<a-text id=\x22statusText\x22 look-at=\x22#player\x22 rotation=\x220 180 0\x22 position=\x220 .5 0\x22 value=\x22\x22></a-text>"+
-                                    "</a-entity>"+
-                                        "<a-entity visible=\x22false\x22 id=\x22statusText\x22 geometry=\x22primitive: plane; width: 1.5; height: 1.5\x22 position=\x220 2.1 -1\x22 material=\x22color: grey; transparent: true; opacity: 0.0\x22" +
-                                            "text=\x22value:status:; wrapCount: 20;\x22>" +
-                                            "<a-entity class=\x22gltf\x22 gltf-model=\x22#square_panel\x22 scale=\x221.5 1.5 1.5\x22 position=\x220 -.25 -.5\x22></a-entity>" +
-                                        "</a-entity>"+
-                                    "</a-entity>";
-                                    }
-                        */
-                        //////////////////////
-                        // console.log("networking: " + networkingEntity);
 
-                        // if (sceneResponse.sceneDomain != null && sceneResponse.sceneDomain != "") {
-                        //     bucketFolder = sceneResponse.sceneDomain;
-                        // } else {
-                        //     callback(err);
-                        // }
+                        let poiIndex = 0;
+
+                      
                         if (sceneResponse.scenePictures != null && sceneResponse.scenePictures.length > 0) {
                             sceneResponse.scenePictures.forEach(function (picture) {
                                 // console.log("scenePIcture " + picture);
@@ -834,9 +816,7 @@ landing_router.get('/:_id', function (req, res) {
                                 geoEntity = "gps-position";
                             }
                             for (var i = 0; i < sceneResponse.sceneLocations.length; i++) {
-                                // console.log("gotsa location markter with type " + sceneResponse.sceneLocations[i].markerType);
-                                // console.log("sceneLocationTracking is " +sceneResponse.sceneLocationTracking && );
-                                // console.log("sceneLocraitons are a thing and sceneLocationTracking is " +sceneResponse.sceneLocationTracking + " " + sceneResponse.sceneLocations[i].type);
+                               
                                 if ((sceneResponse.sceneLocationTracking != null && sceneResponse.sceneLocationTracking == true) || sceneResponse.sceneWebType == "AR Location Tracking") {  
 
                                     if (sceneResponse.sceneLocations[i].type.toLowerCase() == "geographic") { //just to set scripts and restrict to location
@@ -932,15 +912,7 @@ landing_router.get('/:_id', function (req, res) {
                                 }
                                 // let zFix = parseFloat(sceneResponse.sceneLocations[i].z) * -1; //nevermind? fix rots in Unity or whatever
                                 let zFix = parseFloat(sceneResponse.sceneLocations[i].z); //does nothing    
-                                // console.log("loc with model? " + JSON.stringify(sceneResponse.sceneLocations[i]));
-                                //REM THIS?
-                                // if (sceneResponse.sceneLocations[i].markerType == "gltf" || sceneResponse.sceneLocations[i].gltf != null) { //old way, deprecated but still in use...//?
-                                    
-                                //     sceneGLTFLocations.push(sceneResponse.sceneLocations[i]);
-                                //     if (sceneResponse.sceneLocations[i].eventData != null && sceneResponse.sceneLocations[i].eventData.length > 4) {
-                                //         animationComponent = "<script src=\x22https://unpkg.com/aframe-animation-component@5.1.2/dist/aframe-animation-component.min.js\x22></script>"; //unused!  NEEDS FIXING - this component could be added more than once
-                                //     }
-                                // }
+                             
 
                                 if (sceneResponse.sceneLocations[i].objectID != undefined && sceneResponse.sceneLocations[i].objectID != "none" && sceneResponse.sceneLocations[i].objectID.length > 8) { //attaching object to location 
                                     // console.log("pushinbg object locaition " + sceneResponse.sceneLocations[i]);
@@ -969,29 +941,15 @@ landing_router.get('/:_id', function (req, res) {
                                         if (!tLoc.markerObjScale) {
                                             tLoc.markerObjScale = 1;
                                         }
-                                        // if (tLoc.model == undefined) {
-                                        //     if (tLoc.markerType == "mailbox")
-                                        //     tLoc.model = "#mailbox";
-                                        // }
-                                        // tLoc.markerObjScale = (parseFloat(tLoc.markerObjScale) != undefined && parseFloat(tLoc.markerObjScale) != null) ? parseFloat(tLoc.markerObjScale) : 1;
-                                        // console.log("TRYNA SET PLACEHOLDER LOCATION : " + JSON.stringify(tLoc) );
+                                    
                                         locationPlaceholders.push(tLoc);
                                     }
 
                                 }
                                 if (sceneResponse.sceneLocations[i].markerType == "player") {
-                                    let yFix = sceneResponse.sceneLocations[i].y;
-                                    // if (sceneResponse.sceneWebXREnvironment != null && sceneResponse.sceneWebXREnvironment != "none" && sceneResponse.sceneWebXREnvironment != "") {
-                                    //     yFix = 0;
-                                    //     playerPosition = sceneResponse.sceneLocations[i].x + " " + yFix + " " + zFix;
-                                    //     console.log("player sceneWebXREnvironment position: " + playerPosition);
-                                    // } else if (sceneResponse.sceneGroundLevel != null && sceneResponse.sceneGroundLevel != undefined && sceneResponse.sceneGroundLevel != 0 && sceneResponse.sceneGroundLevel != "0") {
-                                    //     yFix = sceneResponse.sceneGroundLevel;
-                                    //     playerPosition = sceneResponse.sceneLocations[i].x + " " + yFix + " " + zFix;
-                                    //     console.log("player position: " + playerPosition);
-                                    // } else {
+                                    
                                         playerPosition = sceneResponse.sceneLocations[i].x + " " +  sceneResponse.sceneLocations[i].y + " " +  sceneResponse.sceneLocations[i].z;
-                                    // }
+                               
                                 }
                                 if (sceneResponse.sceneLocations[i].markerType == "text") {
                                     textLocation = sceneResponse.sceneLocations[i].x + " " + sceneResponse.sceneLocations[i].y + " " + zFix; //TODO - these must all be arrays, like sceneModelLocations above!
@@ -1044,9 +1002,7 @@ landing_router.get('/:_id', function (req, res) {
                                 if (sceneResponse.sceneLocations[i].markerType == "car") {
                                     carLocation = sceneResponse.sceneLocations[i].x + " " + sceneResponse.sceneLocations[i].y + " " + zFix;
                                 }
-                                if (sceneResponse.sceneLocations[i].markerType != undefined && sceneResponse.sceneLocations[i].markerType.toLowerCase().includes('picture')) {
-                                    pictureLocation = sceneResponse.sceneLocations[i].x + " " + sceneResponse.sceneLocations[i].y + " " + zFix;
-                                }
+                              
                                 if (sceneResponse.sceneLocations[i].markerType == "picturegroup") {
                                     
                                     picturegroupLocation = sceneResponse.sceneLocations[i].x + " " + sceneResponse.sceneLocations[i].y + " " + zFix;
@@ -1187,13 +1143,13 @@ landing_router.get('/:_id', function (req, res) {
                                 "<div class=\x22previous_button\x22 style=\x22color: rgba(255, 255, 255, 0.75); float: right; margin: 5px 5px;\x22 onclick=\x22PreviousButton()\x22><i class=\x22fas fa-step-backward fa-2x\x22></i></div>"+
                                 "<div id=\x22transportStats\x22 style=\x22color: rgba(255, 255, 255, 0.75); float: right; margin: 5px 5px; text-align: left\x22></div></div>";                                
 
-                                transportButtonsWithSlider = "<div class=\x22transport_buttons\x22><div class=\x22sslidecontainer\x22><input type=\x22range\x22 min=\x221\x22 max=\x22100\x22 value=\x221\x22 class=\x22sslider\x22 id=\x22mainTransportSlider\x22>"+
-                                "</div><div id=\x22transportStats\x22 style=\x22color: rgba(255, 255, 255, 0.75); float: left; margin: 5px 5px; text-align: left\x22></div>"+
-                                "<div class=\x22next_button\x22 style=\x22color: rgba(255, 255, 255, 0.75); float: right; margin: 5px 5px;\x22 onclick=\x22NextButton()\x22><i class=\x22fas fa-step-forward fa-2x\x22></i></div>"+
-                                "<div class=\x22ffwd_button\x22 style=\x22color: rgba(255, 255, 255, 0.75); float: right; margin: 5px 5px;\x22 onclick=\x22FastForwardButton()\x22><i class=\x22fas fa-forward fa-2x\x22></i></div>"+
-                                "<div class=\x22play_button\x22 id=\x22transportPlayButton\x22 style=\x22color: rgba(255, 255, 255, 0.75); float: right; margin: 5px 5px;\x22 onclick=\x22TransportPlayButton()\x22><i class=\x22fas fa-play-circle fa-2x\x22></i></div>" +
-                                "<div class=\x22rewind_button\x22 style=\x22color: rgba(255, 255, 255, 0.75); float: right; margin: 5px 5px;\x22 onclick=\x22RewindButton()\x22><i class=\x22fas fa-backward fa-2x\x22></i></div>"+
-                                "<div class=\x22previous_button\x22 style=\x22color: rgba(255, 255, 255, 0.75); float: right; margin: 5px 5px;\x22 onclick=\x22PreviousButton()\x22><i class=\x22fas fa-step-backward fa-2x\x22></i></div></div>";
+                                // transportButtonsWithSlider = "<div class=\x22transport_buttons\x22><div class=\x22sslidecontainer\x22><input type=\x22range\x22 min=\x221\x22 max=\x22100\x22 value=\x221\x22 class=\x22sslider\x22 id=\x22mainTransportSlider\x22>"+
+                                // "</div><div id=\x22transportStats\x22 style=\x22color: rgba(255, 255, 255, 0.75); float: left; margin: 5px 5px; text-align: left\x22></div>"+
+                                // "<div class=\x22next_button\x22 style=\x22color: rgba(255, 255, 255, 0.75); float: right; margin: 5px 5px;\x22 onclick=\x22NextButton()\x22><i class=\x22fas fa-step-forward fa-2x\x22></i></div>"+
+                                // "<div class=\x22ffwd_button\x22 style=\x22color: rgba(255, 255, 255, 0.75); float: right; margin: 5px 5px;\x22 onclick=\x22FastForwardButton()\x22><i class=\x22fas fa-forward fa-2x\x22></i></div>"+
+                                // "<div class=\x22play_button\x22 id=\x22transportPlayButton\x22 style=\x22color: rgba(255, 255, 255, 0.75); float: right; margin: 5px 5px;\x22 onclick=\x22TransportPlayButton()\x22><i class=\x22fas fa-play-circle fa-2x\x22></i></div>" +
+                                // "<div class=\x22rewind_button\x22 style=\x22color: rgba(255, 255, 255, 0.75); float: right; margin: 5px 5px;\x22 onclick=\x22RewindButton()\x22><i class=\x22fas fa-backward fa-2x\x22></i></div>"+
+                                // "<div class=\x22previous_button\x22 style=\x22color: rgba(255, 255, 255, 0.75); float: right; margin: 5px 5px;\x22 onclick=\x22PreviousButton()\x22><i class=\x22fas fa-step-backward fa-2x\x22></i></div></div>";
                                 
                                 dialogButton = "<div class=\x22dialog_button\x22 style=\x22color: rgba(255, 255, 255, 0.75); float: left; margin: 10px 10px;\x22 onclick=\x22SceneManglerModal('Welcome')\x22><i class=\x22fas fa-info-circle fa-2x\x22></i></div>";
                                
@@ -1406,58 +1362,58 @@ landing_router.get('/:_id', function (req, res) {
                    
                 },
             
-                function (callback) {
-                    var modelz = [];
-                //    console.log("sceneModels : " + JSON.stringify(sceneResponse.sceneModels));
-                    if (sceneResponse.sceneModels != null) {
-                        async.each (sceneResponse.sceneModels, function (objID, callbackz) { //nested async-ery!
-                            var oo_id = ObjectID(objID);
-                            // console.log("13904 tryna get sceneObject: " + objID);
-                            db.models.findOne({"_id": oo_id}, function (err, model) {
-                                if (err || !model) {
-                                    console.log("error getting model: " + objID); //todo - report? 
-                                    callbackz();
-                                } else {
-                                    // console.log("got user model:" + model._id);
-                                    if (minioClient) {
+                // function (callback) {
+                //     var modelz = [];
+                // //    console.log("sceneModels : " + JSON.stringify(sceneResponse.sceneModels));
+                //     if (sceneResponse.sceneModels != null) {
+                //         async.each (sceneResponse.sceneModels, function (objID, callbackz) { //nested async-ery!
+                //             var oo_id = ObjectID(objID);
+                //             // console.log("13904 tryna get sceneObject: " + objID);
+                //             db.models.findOne({"_id": oo_id}, function (err, model) {
+                //                 if (err || !model) {
+                //                     console.log("error getting model: " + objID); //todo - report? 
+                //                     callbackz();
+                //                 } else {
+                //                     // console.log("got user model:" + model._id);
+                //                     if (minioClient) {
 
-                                        minioClient.presignedGetObject(process.env.S3_ROOT_BUCKET_NAME, 'users/' + model.userID + "/gltf/" + model.filename, 6000, function(err, presignedUrl) { //use callback version here, can't await?
-                                            if (err) {
-                                                console.log(err);
-                                                callbackz(err);
-                                            } else {
-                                                model.url = presignedUrl;
-                                                modelz.push(model);
-                                                callbackz();
-                                            }
-                                        });    
-                                    } else { 
-                                        let url = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: 'users/' + model.userID + "/gltf/" + model.filename, Expires: 6000});
-                                        model.url = url;
-                                        modelz.push(model);
-                                        callbackz();
-                                    }
-                                }
-                            });
-                        }, function(err) {
+                //                         minioClient.presignedGetObject(process.env.S3_ROOT_BUCKET_NAME, 'users/' + model.userID + "/gltf/" + model.filename, 6000, function(err, presignedUrl) { //use callback version here, can't await?
+                //                             if (err) {
+                //                                 console.log(err);
+                //                                 callbackz(err);
+                //                             } else {
+                //                                 model.url = presignedUrl;
+                //                                 modelz.push(model);
+                //                                 callbackz();
+                //                             }
+                //                         });    
+                //                     } else { 
+                //                         let url = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: 'users/' + model.userID + "/gltf/" + model.filename, Expires: 6000});
+                //                         model.url = url;
+                //                         modelz.push(model);
+                //                         callbackz();
+                //                     }
+                //                 }
+                //             });
+                //         }, function(err) {
                            
-                            if (err) {
+                //             if (err) {
                                 
-                                console.log('A file failed to process');
-                                callback(null);
-                            } else {
-                                console.log('modelz have been added to scene');
-                                // objectResponse = modelz;
-                                // sceneResponse.sceneModelz = objectResponse;
-                                var buff = Buffer.from(JSON.stringify(modelz)).toString("base64");
-                                modelData = "<div id=\x22sceneModels\x22 data-models='"+buff+"'></div>";
-                                callback(null);
-                            }
-                        });
-                    } else {
-                        callback(null);
-                    }
-                }, 
+                //                 console.log('A file failed to process');
+                //                 callback(null);
+                //             } else {
+                //                 console.log('modelz have been added to scene');
+                //                 // objectResponse = modelz;
+                //                 // sceneResponse.sceneModelz = objectResponse;
+                //                 var buff = Buffer.from(JSON.stringify(modelz)).toString("base64");
+                //                 modelData = "<div id=\x22sceneModels\x22 data-models='"+buff+"'></div>";
+                //                 callback(null);
+                //             }
+                //         });
+                //     } else {
+                //         callback(null);
+                //     }
+                // }, 
                 function (callback) { //get available scenes for scene links
                 //     var platformString = "";
             
@@ -1472,7 +1428,7 @@ landing_router.get('/:_id', function (req, res) {
                     var availableScenes = [];
                     availableScenesResponse.availableScenes = availableScenes;
                         async.each(scenes, function (scene, cb) {
-                            availableScene = {};
+                            let availableScene = {};
                             if (scene.scenePostcards != null && scene.scenePostcards.length > 0) { //cain't show without no postcard
                                 var postcardIndex = Math.floor(Math.random()*scene.scenePostcards.length);
                                 var oo_id = ObjectID(scene.scenePostcards[postcardIndex]); //TODO randomize? or ensure latest?  or use assigned default?
@@ -2413,12 +2369,12 @@ landing_router.get('/:_id', function (req, res) {
                                 // console.log("didn't find next scene");
                             } else {
                                 nextLink = "href=\x22../" + scene.short_id + "\x22";    
-                                sceneNextScene = scene.short_id;
+                               
                             }
                         }); 
                     } else {
-                        nextLink = "href=\x22../4K94Gjtw7\x22";    
-                        sceneNextScene = "4K94Gjtw7";
+                        nextLink = "href=\x22#\x22";    
+                        
                     }
                     if (sceneResponse.scenePreviousScene != null && sceneResponse.scenePreviousScene != "") {
                         db.scenes.findOne({$or: [ { short_id: sceneResponse.scenePreviousScene }, { sceneTitle: sceneResponse.scenePreviousScene } ]}, function (err, scene) {
@@ -2790,7 +2746,7 @@ landing_router.get('/:_id', function (req, res) {
                                     "src: [\x22"+ambientOggUrl+"\x22,\x22"+ambientMp3Url+"\x22], volume: 0, loop: true" + 
                                 "});" +
                             "ambientAudioHowl.load();</script>";
-                            ambientAudioControl = "<script src=\x22../main/src/component/ambient-audio-control.js\x22></script>";
+                            // ambientAudioControl = "<script src=\x22../main/src/component/ambient-audio-control.js\x22></script>";
                             let ambientPosAnim = "animation__yoyo=\x22property: position; to: -33 3 0; dur: 60000; dir: alternate; easing: easeInSine; loop: true;\x22 ";
                             let ambientRotAnim = "animation__rot=\x22property:rotation; dur:60000; to: 0 360 0; loop: true; easing:linear;\x22 ";        
                             // posAnim = "animation__pos=\x22property: position; to: random-position; dur: 15000; loop: true;";  
@@ -2839,7 +2795,7 @@ landing_router.get('/:_id', function (req, res) {
                 },
 
                 function (video_items, callback) { //add the signed URLs to the obj array
-                    preloadVideo = true; //FOR NOW - testing on ios, need to set a toggle for this...
+                    let preloadVideo = true; //FOR NOW - testing on ios, need to set a toggle for this...
               
                     if (video_items != null && video_items[0] != null) { //only single vid for now, need to loop array
 
@@ -3068,7 +3024,7 @@ landing_router.get('/:_id', function (req, res) {
                         if (hasTriggerAudio) {
                             triggerAudioSliderChunk = "<span id=\x22triggerAudioVolume\x22>Trigger Volume</span><div class=\x22slidecontainer\x22><input type=\x22range\x22 min=\x22-80\x22 max=\x2220\x22 value=\x22"+sceneTriggerVolume+"\x22 class=\x22slider\x22 id=\x22triggerAudioVolumeSlider\x22></div>";
                         }
-                        userText = "<div class=\x22smallfont\x22><span id=\x22userName\x22 class=\x22\x22>Welcome " + avatarName+ "</span>!&nbsp;&nbsp;<button onclick=\x22Disconnect()\x22 type=\x22button\x22 class=\x22btn\x22>Disconnect</button></div><hr>";
+                        let userText = "<div class=\x22smallfont\x22><span id=\x22userName\x22 class=\x22\x22>Welcome " + avatarName+ "</span>!&nbsp;&nbsp;<button onclick=\x22Disconnect()\x22 type=\x22button\x22 class=\x22btn\x22>Disconnect</button></div><hr>";
                         if (isGuest) {
                             userText = "<div><span id=\x22userName\x22 class=\x22smallfont\x22>Welcome Guest known as " + avatarName+ "</span>"+
                             //loginLink +
@@ -3164,39 +3120,50 @@ landing_router.get('/:_id', function (req, res) {
                                     console.log("error getting postcard " + postcard._id + err);
                                     callback(err);
                                 } else {
-                                    postcardImages.push(ReturnPresignedUrlSync(process.env.S3_ROOT_BUCKET_NAME, 'users/' + picture_item.userID +"/pictures/"+ picture_item._id + ".standard." + picture_item.filename, 12000)); //just return a single 
-                                    // // console.log("postcard1 " + postcard1);
-                                    // callback(null);
-                                    var params = {
-                                        Bucket: bucketFolder,
-                                        Key: "postcards/" + sceneResponse.short_id + "/"+ postcard + ".standard." + picture_item.filename //put in postcards folder instead of root, duh
-                                    }
-                                    //todo - MINIO support
-                                    s3.headObject(params, function(err, data) { //check that the postcard is pushed to static route
-                                        if (err) {
-                                            console.log("postcard missing from static route, tryna copy to " + sceneResponse.sceneDomain);
-                                            s3.copyObject({Bucket: bucketFolder, CopySource: 'servicemedia/users/' + picture_item.userID +"/pictures/"+ picture_item._id + ".standard." + picture_item.filename,
-                                                Key: "postcards/" + sceneResponse.short_id + "/"+ picture_item._id + ".standard." + picture_item.filename}, function (err, data) {
-                                                if (err) {
-                                                    console.log("ERROR copyObject" + err);
-                                                    callback();
-                                                } else {
-                                                    console.log('SUCCESS copyObject');
-                                                    
-                                                    
-                                                    postcard1 = sceneResponse.sceneDomain +"/postcards/"+sceneResponse.short_id +"/"+ picture_item._id + ".standard." + picture_item.filename;
-                                                   
-                                                    callback();
-                                                }
-                                            });
-                                        } else {
-                                            postcardImages.push()
-                                            postcard1 = "http://" + bucketFolder +"/postcards/"+sceneResponse.short_id +"/"+ picture_item._id + ".standard." + picture_item.filename;
-                                            console.log("gotsa postcard " + postcard1 );
-                                            callback();
-                                        }
+
+                                    // postcard1 = sceneResponse.sceneDomain +"/postcards/"+sceneResponse.short_id +"/"+ picture_item._id + ".standard." + picture_item.filename;
+                                    // callback();
+                                    (async () => {
+                                        postcard1 = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + picture_item.userID +"/pictures/"+ picture_item._id + ".standard." + picture_item.filename)
+                                        // postcardImages.push(ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + picture_item.userID +"/pictures/"+ picture_item._id + ".standard." + picture_item.filename, 12000)); //just return a single 
+                                        // // console.log("postcard1 " + postcard1);
+                                        // callback(null);
+                                        postcardImages.push(postcard1);
+                                        console.log("postcard is " + postcard1);
+                                        callback();
                                         
-                                    });
+                                    })();
+                                   
+                                    // var params = {
+                                    //     Bucket: bucketFolder,
+                                    //     Key: "postcards/" + sceneResponse.short_id + "/"+ postcard + ".standard." + picture_item.filename //put in postcards folder instead of root, duh
+                                    // }
+                                    // //todo - MINIO support
+                                    // s3.headObject(params, function(err, data) { //check that the postcard is pushed to static route
+                                    //     if (err) {
+                                    //         console.log("postcard missing from static route, tryna copy to " + sceneResponse.sceneDomain);
+                                    //         s3.copyObject({Bucket: bucketFolder, CopySource: 'servicemedia/users/' + picture_item.userID +"/pictures/"+ picture_item._id + ".standard." + picture_item.filename,
+                                    //             Key: "postcards/" + sceneResponse.short_id + "/"+ picture_item._id + ".standard." + picture_item.filename}, function (err, data) {
+                                    //             if (err) {
+                                    //                 console.log("ERROR copyObject" + err);
+                                    //                 callback();
+                                    //             } else {
+                                    //                 console.log('SUCCESS copyObject');
+                                                    
+                                                    
+                                    //                 postcard1 = sceneResponse.sceneDomain +"/postcards/"+sceneResponse.short_id +"/"+ picture_item._id + ".standard." + picture_item.filename;
+                                                   
+                                    //                 callback();
+                                    //             }
+                                    //         });
+                                    //     } else {
+                                    //         postcardImages.push()
+                                    //         postcard1 = "http://" + bucketFolder +"/postcards/"+sceneResponse.short_id +"/"+ picture_item._id + ".standard." + picture_item.filename;
+                                    //         console.log("gotsa postcard " + postcard1 );
+                                    //         callback();
+                                    //     }
+                                        
+                                    // });
                                 }
                             });
                         //             }
@@ -3428,13 +3395,7 @@ landing_router.get('/:_id', function (req, res) {
                                                     link = "basic-link=\x22href: "+picture_item.linkURL+";\x22 class=\x22activeObjexGrab activeObjexRay\x22";
                                                 }
                                             }
-                                            if (picture_item.useTarget != undefined && picture_item.useTarget != "") { //used by mindar - good stuff!
-                                                console.log("GOTSA urlTarget " + picture_item.urlTarget);
-                                                const targetURL = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + picture_item.userID + "/pictures/targets/" + picture_item._id + ".mind", Expires: 6000});
-                                                arImageTargets.push(targetURL);
-                                            
 
-                                            }
                                             if (picture_item.hasAlphaChannel) {
                                                 imageEntities = imageEntities + "<a-entity "+link+""+lookat+" geometry=\x22primitive: plane; height: 10; width: 10\x22 material=\x22shader: flat; transparent: true; src: #smimage" + index + "; alphaTest: 0.5;\x22"+
                                                 " position=\x22"+position+"\x22 rotation=\x22"+rotation+"\x22 visible='true'>"+caption+"</a-entity>";
@@ -3632,19 +3593,19 @@ landing_router.get('/:_id', function (req, res) {
 
                     //scenetype filters below...
 
-                    console.log("sceneWebType: "+ sceneResponse.sceneWebType);
-                    if (sceneResponse.sceneWebType == undefined || sceneResponse.sceneWebType.toLowerCase() == "default" || sceneResponse.sceneWebType.toLowerCase() == "aframe") { 
-                        // webxrFeatures = "webxr=\x22optionalFeatures: hit-test, local-floor\x22"; //otherwise hit-test breaks everythign!
-                        webxrFeatures = "webxr=\x22optionalFeatures: hit-test, local-floor, dom-overlay, unbounded; overlayElement:#ar_overlay;\x22"; //otherwise hit-test breaks everythign!
-                        // arHitTest = "ar-hit-test-spawn=\x22mode: "+arMode+"\x22";
-                        // arShadowPlane = "<a-plane show-in-ar-mode id="shadow-plane" material="shader:shadow" shadow="cast:false;" visible=\x22false\x22 height=\x2210\x22 width=\x2210\x22 rotation=\x22-90 0 0\x22 shadow=\x22receive:true\x22 ar-shadows=\x22opacity: 0.3\x22 static-body=\x22shape: none\x22 shape__main=\x22shape: box; halfExtents: 100 100 0.125; offset: 0 0 -0.125\x22>" +
-                        arShadowPlane = "<a-plane show-in-ar-mode visible=\x22false\x22 id=\x22shadow-plane\x22 material=\x22shader:shadow\x22 shadow=\x22cast:false;\x22 follow-shadow=\x22.activeObjexRay\x22 height=\x2233\x22 width=\x2233\x22 rotation=\x22-90 0 0\x22>" +
-                            "</a-plane>";
+                    // console.log("sceneWebType: "+ sceneResponse.sceneWebType);
+                    // if (sceneResponse.sceneWebType == undefined || sceneResponse.sceneWebType.toLowerCase() == "default" || sceneResponse.sceneWebType.toLowerCase() == "aframe") { 
+                    //     // webxrFeatures = "webxr=\x22optionalFeatures: hit-test, local-floor\x22"; //otherwise hit-test breaks everythign!
+                    //     webxrFeatures = "webxr=\x22optionalFeatures: hit-test, local-floor, dom-overlay, unbounded; overlayElement:#ar_overlay;\x22"; //otherwise hit-test breaks everythign!
+                    //     // arHitTest = "ar-hit-test-spawn=\x22mode: "+arMode+"\x22";
+                    //     // arShadowPlane = "<a-plane show-in-ar-mode id="shadow-plane" material="shader:shadow" shadow="cast:false;" visible=\x22false\x22 height=\x2210\x22 width=\x2210\x22 rotation=\x22-90 0 0\x22 shadow=\x22receive:true\x22 ar-shadows=\x22opacity: 0.3\x22 static-body=\x22shape: none\x22 shape__main=\x22shape: box; halfExtents: 100 100 0.125; offset: 0 0 -0.125\x22>" +
+                    //     arShadowPlane = "<a-plane show-in-ar-mode visible=\x22false\x22 id=\x22shadow-plane\x22 material=\x22shader:shadow\x22 shadow=\x22cast:false;\x22 follow-shadow=\x22.activeObjexRay\x22 height=\x2233\x22 width=\x2233\x22 rotation=\x22-90 0 0\x22>" +
+                    //         "</a-plane>";
                         
-                        // }
-                        handsTemplate = "<template id=\x22hand-template\x22><a-entity><a-box scale=\x220.1 0.1 0.1\x22 visible=false></a-box></a-entity></template>";
+                    //     // }
+                    //     handsTemplate = "<template id=\x22hand-template\x22><a-entity><a-box scale=\x220.1 0.1 0.1\x22 visible=false></a-box></a-entity></template>";
                        
-                    } 
+                    // } 
                    
                     
                    if (sceneResponse.sceneWebType != "Video Landinggggg") {
@@ -3709,7 +3670,7 @@ landing_router.get('/:_id', function (req, res) {
                         let buttonLabel = sceneResponse.sceneWebType == "Video Landing" ? "Watch Video" : "Enter WebXR Scene"
 
                         let platformButtons = "<a class=\x22mx-auto btn btn-xl btn-primary \x22 href=\x22../webxr/"+ sceneResponse.short_id + "\x22>"+buttonLabel+"</a>"+
-                        "<a class=\x22mx-auto btn btn-xl btn-primary \x22 href=\x22https://www.oculus.com/open_url/?url=https://smxr.net/webxr/"+ sceneResponse.short_id + "\x22>Open on Quest</a>"
+                        "<a class=\x22mx-auto btn btn-xl btn-primary \x22 href=\x22https://www.oculus.com/open_url/?url=https://smxr.net/webxr/"+ sceneResponse.short_id + "\x22>Send to Quest</a>"
                         if (sceneResponse.sceneShareWithSubscribers) {
                             if (isGuest) {
                                 platformButtons = "";
@@ -3920,5 +3881,5 @@ landing_router.get('/:_id', function (req, res) {
 
 
 
-
-module.exports = landing_router;
+export default landing_router;
+// module.exports = landing_router;

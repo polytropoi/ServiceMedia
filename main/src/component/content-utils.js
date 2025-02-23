@@ -1679,8 +1679,12 @@ AFRAME.registerComponent('toggle-available-scenes', {
           // // console.log(scenesPanelEl.getAttribute('available_scenes_control', jsonData.availableScenes));
           // // console.log(scenesArray);
           // var scene = scenesArray[Math.floor(Math.random() * scenesArray.length)];
-          let sceneHref = "/webxr/" + scenesArray[0].sceneKey;
-          console.log(sceneHref);
+          let sceneHref = "";
+          if (scenesArray.length) {
+            sceneHref = "/webxr/" + scenesArray[0].sceneKey;
+          } 
+          
+          console.log("sceneHref : "+sceneHref);
           // document.getElementById("availableScenePic").setAttribute('basic-scene-link', {href: sceneHref});
           document.getElementById("availableScenePic").setAttribute('link', {href: sceneHref});
 

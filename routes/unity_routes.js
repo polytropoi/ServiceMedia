@@ -1,3 +1,8 @@
+import { createRequire } from "module";
+import { ReturnPresignedUrl } from "../server";
+const require = createRequire(import.meta.url);
+
+
 const express = require("express");
 const unity_router = express.Router();
 
@@ -127,17 +132,28 @@ unity_router.get('/scene/:_id/:platform/:version', function (req, res) { //calle
                                 callbackz();
                             } else {
                                 // let weblink = {};
-                                var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia.web', Key: objID + "/" + objID + ".thumb.jpg", Expires: 6000});
-                                var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia.web', Key: objID + "/" + objID + ".half.jpg", Expires: 6000});
-                                var urlStandard = s3.getSignedUrl('getObject', {Bucket: 'servicemedia.web', Key: objID + "/" + objID + ".standard.jpg", Expires: 6000});
-                                weblink.urlThumb = urlThumb;
-                                weblink.urlHalf = urlHalf;
-                                weblink.urlStandard = urlStandard;
-                                weblink.link_id = weblink._id;
-                                // weblink.link_url;
-                                // console.log("tryna push weblink " + JSON.stringify(weblink));
-                                sceneWebLinx.push(weblink);
-                                callbackz();
+                                (async () => {
+                                    try {
+                                        const urlThumb = await ReturnPresignedUrl(process.env.S3_WEBSCRAPE_BUCKET_NAME, objID + "/" + objID + ".thumb.jpg", 6000);
+                                        const urlHalf = await ReturnPresignedUrl(process.env.S3_WEBSCRAPE_BUCKET_NAME, objID + "/" + objID + ".half.jpg", 6000);
+                                        const urlStandard = await ReturnPresignedUrl(process.env.S3_WEBSCRAPE_BUCKET_NAME, objID + "/" + objID + ".standard.jpg", 6000);
+                                        weblink.urlThumb = urlThumb;
+                                        weblink.urlHalf = urlHalf;
+                                        weblink.urlStandard = urlStandard;
+                                        weblink.link_id = weblink._id;
+                                        // weblink.link_url;
+                                        // console.log("tryna push weblink " + JSON.stringify(weblink));
+                                        sceneWebLinx.push(weblink);
+                                        callbackz();
+                                    } catch (e) {
+                                        callbackz();
+                                    }
+                                    // var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia.web', Key: objID + "/" + objID + ".thumb.jpg", Expires: 6000});
+                                    // var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia.web', Key: objID + "/" + objID + ".half.jpg", Expires: 6000});
+                                    // var urlStandard = s3.getSignedUrl('getObject', {Bucket: 'servicemedia.web', Key: objID + "/" + objID + ".standard.jpg", Expires: 6000});
+                                   
+                                    
+                                })();
                             }
                         });
                     }, function(err) {
@@ -164,10 +180,23 @@ unity_router.get('/scene/:_id/:platform/:version', function (req, res) { //calle
 
                 if (sceneResponse.sceneUseEnvironment) {
 //                    var urlScene = s3.getSignedUrl('getObject', {Bucket: 'mvmv.us', Key: versionID + '/' + 'scenes_' + platformType + '/' + sceneResponse.sceneEnvironment.name + '_' + platformType + '.unity3d', Expires: 6000});
-                    var urlScene = s3.getSignedUrl('getObject', {Bucket: 'mvmv.us', Key: versionID + '/' + 'scenes_' + platformType + '/' + sceneResponse.sceneEnvironment.name, Expires: 6000});
-                    sceneResponse.sceneEnvironment.sceneBundleUrl = urlScene;
-                    console.log(urlScene);
-                    callback(null);
+                    // var urlScene = s3.getSignedUrl('getObject', {Bucket: 'mvmv.us', Key: versionID + '/' + 'scenes_' + platformType + '/' + sceneResponse.sceneEnvironment.name, Expires: 6000});
+                    
+                    (async () => {
+                        try {
+                            const urlScene = await ReturnPresignedUrl(process.env.UNITY_BUCKET_NAME,versionID + '/' + 'scenes_' + platformType + '/' + sceneResponse.sceneEnvironment.name,6000);
+                            sceneResponse.sceneEnvironment.sceneBundleUrl = urlScene;
+                            console.log("gotsa unity urlscene: " + urlScene);
+                            callback(null);
+                        } catch (e) {
+                            console.log("error getting scene asset bundle");
+                            callback(null);
+                        }
+                    })();
+                    
+                    
+                    // console.log(urlScene);
+                    
                 } else {
                     callback(null);
                 }
@@ -215,20 +244,45 @@ unity_router.get('/scene/:_id/:platform/:version', function (req, res) { //calle
                     var mp3Name = baseName + '.mp3';
                     var oggName = baseName + '.ogg';
                     var pngName = baseName + '.png';
-                    var urlMp3 = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + mp3Name, Expires: 60000});
-                    var urlOgg = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + oggName, Expires: 60000});
-                    var urlPng = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + pngName, Expires: 60000});
-//                            audio_items.URLmp3 = urlMp3; //jack in teh signed urls into the object array
-                    audio_items[i].URLmp3 = urlMp3; //jack in teh signed urls into the object array
-                    audio_items[i].URLogg = urlOgg;
-                    audio_items[i].URLpng = urlPng;
-                    if (audio_items[i].tags != null) {
-                        if (audio_items[i].tags.length < 1) {
-                            audio_items[i].tags = [""];
-                        } else {
-                            audio_items[i].tags = [""];
+
+                    (async () => {
+                        try {
+                            const urlMp3 = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + mp3Name, 6000);
+                            const urlOgg = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + oggName, 6000);
+                            const urlPng = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + pngName, 6000);
+
+        //                            audio_items.URLmp3 = urlMp3; //jack in teh signed urls into the object array
+                            audio_items[i].URLmp3 = urlMp3; //jack in teh signed urls into the object array
+                            audio_items[i].URLogg = urlOgg;
+                            audio_items[i].URLpng = urlPng;
+                            if (audio_items[i].tags != null) {
+                                if (audio_items[i].tags.length < 1) {
+                                    audio_items[i].tags = [""];
+                                } else {
+                                    audio_items[i].tags = [""];
+                                }
+                            }
+  
+                            callback(null);
+                        } catch (e) {
+                           
+                            callback(null);
                         }
-                    }
+                    })();
+//                     var urlMp3 = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + mp3Name, Expires: 60000});
+//                     var urlOgg = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + oggName, Expires: 60000});
+//                     var urlPng = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + pngName, Expires: 60000});
+// //                            audio_items.URLmp3 = urlMp3; //jack in teh signed urls into the object array
+//                     audio_items[i].URLmp3 = urlMp3; //jack in teh signed urls into the object array
+//                     audio_items[i].URLogg = urlOgg;
+//                     audio_items[i].URLpng = urlPng;
+//                     if (audio_items[i].tags != null) {
+//                         if (audio_items[i].tags.length < 1) {
+//                             audio_items[i].tags = [""];
+//                         } else {
+//                             audio_items[i].tags = [""];
+//                         }
+//                     }
                 }
                 //   console.log('tryna send ' + audio_items);
                 audioResponse = audio_items;
@@ -266,21 +320,43 @@ unity_router.get('/scene/:_id/:platform/:version', function (req, res) { //calle
                     var standardName = 'standard.' + baseName + item_string_filename_ext;
                     var originalName = baseName + item_string_filename_ext;
 
-                    var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_items[i].userID + "/pictures/" + picture_items[i]._id + "." + thumbName, Expires: 6000}); //just send back thumbnail urls for list
-                    var urlQuarter = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_items[i].userID + "/pictures/" + picture_items[i]._id + "." + quarterName, Expires: 6000});
-                    var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_items[i].userID + "/pictures/" + picture_items[i]._id + "." + halfName, Expires: 6000});
-                    var urlStandard = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_items[i].userID + "/pictures/" + picture_items[i]._id + "." + standardName, Expires: 6000});
-                    var urlTarget = "";
-                    if (picture_items[i].useTarget) {
-                        urlTarget = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_items[i].userID + "/pictures/targets/" + picture_items[i]._id + ".mind", Expires: 6000});
-                    }
+                    (async () => {
+                        try {
+
+                            var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_items[i].userID + "/pictures/" + picture_items[i]._id + "." + thumbName, Expires: 6000}); //just send back thumbnail urls for list
+                            var urlQuarter = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_items[i].userID + "/pictures/" + picture_items[i]._id + "." + quarterName, Expires: 6000});
+                            var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_items[i].userID + "/pictures/" + picture_items[i]._id + "." + halfName, Expires: 6000});
+                            var urlStandard = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_items[i].userID + "/pictures/" + picture_items[i]._id + "." + standardName, Expires: 6000});
+                            var urlTarget = "";
+                            if (picture_items[i].useTarget) {
+                                urlTarget = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_items[i].userID + "/pictures/targets/" + picture_items[i]._id + ".mind", Expires: 6000});
+                            }
+                            picture_items[i].urlThumb = urlThumb; //jack in teh signed urls into the object array
+                            picture_items[i].urlQuarter = urlQuarter; //jack in teh signed urls into the object array
+                            picture_items[i].urlHalf = urlHalf; //jack in teh signed urls into the object array
+                            picture_items[i].urlStandard = urlStandard; //jack in teh signed urls into the object array
+  
+                            
+                        } catch (e) {
+                           console.log("pic error : "+ e);
+                        }
+                    })();
+
+                    // var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_items[i].userID + "/pictures/" + picture_items[i]._id + "." + thumbName, Expires: 6000}); //just send back thumbnail urls for list
+                    // var urlQuarter = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_items[i].userID + "/pictures/" + picture_items[i]._id + "." + quarterName, Expires: 6000});
+                    // var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_items[i].userID + "/pictures/" + picture_items[i]._id + "." + halfName, Expires: 6000});
+                    // var urlStandard = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_items[i].userID + "/pictures/" + picture_items[i]._id + "." + standardName, Expires: 6000});
+                    // var urlTarget = "";
+                    // if (picture_items[i].useTarget) {
+                    //     urlTarget = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_items[i].userID + "/pictures/targets/" + picture_items[i]._id + ".mind", Expires: 6000});
+                    // }
                     
                     
                     //var urlPng = knoxClient.signedUrl(audio_item[0]._id + "." + pngName, expiration);
-                    picture_items[i].urlThumb = urlThumb; //jack in teh signed urls into the object array
-                    picture_items[i].urlQuarter = urlQuarter; //jack in teh signed urls into the object array
-                    picture_items[i].urlHalf = urlHalf; //jack in teh signed urls into the object array
-                    picture_items[i].urlStandard = urlStandard; //jack in teh signed urls into the object array
+                    // picture_items[i].urlThumb = urlThumb; //jack in teh signed urls into the object array
+                    // picture_items[i].urlQuarter = urlQuarter; //jack in teh signed urls into the object array
+                    // picture_items[i].urlHalf = urlHalf; //jack in teh signed urls into the object array
+                    // picture_items[i].urlStandard = urlStandard; //jack in teh signed urls into the object array
                     picture_items[i].urlTarget = urlTarget;
                     if (picture_items[i].orientation != null && picture_items[i].orientation.toLowerCase() == "equirectangular") { //add the big one for skyboxes
                         let theKey = "users/" + picture_items[i].userID + "/pictures/originals/" + picture_items[i]._id + ".original." + originalName;
@@ -296,22 +372,22 @@ unity_router.get('/scene/:_id/:platform/:version', function (req, res) { //calle
                         // });
                         var urlOriginal = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: theKey, Expires: 6000});
                         picture_items[i].urlOriginal = urlOriginal;
-                        let cubeMapAsset = [];
-                        if (sceneResponse.sceneUseDynCubeMap != null && sceneResponse.sceneUseDynCubeMap) {
-                            let path1 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_items[i].userID+"/cubemaps/"+picture_items[i]._id+"_px.jpg", Expires: 6000});  
-                            let path2 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_items[i].userID+"/cubemaps/"+picture_items[i]._id+"_nx.jpg", Expires: 6000});  
-                            let path3 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_items[i].userID+"/cubemaps/"+picture_items[i]._id+"_py.jpg", Expires: 6000});  
-                            let path4 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_items[i].userID+"/cubemaps/"+picture_items[i]._id+"_ny.jpg", Expires: 6000});  
-                            let path5 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_items[i].userID+"/cubemaps/"+picture_items[i]._id+"_pz.jpg", Expires: 6000});  
-                            let path6 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_items[i].userID+"/cubemaps/"+picture_items[i]._id+"_nz.jpg", Expires: 6000});                                    
-                            cubeMapAsset.push(path1);
-                            cubeMapAsset.push(path2);
-                            cubeMapAsset.push(path3);
-                            cubeMapAsset.push(path4);
-                            cubeMapAsset.push(path5);
-                            cubeMapAsset.push(path6);
-                            sceneResponse.cubeMapAsset = cubeMapAsset;
-                        }
+                        // let cubeMapAsset = [];
+                        // if (sceneResponse.sceneUseDynCubeMap != null && sceneResponse.sceneUseDynCubeMap) {
+                        //     let path1 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_items[i].userID+"/cubemaps/"+picture_items[i]._id+"_px.jpg", Expires: 6000});  
+                        //     let path2 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_items[i].userID+"/cubemaps/"+picture_items[i]._id+"_nx.jpg", Expires: 6000});  
+                        //     let path3 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_items[i].userID+"/cubemaps/"+picture_items[i]._id+"_py.jpg", Expires: 6000});  
+                        //     let path4 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_items[i].userID+"/cubemaps/"+picture_items[i]._id+"_ny.jpg", Expires: 6000});  
+                        //     let path5 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_items[i].userID+"/cubemaps/"+picture_items[i]._id+"_pz.jpg", Expires: 6000});  
+                        //     let path6 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_items[i].userID+"/cubemaps/"+picture_items[i]._id+"_nz.jpg", Expires: 6000});                                    
+                        //     cubeMapAsset.push(path1);
+                        //     cubeMapAsset.push(path2);
+                        //     cubeMapAsset.push(path3);
+                        //     cubeMapAsset.push(path4);
+                        //     cubeMapAsset.push(path5);
+                        //     cubeMapAsset.push(path6);
+                        //     sceneResponse.cubeMapAsset = cubeMapAsset;
+                        // }
                     }
                     if (picture_items[i].hasAlphaChannel == null) {picture_items[i].hasAlphaChannel = false}
                     //pathResponse.path.pictures.push(urlThumb, urlQuarter, urlHalf, urlStandard);

@@ -22,7 +22,7 @@
     <link rel="stylesheet" href="vendor/jquery-confirm/jquery-confirm.min.css" rel="stylesheet">
     <link href="vendor/bootstrap-toggle/bootstrap-toggle.min.css" rel="stylesheet">
     <link href="css/slider.css" rel="stylesheet">
-    <link href="vendor/uppy/uppy.min.css" rel="stylesheet">
+    <!-- <link href="vendor/uppy/uppy.min.css" rel="stylesheet"> -->
     <!-- Custom styles for this page -->
     <link href="vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
@@ -167,6 +167,11 @@
           height: 100%;
       } */
     </style> 
+
+      <link
+      href="https://releases.transloadit.com/uppy/v4.13.2/uppy.min.css"
+      rel="stylesheet"
+      />
   </head>
 
   <body id="page-top">
@@ -1249,6 +1254,16 @@
           </div>
         </div>
 
+        <!-- <script type="module">
+          import {
+            Uppy,
+            Dashboard
+          } from 'https://releases.transloadit.com/uppy/v4.13.2/uppy.min.mjs'
+  
+          const uppy = new Uppy()
+          uppy.use(Dashboard, { target: '#drag-drop-area' });
+          console.log("tryna load uppy!");
+        </script> -->
       <!-- Bootstrap core JavaScript-->
       <script src="vendor/jquery/jquery.min.js"></script>
       <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -1257,7 +1272,7 @@
       <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
       <script src="src/util/axios.js"></script>
       <script src="vendor/jscookie/js.cookie.min.js"></script>
-      <script src="vendor/uppy/uppy.min.js"></script>
+      <!-- <script src="vendor/uppy/uppy.min.js"></script> -->
       <script src="vendor/jquery-confirm/jquery-confirm.min.js"></script>
       <script src="vendor/bootstrap-toggle/bootstrap-toggle.min.js"></script>
       <script src="vendor/jquery-knob/jquery.knob.min.js"></script>
@@ -1291,8 +1306,26 @@
       <script src="js/demo/chart-area-demo.js"></script>
       <script src="js/demo/chart-pie-demo.js"></script>
 
+
+      <!-- 2. Initialize -->
+      <!-- <div id="files-drag-drop"></div> -->
+
+
+          <!-- 1. Add CSS to `<head>` -->
+    <!-- <link href="vendor/uppy/uppy.min.css" rel="stylesheet"> -->
+
+    <!-- 2. Initialize -->
+    <!-- <div id="uppy"></div>
+
+    <script type="module">
+      import { Uppy, Dashboard } from "../main/vendor/uppy/uppy.min.mjs"
+      const uppy = new Uppy()
+      uppy.use(Dashboard, { target: '#drag-drop-area', inline: true })
+    </script> -->
+    
       <!-- dashbro below -->
-      <script src="index.js"></script>
+
+      <script type="module" src="index.js"></script>
       
 
   </body>

@@ -1,3 +1,6 @@
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+
 const express = require("express");
 const oculus_router = express.Router();
 const axios =  require("axios");
@@ -50,4 +53,5 @@ oculus_router.post("/:app/:action", function (req, res) {
         res.send("OK!");
     });
 
-module.exports = oculus_router;
+// module.exports = oculus_router;
+export default oculus_router;

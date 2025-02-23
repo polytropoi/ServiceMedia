@@ -2,14 +2,16 @@
   "name": "smweb",
   "version": "1.1.0",
   "description": "servicemedia platform",
+  "type": "module",
   "main": "server.js",
   "engines": {
     "npm": ">=5.0.0",
     "node": ">=10.0.0"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.749.0",
+    "@aws-sdk/s3-request-presigner": "^3.749.0",
     "async": "^3.2.4",
-    "aws-sdk": "^2.1296.0",
     "axios": "^1.2.3",
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "^1.20.1",

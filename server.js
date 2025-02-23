@@ -1,11 +1,17 @@
 //copyright 2022 servicemedia.net
 
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+
+import path from 'path';
+import { fileURLToPath } from 'url';
+
 var express = require("express")
     , http = require("http")
     
     , jwt = require("jsonwebtoken")
     , axios = require("axios")
-    , path = require("path")
+    // , path = require("path")
     , fs = require("fs")
     , bodyParser = require('body-parser')
     , cookieParser = require('cookie-parser')
@@ -29,8 +35,10 @@ var express = require("express")
     // , internetradio = require('node-internet-radio') bad behavior..
     , requireText = require('require-text');
 
-
-    app = express();
+    const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
+    const __dirname = path.dirname(__filename); // get the name of the directory
+    
+    export let app = express();
     require('dotenv').config();
 
     // app.use(helmet.contentSecurityPolicy());
@@ -101,7 +109,7 @@ var databaseUrl = process.env.MONGO_URL; //servicemedia connstring
 var collections = ["acl", "auth_req", "domains", "apps", "assets", "assetsbundles", "models", "users", "inventories", "inventory_items", "audio_items", "text_items", "audio_item_keys", "image_items", "video_items",
     "obj_items", "paths", "keys", "traffic", "scores", "attributes", "achievements", "activity", "actions", "purchases", "storeitems", "scenes", "groups", "weblinks", "locations", "iap"];
 
-var db = mongojs(databaseUrl, collections);
+export let db = mongojs(databaseUrl, collections);
 var store = new MongoDBStore({ //store session cookies in a separate db with different user, so nice
     uri: process.env.MONGO_SESSIONS_URL,
     collection: 'sessions'
@@ -146,19 +154,42 @@ var store = new MongoDBStore({ //store session cookies in a separate db with dif
     // app.use(autoReap);
 
     var maxItems = 1000;
-    const { CloudSearch } = require("aws-sdk");
+    // const { CloudSearch } = require("aws-sdk");
     //var upload = multer({ dest: 'uploads/' });
 
-    var aws = require('aws-sdk');
+    // var aws = require('aws-sdk');
+
+
+
     const { json } = require("body-parser");
     const { profile } = require("console");
 
     const { lookupService, resolveNaptr, resolveCname, resolveMx } = require("dns");
 
-    aws.config = new aws.Config({accessKeyId: process.env.AWSKEY, secretAccessKey: process.env.AWSSECRET, region: process.env.AWSREGION});
-    var ses = new aws.SES({apiVersion : '2010-12-01'});
-    var s3 = new aws.S3();
+    // aws.config = new aws.Config({accessKeyId: process.env.AWSKEY, secretAccessKey: process.env.AWSSECRET, region: process.env.AWSREGION});
+    // export let ses = new aws.SES({apiVersion : '2010-12-01'});
+    import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+    import {
+        S3Client, 
+        S3ServiceException, 
+        GetObjectCommand, 
+        HeadObjectCommand, 
+        CopyObjectCommand, 
+        ListObjectsV2Command,
+        PutObjectCommand,
+        DeleteObjectCommand,
+        DeleteObjectsCommand
+      } from "@aws-sdk/client-s3";
+    // export let s3 = new aws.S3();
+    export const s3 = new S3Client({
+        region: 'us-east-1',
+        credentials: {
+            accessKeyId: process.env.AWSKEY,
+            secretAccessKey: process.env.AWSSECRET
+        }
+    });
 
+    ///////// minio init ///////////////////////////////
     var minioClient = null;
     if (process.env.MINIOKEY && process.env.MINIOKEY != "" && process.env.MINIOENDPOINT && process.env.MINIOENDPOINT != "") {
             minioClient = new minio.Client({
@@ -169,7 +200,7 @@ var store = new MongoDBStore({ //store session cookies in a separate db with dif
             secretKey: process.env.MINIOSECRET
         });
     }
-
+    ////////////////////////////////////
     var appAuth = "noauth";
     // let docClient = new aws.DynamoDB.DocumentClient();
     // let trafficTable = "traffic_1";
@@ -186,15 +217,18 @@ var store = new MongoDBStore({ //store session cookies in a separate db with dif
 
     db.scenes.createIndex( { short_id: -1 } );
 
-    //INCLUDE EXTERNAL ROUTES BELOW
-    var oculus_routes = require('./routes/oculus_routes');
+    // INCLUDE EXTERNAL ROUTES BELOW
+    // var oculus_routes = require('./routes/oculus_routes.cjs');
+    import oculus_routes from './routes/oculus_routes.js';
     app.use('/oculus', oculus_routes);
-    var webxr_routes = require('./routes/webxr_routes');
+    import webxr_routes from './routes/webxr_routes.js';
+    // var webxr_routes = require('./routes/webxr_routes');
     app.use('/webxr', webxr_routes);  
-    var landing_routes = require('./routes/landing_routes');
+    // var landing_routes = require('./routes/landing_routes');
+    import landing_routes from './routes/landing_routes.js';
     app.use('/landing', landing_routes);  
     
-
+    // import oculus_routes from './routes/oculus_routes.js';
 
 // io.attach(http);
 // io.use(function(socket, next){
@@ -458,24 +492,7 @@ io.on('connection', function(socket) {
 });
 //*/
 
-function ReturnPresignedUrlSync (bucket, key, time) {
-    if (minioClient) {
-        minioClient.presignedGetObject(bucket, key, time, function(err, presignedUrl) { //use callback version here, can't await?
-            if (err) {
-                console.log(err);
-                return "err";
-            } else {
-                console.log("minio sync url " + presignedUrl)
-               return presignedUrl;
-                
-            }
-        });
-    } else {
-        let url = s3.getSignedUrl('getObject', {Bucket: bucket, Key: key, Expires: time});
-        console.log("s3 sync url" + url);
-        return url;
-    }
-}
+
 
 function tokenAuthentication(token) { //use for route security?
     jwt.verify(token, process.env.JWT_SECRET, function (err, payload) {
@@ -1040,50 +1057,321 @@ app.post('/create_apikey/', requiredAuthentication, function(req, res){
 
 
 ///////////////////////// OBJECT STORE (S3, Minio, etc) OPS BELOW - TODO - replace all s3 getSignedUrl calls with this, promised based version, to suport minio, etc... (!)
-async function ReturnPresignedUrl(bucket, key, time) {
+export async function ReturnPresignedUrl(bucket, key, time) {
     
     if (minioClient) {
         return minioClient.presignedGetObject(bucket, key, time);
     } else {
-        return s3.getSignedUrl('getObject', {Bucket: bucket, Key: key, Expires: time}); //returns a promise if called in async function?
+        // return s3.getSignedUrl('getObject', {Bucket: bucket, Key: key, Expires: time}); //returns a promise if called in async function?
+        const command = new GetObjectCommand({
+            Bucket: bucket,
+            Key: key,
+          });
+        return await getSignedUrl(s3, command, {expiresIn : time});
+        // return url;
     } 
 }
-async function ReturnObjectMetadata(bucket, key) { //s3.headObject == minio.statObject
-    if (minioClient) {
 
+export async function ReturnPresignedUrlPut(bucket, key, time) {
+    
+    if (minioClient) {
+        return minioClient.presignedPutObject(bucket, key, time);
     } else {
-        s3.headObject(params, function (err, data) {
-            if (err && err.code === 'NotFound') {
-                // Handle no object on cloud here
-                console.log(err);
-                // callback(err);
-                // res.send("staged file not found");
-                return err
-            } else {
-                // meateada = metadata;
-                console.log("ReturnObjectMetadata file meateada " + data);
-                // callback(null);
-                return data;
-            }
+        // return s3.getSignedUrl('getObject', {Bucket: bucket, Key: key, Expires: time}); //returns a promise if called in async function?
+        const command = new PutObjectCommand({
+            Bucket: bucket,
+            Key: key,
+          });
+        return await getSignedUrl(s3, command, {expiresIn : time});
+        // return url;
+    } 
+}
+
+// export function ReturnPresignedUrlSync (bucket, key, time) {
+//     if (minioClient) {
+//         minioClient.presignedGetObject(bucket, key, time, function(err, presignedUrl) { //use callback version here, can't await?
+//             if (err) {
+//                 console.log(err);
+//                 return "err";
+//             } else {
+//                 console.log("minio sync url " + presignedUrl)
+//                return presignedUrl;
+                
+//             }
+//         });
+//     } else {
+//         // let url = s3.getSignedUrl('getObject', {Bucket: bucket, Key: key, Expires: time});
+//         // console.log("s3 sync url" + url);
+//         // return url;
+//         // const createPresignedUrlWithClient = ({ region, bucket, key }) => {
+//             // const client = new S3Client({ region });
+//             const command = new GetObjectCommand({ Bucket: bucket, Key: key });
+//             return getSignedUrl(s3, command, { expiresIn: 6000 });
+          
+//     }
+// }
+export async function DeleteObjects(bucket, objectKeys) { //s3.headObject == minio.statObject
+    if (minioClient) {
+                //todo!
+    } else {
+
+        const command = new DeleteObjectsCommand({
+            Bucket: bucket,
+            Delete: objectKeys,
         });
+        
+        try {
+            const response = await s3.send(command);
+            // await s3.waitUntilObjectNotExists(
+            //     { Bucket: bucket, Key: key },
+            //   );
+            console.log("delete objects resp: " + response );
+            return response;
+            // return true;
+        } catch (error) {
+            if (error.name === 'NotFound') {
+                console.log("File does not exist: " + key);
+                return "not found";
+                // return false;
+            }
+            console.error(`Error checking file existence: ${error}`);
+            return error;
+            // return false;
+        }
     }
 }
-async function CopyObject(targetBucket, copySource, key) {
+
+export async function DeleteObject(bucket, key) { //s3.headObject == minio.statObject
+    if (minioClient) {
+                //todo!
+    } else {
+
+        const command = new DeleteObjectCommand({
+            Bucket: bucket,
+            Key: key,
+        });
+        
+        try {
+            await s3.send(command);
+            await s3.waitUntilObjectNotExists(
+                { Bucket: bucket, Key: key },
+              );
+            console.log("File deleted: " + JSON.stringify(data));
+            return "deleted";
+            // return true;
+        } catch (error) {
+            if (error.name === 'NotFound') {
+                console.log("File does not exist: " + key);
+                return "not found";
+                // return false;
+            }
+            console.error(`Error checking file existence: ${error}`);
+            return error;
+            // return false;
+        }
+    }
+}
+
+
+export async function ReturnObjectExists(bucket, key) { //s3.headObject == minio.statObject
+    if (minioClient) {
+                //todo!
+    } else {
+
+        const command = new HeadObjectCommand({
+            Bucket: bucket,
+            Key: key,
+        });
+        
+        try {
+            let data = await s3.send(command);
+            console.log("File exists: " + JSON.stringify(data));
+            return { exists: true, error: null };
+            // return true;
+        } catch (error) {
+            if (error.name === 'NotFound') {
+                console.log("File does not exist: " + key);
+                return { exists: false, error: null };
+                // return false;
+            }
+            console.error(`Error checking file existence: ${error}`);
+            return { exists: false, error };
+            // return false;
+        }
+    }
+}
+
+export async function ReturnObjectMetadata(bucket, key) { //s3.headObject == minio.statObject
+    if (minioClient) {
+                //todo!
+    } else {
+
+        const command = new HeadObjectCommand({
+            Bucket: bucket,
+            Key: key,
+        });
+    
+        try {
+            let data = await s3.send(command);
+            console.log("File exists:" + data);
+            // return { exists: true, error: null };
+            return data;
+        } catch (error) {
+            if (error.name === 'NotFound') {
+                console.log("File does not exist: "  + key);
+                // return { exists: false, error: null };
+                return error;
+            }
+            console.error(`Error checking file existence: ${error}`);
+            // return { exists: false, error };
+            return error;
+        }
+        // s3.headObject(params, function (err, data) { //v2
+        //     if (err && err.code === 'NotFound') {
+        //         // Handle no object on cloud here
+        //         console.log(err);
+        //         // callback(err);
+        //         // res.send("staged file not found");
+        //         return err
+        //     } else {
+        //         // meateada = metadata;
+        //         console.log("ReturnObjectMetadata file meateada " + data);
+        //         // callback(null);
+        //         return data;
+        //     }
+        // });
+    }
+}
+export async function ListObjects(bucket, prefix) {
+    try {
+    
+      const response = await s3.send(
+        new ListObjectsV2Command({
+            Bucket: bucket,
+            MaxKeys: 1000000,
+            Prefix: prefix
+          }),
+      );
+      return await response;
+    } catch (caught) {
+        if (caught instanceof NoSuchKey) {
+          console.error(
+            `Error from S3 listing objects from "${bucket}". no such bucket exists.`,
+          );
+          return "error";
+        } else if (caught instanceof S3ServiceException) {
+          console.error(
+            `Error from S3 while getting object from ${bucket}.  ${caught.name}: ${caught.message}`,
+          );
+          return "error";
+        } else {
+          throw caught;
+        //   return caught;
+        }
+      }
+}
+export async function GetObject(bucket, key) {
+
+    try {
+        const response = await s3.send(
+          new GetObjectCommand({
+            Bucket: bucket,
+            Key: key,
+          }),
+        );
+        // The Body object also has 'transformToByteArray' and 'transformToWebStream' methods.
+        const str = await response.Body.transformToString();
+        // console.log(str);
+        return str;
+      } catch (caught) {
+        if (caught instanceof NoSuchKey) {
+          console.error(
+            `Error from S3 while getting object "${key}" from "${bucket}". No such key exists.`,
+          );
+          return "error";
+        } else if (caught instanceof S3ServiceException) {
+          console.error(
+            `Error from S3 while getting object from ${bucket}.  ${caught.name}: ${caught.message}`,
+          );
+          return "error";
+        } else {
+          throw caught;
+        //   return caught;
+        }
+      }
+
+}
+export async function PutObject(bucket, key, body) {
+
+    const command = new PutObjectCommand({
+        Bucket: bucket,
+        Key: key,
+        Body: body,
+      });
+    
+      try {
+        const response = await s3.send(command);
+        console.log(response);
+        return response;
+      } catch (caught) {
+        if (
+          caught instanceof S3ServiceException &&
+          caught.name === "EntityTooLarge"
+        ) {
+          console.error(
+            `Error from S3 while uploading object to ${bucketName}. \
+    The object was too large. To upload objects larger than 5GB, use the S3 console (160GB max) \
+    or the multipart upload API (5TB max).`,
+          );
+          
+        } else if (caught instanceof S3ServiceException) {
+          console.error(
+            `Error from S3 while uploading object to ${bucketName}.  ${caught.name}: ${caught.message}`,
+          );
+        } else {
+          throw caught;
+        }
+        return caught;
+      }
+
+}
+export async function CopyObject(targetBucket, copySource, key) {
     if (minioClient) {
 
     } else {
-        s3.copyObject({Bucket: targetBucket, CopySource: copySource, Key: key}, function (err,data){
-            if (err) {
-                console.log("ERROR copyObject" + err);
-                // callback(err);
-                return err;
-            } else {
-                console.log("SUCCESS copyObject key " + key );
-                return data;
-                // callback(null);
-                // callback(null, item_id, tUrl);
-            }
+      
+        const command = new CopyObjectCommand({
+            Bucket: targetBucket,
+            CopySource: copySource,
+            Key: key
         });
+        try {
+            let data = await s3.send(command);
+
+            return data;
+        } catch (error) {
+            if (error.name === 'NotFound') {
+                console.log(`File does not exist: ${filePath}`);
+                // return { exists: false, error: null };
+                return error;
+            }
+            console.error(`Error copying: ${error}`);
+            // return { exists: false, error };
+            return error;
+        }
+        
+        // s3.copyObject({Bucket: targetBucket, CopySource: copySource, Key: key}, function (err,data) {
+        //     if (err) {
+        //         console.log("ERROR copyObject" + err);
+        //         // callback(err);
+        //         return err;
+        //     } else {
+        //         console.log("SUCCESS copyObject key " + key );
+        //         return data;
+        //         // callback(null);
+        //         // callback(null, item_id, tUrl);
+        //     }
+        // });
     }
 } 
 
@@ -1790,7 +2078,7 @@ app.post("/authreq", function (req, res) {
                         callback();
                     } else {
                         console.log(username + " found " + authUser.length + " users like dat and isSubscriber is " + isSubscriber );
-                        authUserIndex = 0;
+                        let authUserIndex = 0;
                         // for (var i = 0; i < authUser.length; i++) {
                         //     if (authUser[i].userName == req.body.uname) { //only for cases where multiple accounts on one email, match on the name
                         //         authUserIndex = i;
@@ -2483,21 +2771,30 @@ app.post('/domain/', requiredAuthentication, domainadmin, function (req, res) {
                         console.log("error getting picture items: " + err);
                         res.send("error: " + err);
                     } else {
-                        domainPictures = [];
-                        pic_items.forEach(function(picture_item){                
-                            var imageItem = {};
-                            var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".thumb." + picture_item.filename, Expires: 6000});
-                            var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".half." + picture_item.filename, Expires: 6000});
-                            var urlStandard = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".standard." + picture_item.filename, Expires: 6000});
-                            imageItem.urlThumb = urlThumb;
-                            imageItem.urlHalf = urlHalf;
-                            imageItem.urlStandard = urlStandard;
-                            imageItem._id = picture_item._id;
-                            imageItem.filename = picture_item.filename;
-                            domainPictures.push(imageItem);
-                            domain.domainPictures = domainPictures;
-                        });
+                        // (async () => {
+                            try {
+                            domainPictures = [];
+                            pic_items.forEach(function(picture_item){   
+                                (async () => {             
+                                var imageItem = {};
+                                // var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".thumb." + picture_item.filename, Expires: 6000});
+                                // var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".half." + picture_item.filename, Expires: 6000});
+                                // var urlStandard = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".standard." + picture_item.filename, Expires: 6000});
+                                const urlHalf = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + picture_item.userID + "/pictures/" + picture_item._id + ".half." + picture_item.filename, 6000);
+                                // imageItem.urlThumb = urlThumb;
+                                imageItem.urlHalf = urlHalf;
+                                // imageItem.urlStandard = urlStandard;
+                                imageItem._id = picture_item._id;
+                                imageItem.filename = picture_item.filename;
+                                domainPictures.push(imageItem);
+                                domain.domainPictures = domainPictures;
+                                })();
+                            });
                         res.json(domain);
+                        } catch (e) {
+
+                        }
+                    // })();
                     }
                 });
             } else {
@@ -2617,12 +2914,20 @@ app.get('/app/:appID', requiredAuthentication, admin, function (req, res) {
                                 console.log("picItems found for app : " + JSON.stringify(pic_items));
                                 async.each (pic_items, function (picture_item, pcallbackz) {
                                     var imageItem = {};
-                                    var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".half." + picture_item.filename, Expires: 6000});
-                                    imageItem.urlHalf = urlHalf;
-                                    imageItem._id = picture_item._id;
-                                    imageItem.filename = picture_item.filename;
-                                    appPictures.push(imageItem);
-                                    pcallbackz();
+                                    (async () => {
+                                    try {
+                                        // const urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".half." + picture_item.filename, Expires: 6000});
+                                        const urlHalf = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + picture_item.userID + "/pictures/" + picture_item._id + ".half." + picture_item.filename,6000);
+                                        imageItem.urlHalf = urlHalf;
+                                        imageItem._id = picture_item._id;
+                                        imageItem.filename = picture_item.filename;
+                                        appPictures.push(imageItem);
+                                        pcallbackz();
+                                    } catch (e) {
+
+                                    }
+                                   
+                                    })();
                                 }, function(err) {
                                     if (err) {
                                         console.log('An app pic image failed to process');
@@ -2877,32 +3182,32 @@ app.get('/profile/:_id', requiredAuthentication, usercheck, function (req, res) 
                             }
                         });
 
-                    },
-                    function (callback) {
-                        var params = {
-                            Bucket: 'mvmv.us',
-//                            Delimiter: '/',
-                            Prefix: 'assets_2018_1/bundles_ios/'
-                        }
-
-                        s3.listObjects(params, function(err, data) {
-                            if (err) {
-                                console.log(err);
-                                return callback(err);
-                            }
-                            if (data.Contents.length == 0) {
-                                console.log("no content found");
-                                callback(null);
-                            } else {
-
-
-                                profileResponse.assets = data.Contents;
-                                // console.log("assets available: " + JSON.stringify( profileResponse.assets));
-                                callback();
-                            }
-                        });
-
                     }],
+//                     function (callback) {
+//                         var params = {
+//                             Bucket: 'mvmv.us',
+// //                            Delimiter: '/',
+//                             Prefix: 'assets_2018_1/bundles_ios/'
+//                         }
+
+//                         s3.listObjects(params, function(err, data) {
+//                             if (err) {
+//                                 console.log(err);
+//                                 return callback(err);
+//                             }
+//                             if (data.Contents.length == 0) {
+//                                 console.log("no content found");
+//                                 callback(null);
+//                             } else {
+
+
+//                                 profileResponse.assets = data.Contents;
+//                                 // console.log("assets available: " + JSON.stringify( profileResponse.assets));
+//                                 callback();
+//                             }
+//                         });
+
+//                     }],
                 function (err, result) { // #last function, close async
                     res.json(profileResponse);
                     console.log("waterfall done: " + result);
@@ -3807,78 +4112,89 @@ app.get('/get_model/:_id', requiredAuthentication, function (req, res) {
         db.models.findOne({"_id": model_id}, function (err, model) {
             if (err || !model) {
                 console.log("error getting model: " + err);
+                res.send(err);
             } else {
+                (async () => {
+                    try {
+                        
+                        model.url = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + model.userID + "/gltf/" + model.filename, 6000);
+                        res.send (model);
+                    
+                    } catch (e) {
+                        res.send(e);
+                    }
+                })();
                 // console.log("got user models:" + JSON.stringify(models));
-                let url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + model.userID + "/gltf/" + model.filename, Expires: 6000});
-                model.url = url;
-                res.send (model);
+                // let url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + model.userID + "/gltf/" + model.filename, Expires: 6000});
+                // model.url = url;
+                
             }
         });
 });
 
-app.get('/asset_conv/:_id', requiredAuthentication, usercheck, function (req, res) {
-    // console.log("tryna get_userassets for " + req.params._id );
-    db.assets.findOne({"user_id": req.params._id}, function (err, assets) {
-        if (err || !assets) {
-            console.log("error getting user assets: " + err);
-        } else {
-            console.log("got user assets!");
-            let response = {};
-            for (asset in assets) {
+// app.get('/asset_conv/:_id', requiredAuthentication, usercheck, function (req, res) {
+//     // console.log("tryna get_userassets for " + req.params._id );
+//     db.assets.findOne({"user_id": req.params._id}, function (err, assets) {
+//         if (err || !assets) {
+//             console.log("error getting user assets: " + err);
+//         } else {
+//             console.log("got user assets!");
+//             let response = {};
+//             for (asset in assets) {
                 
-            }
-            res.send (response);
-        }
-    });
-});
+//             }
+//             res.send (response);
+//         }
+//     });
+// });
 
-app.get('/sceneassetputurl/:u_id', requiredAuthentication, usercheck, function (req, res) {
+// app.get('/sceneassetputurl/:u_id', requiredAuthentication, usercheck, function (req, res) {
 
-    db.users.findOne({"_id": u_id}, function (err, user) {
-        if (err || !user) {
-            console.log("error getting user: " + err);
-        } else {
-            const fileName = req.query['file-name'];
-            const fileType = req.query['file-type'];
-            const s3Params = {
-                Bucket: S3_BUCKET,
-                Key: fileName,
-                Expires: 60,
-                ContentType: fileType,
-                ACL: 'public-read'
-            };
+//     db.users.findOne({"_id": u_id}, function (err, user) {
+//         if (err || !user) {
+//             console.log("error getting user: " + err);
+//         } else {
+//             const fileName = req.query['file-name'];
+//             const fileType = req.query['file-type'];
+//             const s3Params = {
+//                 Bucket: S3_BUCKET,
+//                 Key: fileName,
+//                 Expires: 60,
+//                 ContentType: fileType,
+//                 ACL: 'public-read'
+//             };
 
-            s3.getSignedUrl('putObject', s3Params, (err, data) => {
-                if(err){
-                console.log(err);
-                return res.end();
-                }
-                const returnData = {
-                signedRequest: data,
-                url: `https://${S3_BUCKET}.s3.amazonaws.com/${fileName}`
-                };
-                res.write(JSON.stringify(returnData));
-                res.end();
-            });
-        }
-    });
-});
+//             s3.getSignedUrl('putObject', s3Params, (err, data) => {
+//                 if(err){
+//                 console.log(err);
+//                 return res.end();
+//                 }
+//                 const returnData = {
+//                 signedRequest: data,
+//                 url: `https://${S3_BUCKET}.s3.amazonaws.com/${fileName}`
+//                 };
+//                 res.write(JSON.stringify(returnData));
+//                 res.end();
+//             });
+//         }
+//     });
+// });
 
-app.get('/bundleassetputurl/:_id/:version_sig/:platform_sig', checkAppID, requiredAuthentication, usercheck, function (req, res) {
-    var u_id = ObjectID(req.params._id);
-    db.users.findOne({"_id": u_id}, function (err, user) {
-        if (err || !user) {
-            console.log("error getting user: " + err);
-        } else {
-            var url = s3.getSignedUrl('putObject', {Bucket: 'servicemedia', Key: "users/" + u_id + "/assets/" + req.params.version_sig + "/bundles_" + req.params.platform_sig, Expires: 600});
-//            s3.getSignedUrl('putObject', params, (err, url) => {
-//                if (err) return console.log(err);
+// app.get('/bundleassetputurl/:_id/:version_sig/:platform_sig', checkAppID, requiredAuthentication, usercheck, function (req, res) {
+//     var u_id = ObjectID(req.params._id);
+//     db.users.findOne({"_id": u_id}, function (err, user) {
+//         if (err || !user) {
+//             console.log("error getting user: " + err);
+//         } else {
+//             var url = s3.getSignedUrl('putObject', {Bucket: 'servicemedia', Key: "users/" + u_id + "/assets/" + req.params.version_sig + "/bundles_" + req.params.platform_sig, Expires: 600});
+// //            s3.getSignedUrl('putObject', params, (err, url) => {
+// //                if (err) return console.log(err);
 
-            res.json({ url: url });
-//        });
-        }
-    });
-});
+//             res.json({ url: url });
+// //        });
+//         }
+//     });
+// });
 
 // app.post('/objputurl/:_id', requiredAuthentication, function (req, res) {
 //     console.log("tryna get a puturl for : " + req.body.uid + " contentTYpe : " + req.body.contentType);
@@ -4208,39 +4524,54 @@ app.post('/process_staging_files', requiredAuthentication, function (req, res) {
                         function (callback) {
                             console.log("groupTYpe : " + groupType);
                             // console.log("Bucket exists and we have access");
-                            (async () => {  // to flex with minio, etc..
+                             // to flex with minio, etc..
                                 if (minioClient) {
-                                    try {
-                                        minioClient.statObject(stagingBucket, "staging/" + item.uid + "/" + itemKey, function(err, stat) { //statObject = headObject at s3
-                                            if (err) {
-                                                console.log(err);
-                                                callback(err);
-                                            } else {
-                                                console.log("minio statObject " + stat);
-                                                callback(null);
-                                            }
+                                    (async () => { 
+                                        try {
+                                            minioClient.statObject(stagingBucket, "staging/" + item.uid + "/" + itemKey, function(err, stat) { //statObject = headObject at s3
+                                                if (err) {
+                                                    console.log(err);
+                                                    callback(err);
+                                                } else {
+                                                    console.log("minio statObject " + stat);
+                                                    callback(null);
+                                                }
 
-                                        });
+                                            });
                                         // callback(null);
-                                    } catch (e) {
-                                        callback(e);
-                                    }
-                                } else {
-                                    var params = {Bucket: stagingBucket, Delimiter: item.uid, Key: "staging/" + item.uid + "/" + itemKey}    
-                                    s3.headObject(params, function (err, data) {
-                                        if (err && err.code === 'NotFound') {
-                                            // Handle no object on cloud here
-                                            console.log(err);
-                                            callback(err);
-                                            // res.send("staged file not found");
-                                        } else {
-                                            // meateada = metadata;
-                                            console.log("head staged file meateada " + data);
-                                            callback(null);
+                                        } catch (e) {
+                                            callback(e);
                                         }
-                                    });
+                                    })();
+                                } else {
+                                    // var params = {Bucket: stagingBucket, Delimiter: item.uid, Key: "staging/" + item.uid + "/" + itemKey}    
+                                    (async () => { 
+                                        try {
+                                        let objectExists = await ReturnObjectExists(stagingBucket,"staging/" + item.uid + "/" + itemKey);
+                                            if (objectExists) {
+                                                console.log("gotsa object " + itemKey);
+                                                callback();
+                                            } else {
+                                                callback("no object found");
+                                            }
+                                        } catch (er) {
+                                            callback(er);
+                                        }
+                                    })();
+                                    // s3.headObject(params, function (err, data) {
+                                    //     if (err && err.code === 'NotFound') {
+                                    //         // Handle no object on cloud here
+                                    //         console.log(err);
+                                    //         callback(err);
+                                    //         // res.send("staged file not found");
+                                    //     } else {
+                                    //         // meateada = metadata;
+                                    //         console.log("head staged file meateada " + data);
+                                    //         callback(null);
+                                    //     }
+                                    // });
                                 }
-                            })();
+                            
                             // var params = {Bucket: 'archive1', Delimiter: item.uid, Key: "staging/" + item.uid + "/" + itemKey}    
                             // s3.headObject(params, function (err, data) {
                             //     if (err && err.code === 'NotFound') {
@@ -4289,40 +4620,59 @@ app.post('/process_staging_files', requiredAuthentication, function (req, res) {
                             //         callback(null);
                             //     }    
                             // });
-                            (async () => {  //flex with minio, etc..
+ 
                                 if (minioClient) {
-                                    try {
-                                        minioClient.statObject(stagingBucket, "staging/" + item.uid + "/" + itemKey, function(err, stat) {
-                                            if (err) {
-                                                console.log(err)
-                                                callback(err);
-                                            } else {
-                                                console.log("minio statObject " + stat);
-                                                callback(null);
-                                            }
-                                          
-                                        });
-                                        
-                                    } catch (e) {
-                                        callback(e);
-                                    }
-                                } else {
-                                    var params = {Bucket: stagingBucket, Key: "staging/" + item.uid + "/" + itemKey}    
-                                    s3.headObject(params, function (err, data) {
-                                        if (err && err.code === 'NotFound') {
-                                            // Handle no object on cloud here
-                                            console.log(err);
-                                            callback(err);
-                                            res.send("staged file not found");
-                                        } else {
-                                            console.log(data);  
-                                            size = data.ContentLength;
-                                            console.log("sizeOf = " + size);
-                                            callback(null);
+                                    (async () => {  //flex with minio, etc..
+                                        try {
+                                            minioClient.statObject(stagingBucket, "staging/" + item.uid + "/" + itemKey, function(err, stat) {
+                                                if (err) {
+                                                    console.log(err)
+                                                    callback(err);
+                                                } else {
+                                                    console.log("minio statObject " + stat);
+                                                    callback(null);
+                                                }
+                                            
+                                            });
+                                            
+                                        } catch (e) {
+                                            callback(e);
                                         }
-                                    });
+                                    })();
+                                } else {
+                                    (async () => { 
+                                        try {
+                                        let data = await ReturnObjectMetadata(stagingBucket,"staging/" + item.uid + "/" + itemKey);
+                                            if (data) {
+                                                console.log("gotsa object " + itemKey);
+                                                // callback();
+                                                console.log(data);  
+                                                size = data.ContentLength;
+                                                console.log("sizeOf = " + size);
+                                                callback(null);
+                                            } else {
+                                                callback("no object found");
+                                            }
+                                        } catch (er) {
+                                            callback(er);
+                                        }
+                                    })();
+                                    // var params = {Bucket: stagingBucket, Key: "staging/" + item.uid + "/" + itemKey}    
+                                    // s3.headObject(params, function (err, data) {
+                                    //     if (err && err.code === 'NotFound') {
+                                    //         // Handle no object on cloud here
+                                    //         console.log(err);
+                                    //         callback(err);
+                                    //         res.send("staged file not found");
+                                    //     } else {
+                                    //         console.log(data);  
+                                    //         size = data.ContentLength;
+                                    //         console.log("sizeOf = " + size);
+                                    //         callback(null);
+                                    //     }
+                                    // });
                                 }
-                            })();
+                            // })();
                             
                         },
                         function (callback) { // Get a url for the source file
@@ -4340,7 +4690,7 @@ app.post('/process_staging_files', requiredAuthentication, function (req, res) {
                             // });
                             (async () => {  
                                 try {
-                                    url = await ReturnPresignedUrl(stagingBucket, "staging/" + item.uid + "/" + itemKey, 6000);
+                                    const url = await ReturnPresignedUrl(stagingBucket, "staging/" + item.uid + "/" + itemKey, 6000);
                                     
                                     callback(null, url);
                                 } catch (e) {
@@ -4376,9 +4726,10 @@ app.post('/process_staging_files', requiredAuthentication, function (req, res) {
                                             var ck = "users/" + saved.userID + "/pictures/originals/" + item_id + ".original." + saved.filename; //path change!
                                             console.log("tryna copy origiinal to " + ck);
                                             var targetBucket = process.env.S3_ROOT_BUCKET_NAME;
-                                            (async () => {  
-                                                try {
+                                            
                                                     if (minioClient) {
+                                                        (async () => {  
+                                                            try {
                                                         minioClient.copyObject(targetBucket, ck, copySource, function(e, data) {
                                                             if (e) {
                                                                 callback(e);
@@ -4387,27 +4738,37 @@ app.post('/process_staging_files', requiredAuthentication, function (req, res) {
                                                                 console.log("etag = " + data.etag + ", lastModified = " + data.lastModified);
                                                                 callback(null, item_id, tUrl);
                                                             }
-                                                            
+                                                        
                                                           });
+                                                        } catch (e) {
+                                                            callback(e);
+                                                        }
+                                                        })();
                                                     } else {
-                                                        s3.copyObject({Bucket: targetBucket, CopySource: copySource, Key: ck}, function (err,data){
-                                                            if (err) {
-                                                                console.log("ERROR copyObject" + err);
-                                                                callback(err);
-                                                            } else {
-                                                                console.log("SUCCESS copyObject key " + ck );
-                                                                // callback(null);
+                                                        (async () => {  
+                                                            try {
+                                                                const data = await CopyObject(targetBucket, copySource, ck);
                                                                 callback(null, item_id, tUrl);
+                                                            } catch (e) {
+                                                                callback(e);
                                                             }
-                                                        });
+                                                        })();
+                                                        // s3.copyObject({Bucket: targetBucket, CopySource: targetBucket, Key: ck}, function (err,data){
+                                                        //     if (err) {
+                                                        //         console.log("ERROR copyObject" + err);
+                                                        //         callback(err);
+                                                        //     } else {
+                                                        //         console.log("SUCCESS copyObject key " + ck );
+                                                        //         // callback(null);
+                                                        //         callback(null, item_id, tUrl);
+                                                        //     }
+                                                        // });
                                                     }
                                                     // let copyResponse = await CopyObject(targetBucket, copySource, ck).promise(); //later
                                                     // console.log("copy response: "+ copyResponse);
                                                     // callback(null, item_id, tUrl);
-                                                } catch (e) {
-                                                    callback(e);
-                                                }
-                                            })();
+                                               
+                                            
                                         }
                                     }
                                 );
@@ -4445,9 +4806,11 @@ app.post('/process_staging_files', requiredAuthentication, function (req, res) {
                                             console.log("tryna copy origiinal to " + ck);
                                             var targetBucket = process.env.S3_ROOT_BUCKET_NAME;
 
-                                            (async () => {  
-                                                try {
+                                             
+                                                
                                                     if (minioClient) {
+                                                        (async () => { 
+                                                        try {
                                                         minioClient.copyObject(targetBucket, ck, copySource, function(e, data) {
                                                             if (e) {
                                                                 callback(e);
@@ -4458,22 +4821,34 @@ app.post('/process_staging_files', requiredAuthentication, function (req, res) {
                                                             }
                                                             
                                                           });
+                                                        } catch (e) {
+                                                            callback(e);
+                                                        }
+                                                    })();
                                                     } else {
-                                                        s3.copyObject({Bucket: targetBucket, CopySource: copySource, Key: ck}, function (err,data){
-                                                            if (err) {
-                                                                console.log("ERROR copyObject" + err);
-                                                                callback(err);
-                                                            } else {
-                                                                console.log("SUCCESS copyObject key " + ck );
-                                                                // callback(null);
+                                                        (async () => { 
+                                                            try {
+                                                                const status = await CopyObject(targetBucket, copySource, ck);
+                                                                console.log("copied somethings " + status);
                                                                 callback(null, item_id, tUrl);
+                                                            } catch (e) {
+                                                                callback(e);
                                                             }
-                                                        });
+                                                        })();
+                                                        
+                                                        // s3.copyObject({Bucket: targetBucket, CopySource: copySource, Key: ck}, function (err,data){
+                                                        //     if (err) {
+                                                        //         console.log("ERROR copyObject" + err);
+                                                        //         callback(err);
+                                                        //     } else {
+                                                        //         console.log("SUCCESS copyObject key " + ck );
+                                                        //         // callback(null);
+                                                        //         callback(null, item_id, tUrl);
+                                                        //     }
+                                                        // });
                                                     }
-                                                } catch (e) {
-                                                    callback(e);
-                                                }
-                                            })();
+
+                                            
                                             // s3.copyObject({Bucket: targetBucket, CopySource: copySource, Key: ck}, function (err,data){
                                             //     if (err) {
                                             //         console.log("ERROR audio copyObject" + err);
@@ -4691,7 +5066,7 @@ app.post('/process_staging_files', requiredAuthentication, function (req, res) {
                                     //     // callback(null);
                                     // })
                                     .then(function () {
-                                        console.log("grabAndSqueeze process_audio response: " + response.data);
+                                        // console.log("grabAndSqueeze process_audio response: " + response.data);
                                         callback(null);
                                     })
                                     .catch(function (error) {
@@ -4718,73 +5093,97 @@ app.post('/process_staging_files', requiredAuthentication, function (req, res) {
                                 //         callback(null);
                                 //     }
                                 // });
-                                (async () => {  
-                                    try {
+
                                         if (minioClient) {
-                                            minioClient.copyObject(targetBucket, ck, copySource, function(e, data) {
-                                                if (e) {
+                                            (async () => {  
+                                                try {
+                                                    minioClient.copyObject(targetBucket, ck, copySource, function(e, data) {
+                                                    if (e) {
+                                                        callback(e);
+                                                    } else {
+                                                        console.log("Successfully copied audio object:");
+                                                        console.log("etag = " + data.etag + ", lastModified = " + data.lastModified);
+                                                        callback(null);
+                                                    }
+                                                    
+                                                });
+                                                } catch (e) {
                                                     callback(e);
-                                                } else {
-                                                    console.log("Successfully copied audio object:");
-                                                    console.log("etag = " + data.etag + ", lastModified = " + data.lastModified);
-                                                    callback(null);
                                                 }
-                                                
-                                              });
+                                            })();
                                         } else {
-                                            s3.copyObject({Bucket: targetBucket, CopySource: copySource, Key: ck}, function (err,data){
-                                                if (err) {
-                                                    console.log("ERROR copyObject" + err);
-                                                    callback(err);
-                                                } else {
-                                                    console.log("SUCCESS copyObject key " + ck );
-                                                    // callback(null);
+                                            (async () => { 
+                                                try {
+                                                    const status = await CopyObject(targetBucket, copySource, ck);
+                                                    console.log("copied somethings " + status);
                                                     callback(null);
+                                                } catch (e) {
+                                                    callback(e);
                                                 }
-                                            });
+                                            })();
+
+                                            // s3.copyObject({Bucket: targetBucket, CopySource: copySource, Key: ck}, function (err,data){
+                                            //     if (err) {
+                                            //         console.log("ERROR copyObject" + err);
+                                            //         callback(err);
+                                            //     } else {
+                                            //         console.log("SUCCESS copyObject key " + ck );
+                                            //         // callback(null);
+                                            //         callback(null);
+                                            //     }
+                                            // });
                                         }
-                                    } catch (e) {
-                                        callback(e);
-                                    }
-                                })();
+
+                                
                             } else if (groupType == ".glb") {
-                                var targetBucket = "servicemedia";
-                                var copySource = "archive1/staging/" + item.uid + "/" + itemKey;
+                                var targetBucket = process.env.S3_ROOT_BUCKET_NAME;
+                                var copySource = process.env.STAGING_BUCKET_NAME + "staging/" + item.uid + "/" + itemKey;
                                 var ck = "users/" + item.uid + "/gltf/" + itemKey;
                                 console.log("tryna copy glb to " + ck);
-                                (async () => {  
-                                    try {
+
                                         let metadata = {"Content-Type":"model/gltf-binary"};
                                         // metadata.Content-Type = 'model/gltf-binary';
                                         if (minioClient) {
+                                            (async () => {  
+                                                try {
                                             // minioClient.copyObject(targetBucket, ck, copySource, metadata, function(e, data) { //hrm dunno, needs testing
-                                            minioClient.copyObject(targetBucket, ck, copySource, function(e, data) {
-                                                if (e) {
+                                                minioClient.copyObject(targetBucket, ck, copySource, function(e, data) {
+                                                    if (e) {
+                                                        callback(e);
+                                                    } else {
+                                                        console.log("Successfully copied glb object:");
+                                                        console.log("etag = " + data.etag + ", lastModified = " + data.lastModified);
+                                                        callback(null);
+                                                    }
+                                                    
+                                                });
+                                                } catch (e) {
                                                     callback(e);
-                                                } else {
-                                                    console.log("Successfully copied glb object:");
-                                                    console.log("etag = " + data.etag + ", lastModified = " + data.lastModified);
-                                                    callback(null);
                                                 }
-                                                
-                                              });
+                                            })();
                                         } else {
                                             console.log("tryna copy with metadata" + JSON.stringify(metadata));
-                                            s3.copyObject({Bucket: targetBucket, CopySource: copySource, Key: ck, ContentType: 'model/gltf-binary', Metadata: metadata}, function (err,data){ //no workiie?
-                                                if (err) {
-                                                    console.log("ERROR copyObject" + err);
-                                                    callback(err);
-                                                } else {
-                                                    console.log("SUCCESS copyObject key " + ck );
-                                                    // callback(null);
+
+                                            (async () => {
+                                                try {
+                                                    const status = await CopyObject(targetBucket, copySource, ck);
                                                     callback(null);
+                                                } catch (e) {
+                                                    callback(e);
                                                 }
-                                            });
+                                            })();
+                                            // s3.copyObject({Bucket: targetBucket, CopySource: copySource, Key: ck, ContentType: 'model/gltf-binary', Metadata: metadata}, function (err,data){ //no workiie?
+                                            //     if (err) {
+                                            //         console.log("ERROR copyObject" + err);
+                                            //         callback(err);
+                                            //     } else {
+                                            //         console.log("SUCCESS copyObject key " + ck );
+                                            //         // callback(null);
+                                            //         callback(null);
+                                            //     }
+                                            // });
                                         }
-                                    } catch (e) {
-                                        callback(e);
-                                    }
-                                })();
+                                    
                                 // s3.copyObject({Bucket: targetBucket, CopySource: copySource, Key: ck}, function (err,data){
                                 //     if (err) {
                                 //         console.log("ERROR copyObject" + err);
@@ -4799,35 +5198,46 @@ app.post('/process_staging_files', requiredAuthentication, function (req, res) {
                                 var copySource = "archive1/staging/" + item.uid + "/" + itemKey;
                                 var ck = "users/" + item.uid + "/usdz/" + itemKey;
                                 console.log("tryna copy usdz to " + ck);
-                                (async () => {  
-                                    try {
+
                                         if (minioClient) {
-                                            minioClient.copyObject(targetBucket, ck, copySource, function(e, data) {
-                                                if (e) {
-                                                    callback(e);
-                                                } else {
-                                                    console.log("Successfully copied usdz object:");
-                                                    console.log("etag = " + data.etag + ", lastModified = " + data.lastModified);
-                                                    callback(null);
+                                            (async () => {  
+                                                try {
+                                                minioClient.copyObject(targetBucket, ck, copySource, function(e, data) {
+                                                    if (e) {
+                                                        callback(e);
+                                                    } else {
+                                                        console.log("Successfully copied usdz object:");
+                                                        console.log("etag = " + data.etag + ", lastModified = " + data.lastModified);
+                                                        callback(null);
+                                                    }
+                                                    
+                                                });
+                                                } catch (e){
+                                                    callback(e);   
                                                 }
-                                                
-                                              });
+                                            })();
                                         } else {
-                                            s3.copyObject({Bucket: targetBucket, CopySource: copySource, Key: ck}, function (err,data){
-                                                if (err) {
-                                                    console.log("ERROR copyObject" + err);
-                                                    callback(err);
-                                                } else {
-                                                    console.log("SUCCESS copyObject key " + ck );
-                                                    // callback(null);
+                                            (async () => {
+                                                try {
+                                                    const status = await CopyObject(targetBucket, copySource, ck);
                                                     callback(null);
+                                                } catch (e) {
+                                                    callback(e);
                                                 }
-                                            });
+                                            })();
+                                            // s3.copyObject({Bucket: targetBucket, CopySource: copySource, Key: ck}, function (err,data){
+                                            //     if (err) {
+                                            //         console.log("ERROR copyObject" + err);
+                                            //         callback(err);
+                                            //     } else {
+                                            //         console.log("SUCCESS copyObject key " + ck );
+                                            //         // callback(null);
+                                            //         callback(null);
+                                            //     }
+                                            // });
                                         }
-                                    } catch (e) {
-                                        callback(e);
-                                    }
-                                })();
+                                    
+                                
                                 // s3.copyObject({Bucket: targetBucket, CopySource: copySource, Key: ck}, function (err,data){
                                 //     if (err) {
                                 //         console.log("ERROR copyObject" + err);
@@ -4837,50 +5247,51 @@ app.post('/process_staging_files', requiredAuthentication, function (req, res) {
                                 //         callback(null);
                                 //     }
                                 // });
-                            } else if (groupType == ".reality") {
-                                var targetBucket = "servicemedia";
-                                var copySource = "archive1/staging/" + item.uid + "/" + itemKey;
-                                var ck = "users/" + item.uid + "/reality/" + itemKey;
-                                console.log("tryna copy usdz to " + ck);
-                                (async () => {  
-                                    try {
-                                        if (minioClient) {
-                                            minioClient.copyObject(targetBucket, ck, copySource, function(e, data) {
-                                                if (e) {
-                                                    callback(e);
-                                                } else {
-                                                    console.log("Successfully copied the object:");
-                                                    console.log("etag = " + data.etag + ", lastModified = " + data.lastModified);
-                                                    callback(null);
-                                                }
+                            } 
+                            // else if (groupType == ".reality") {
+                            //     var targetBucket = process.env.S3_ROOT_BUCKET_NAME;
+                            //     var copySource = process.env.STAGING_BUCKET_NAME + "staging/" + item.uid + "/" + itemKey;
+                            //     var ck = "users/" + item.uid + "/reality/" + itemKey;
+                            //     console.log("tryna copy usdz to " + ck);
+                            //     (async () => {  
+                            //         try {
+                            //             if (minioClient) {
+                            //                 minioClient.copyObject(targetBucket, ck, copySource, function(e, data) {
+                            //                     if (e) {
+                            //                         callback(e);
+                            //                     } else {
+                            //                         console.log("Successfully copied the object:");
+                            //                         console.log("etag = " + data.etag + ", lastModified = " + data.lastModified);
+                            //                         callback(null);
+                            //                     }
                                                 
-                                              });
-                                        } else {
-                                            s3.copyObject({Bucket: targetBucket, CopySource: copySource, Key: ck}, function (err,data){
-                                                if (err) {
-                                                    console.log("ERROR copyObject" + err);
-                                                    callback(err);
-                                                } else {
-                                                    console.log("SUCCESS copyObject key " + ck );
-                                                    // callback(null);
-                                                    callback(null);
-                                                }
-                                            });
-                                        }
-                                    } catch (e) {
-                                        callback(e);
-                                    }
-                                })();
-                                // s3.copyObject({Bucket: targetBucket, CopySource: copySource, Key: ck}, function (err,data){
-                                //     if (err) {
-                                //         console.log("ERROR copyObject" + err);
-                                //         callback(err);
-                                //     } else {
-                                //         console.log("SUCCESS copyObject key " + ck );
-                                //         callback(null);
-                                //     }
-                                // });
-                            }  
+                            //                   });
+                            //             } else {
+                            //                 s3.copyObject({Bucket: targetBucket, CopySource: copySource, Key: ck}, function (err,data){
+                            //                     if (err) {
+                            //                         console.log("ERROR copyObject" + err);
+                            //                         callback(err);
+                            //                     } else {
+                            //                         console.log("SUCCESS copyObject key " + ck );
+                            //                         // callback(null);
+                            //                         callback(null);
+                            //                     }
+                            //                 });
+                            //             }
+                            //         } catch (e) {
+                            //             callback(e);
+                            //         }
+                            //     })();
+                            //     // s3.copyObject({Bucket: targetBucket, CopySource: copySource, Key: ck}, function (err,data){
+                            //     //     if (err) {
+                            //     //         console.log("ERROR copyObject" + err);
+                            //     //         callback(err);
+                            //     //     } else {
+                            //     //         console.log("SUCCESS copyObject key " + ck );
+                            //     //         callback(null);
+                            //     //     }
+                            //     // });
+                            // }  
                             
 
                         },
@@ -4889,32 +5300,46 @@ app.post('/process_staging_files', requiredAuthentication, function (req, res) {
                             params.Delete.Objects.push({Key: 'staging/' + item.uid + '/' + item.key}); //clean up
                             // console.log("delete params: " + JSON.stringify(params));
 
-                            (async () => {  
-                                try {
+                            // (async () => {  
+                                
                                     if (minioClient) { // --really only one here...
-                                        minioClient.removeObject(process.env.STAGING_BUCKET_NAME, 'staging/' + item.uid + '/' + item.key, function(err) {
-                                            if (err) {
-                                              console.log('Unable to remove object', err);
-                                              callback(err);
-                                            }
-                                            console.log('Removed the object');
-                                            callback(null);
-                                          })
-                                    } else {
-                                        s3.deleteObjects(params, function(err, data) {
-                                            if (err) {
-                                                console.log("error deleting " + err);
+                                        (async () => {
+                                            try {
+                                            minioClient.removeObject(process.env.STAGING_BUCKET_NAME, 'staging/' + item.uid + '/' + item.key, function(err) {
+                                                if (err) {
+                                                console.log('Unable to remove object', err);
                                                 callback(err);
-                                            } else {
-                                                // console.log('deleted staging files: ' + JSON.stringify(params));
+                                                }
+                                                console.log('Removed the object');
                                                 callback(null);
+                                            })
+                                            } catch (e) {
+                                                callback(e);
                                             }
-                                        });
+                                        })();
+                                    } else {
+                                        (async () => {
+                                            try {
+                                               await DeleteObjects(process.env.STAGING_BUCKET_NAME, params.Delete);
+
+                                                callback(null);
+                                                // db.image_items.remove( { "_id" : o_id }, 1 );  // TODO what if files are gone but db reference remains? 
+                                            } catch (e) {
+                                               callback(e);
+                                            }
+                                        })();
+                                        // s3.deleteObjects(params, function(err, data) {
+                                        //     if (err) {
+                                        //         console.log("error deleting " + err);
+                                        //         callback(err);
+                                        //     } else {
+                                        //         // console.log('deleted staging files: ' + JSON.stringify(params));
+                                        //         callback(null);
+                                        //     }
+                                        // });
                                     }
-                                } catch (e) {
-                                    callback(e);
-                                }
-                            })();
+        
+                            // })();
 
                             // s3.deleteObjects(params, function(err, data) {
                             //     if (err) {
@@ -5036,7 +5461,7 @@ app.post('/process_staging_files', requiredAuthentication, function (req, res) {
 app.post('/staging_delete', requiredAuthentication, function (req, res) {
     console.log("staging delete: " + JSON.stringify(req.body));
     params = {
-            Bucket: 'archive1',
+            Bucket: process.env.STAGING_BUCKET_NAME,
             // Prefix: 'staging/' + u_id + '/'
         };
     params.Delete = {Objects:[]};
@@ -5044,14 +5469,23 @@ app.post('/staging_delete', requiredAuthentication, function (req, res) {
     params.Delete.Objects.push({Key: 'staging/' + req.body.uid + '/' + req.body.key});
     // });
     console.log("delete params: " + JSON.stringify(params));
-    s3.deleteObjects(params, function(err, data) {
-        if (err) {
-            console.log("error deleting " + err)
-            res.send("error deleting " + err);
-        } else {
-            res.send("files deleted" + JSON.stringify(data));
+
+    (async () => {
+        try {
+            const status = await DeleteObjects(process.env.STAGING_BUCKET_NAME, params.Delete);
+            res.send("files deleted from staging..." + status);
+        } catch (e) {
+            res.send("error deleting " + e);
         }
-    });
+    })();
+    // s3.deleteObjects(params, function(err, data) {
+    //     if (err) {
+    //         console.log("error deleting " + err)
+    //         res.send("error deleting " + err);
+    //     } else {
+    //         res.send("files deleted" + JSON.stringify(data));
+    //     }
+    // });
 });
 app.post('/staging_delete_array', requiredAuthentication, function (req, res) {
     console.log("staging delete: " + JSON.stringify(req.body));
@@ -5079,7 +5513,7 @@ app.post('/staging_delete_array', requiredAuthentication, function (req, res) {
 
         });
     } else {
-        params = {
+        const params = {
                 Bucket: process.env.STAGING_BUCKET_NAME,
                 // Prefix: 'staging/' + u_id + '/'
             };
@@ -5089,106 +5523,118 @@ app.post('/staging_delete_array', requiredAuthentication, function (req, res) {
             params.Delete.Objects.push({Key: 'staging/' + content.uid + '/' + content.key});
         });
         console.log("delete params: " + JSON.stringify(params));
-        s3.deleteObjects(params, function(err, data) {
-            if (err) {
-                console.log("error deleting " + err)
-                res.send("error deleting " + err);
-            } else {
-                res.send("files deleted" + JSON.stringify(data));
+        
+        (async () => {
+            try {
+               const status = await DeleteObjects(process.env.STAGING_BUCKET_NAME, params.Delete);
+
+               res.send("files deleted ~" + status);
+                // db.image_items.remove( { "_id" : o_id }, 1 );  // TODO what if files are gone but db reference remains? 
+            } catch (e) {
+               res.send(e);
             }
-        });
+        })();
+
+        // s3.deleteObjects(params, function(err, data) {
+        //     if (err) {
+        //         console.log("error deleting " + err)
+        //         res.send("error deleting " + err);
+        //     } else {
+        //         res.send("files deleted" + JSON.stringify(data));
+        //     }
+        // });
     }
 });
 
-app.post('/putobjecturl/', requiredAuthentication, function (req, res) {
-    console.log("tryna get a puturl for contentTYpe : " + req.body.contentType);
-    var cType = req.body.contentType;
-    var timestamp = Math.round(Date.now());
-    const params = {
-        Bucket: '3dcasefiles.com/braincheck',
-        //meatadata aqui
-        // ACL: 'bucket-owner-full-control',
-        // ContentType: 'text/csv',
-        Body: '',
-        ContentType: cType,
-        Key: req.body.filename,
-        Expires: 100
-    };
+// app.post('/putobjecturl/', requiredAuthentication, function (req, res) {
+//     console.log("tryna get a puturl for contentTYpe : " + req.body.contentType);
+//     var cType = req.body.contentType;
+//     var timestamp = Math.round(Date.now());
+//     const params = {
+//         Bucket: '3dcasefiles.com/braincheck',
+//         //meatadata aqui
+//         // ACL: 'bucket-owner-full-control',
+//         // ContentType: 'text/csv',
+//         Body: '',
+//         ContentType: cType,
+//         Key: req.body.filename,
+//         Expires: 100
+//     };
 
-    s3.getSignedUrl('putObject', params, function(err, signedUrl) {
-        let response;
-        if (err) {
-            response = {
-            statusCode: 500,
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-            },
-            body: JSON.stringify({
-                error: 'Did not receive signed url'
-            }),
-            };
-            console.log("putObject url error : " + err );
-            res.json(err);
-        } else {
-            response = {
-            statusCode: 200,
-            headers: {
-                'Access-Control-Allow-Origin': '*', // Required for CORS support to work
-            },
-            body: "",
-            method: "put",
-            url: signedUrl,
-            fields: []
-            };
-            console.log("putObject url : " + signedUrl );
-            res.json(signedUrl);
-        }
-    });
-});
+//     s3.getSignedUrl('putObject', params, function(err, signedUrl) {
+//         let response;
+//         if (err) {
+//             response = {
+//             statusCode: 500,
+//             headers: {
+//                 'Access-Control-Allow-Origin': '*',
+//             },
+//             body: JSON.stringify({
+//                 error: 'Did not receive signed url'
+//             }),
+//             };
+//             console.log("putObject url error : " + err );
+//             res.json(err);
+//         } else {
+//             response = {
+//             statusCode: 200,
+//             headers: {
+//                 'Access-Control-Allow-Origin': '*', // Required for CORS support to work
+//             },
+//             body: "",
+//             method: "put",
+//             url: signedUrl,
+//             fields: []
+//             };
+//             console.log("putObject url : " + signedUrl );
+//             res.json(signedUrl);
+//         }
+//     });
+// });
 
 
-app.post('/puturl/', requiredAuthentication, function (req, res) {
-    console.log("tryna get a puturl for contentTYpe : " + req.body.contentType);
-    var cType = req.body.contentType;
-    // var timestamp = Math.round(Date.now());
-    const params = {
-        Bucket: 'archive1/tmp',
-        Body: '',
-        ContentType: cType,
-        Key: req.body.filename,
-        Expires: 100
-    };
+// app.post('/puturl/', requiredAuthentication, function (req, res) {
+//     console.log("tryna get a puturl for contentTYpe : " + req.body.contentType);
+//     var cType = req.body.contentType;
+//     // var timestamp = Math.round(Date.now());
+//     const params = {
+//         Bucket: 'archive1/tmp',
+//         Body: '',
+//         ContentType: cType,
+//         Key: req.body.filename,
+//         Expires: 100
+//     };
 
-    s3.getSignedUrl('putObject', params, function(err, signedUrl) {
-        let response;
-        if (err) {
-            response = {
-            statusCode: 500,
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-            },
-            body: JSON.stringify({
-                error: 'Did not receive signed url'
-            }),
-            };
-            console.log("putObject url error : " + err );
-            res.json(err);
-        } else {
-            response = {
-            statusCode: 200,
-            headers: {
-                'Access-Control-Allow-Origin': '*', // Required for CORS support to work
-            },
-            body: "",
-            method: "put",
-            url: signedUrl,
-            fields: []
-            };
-            console.log("putObject url : " + signedUrl );
-            res.json(signedUrl);
-        }
-    });
-});
+//     s3.getSignedUrl('putObject', params, function(err, signedUrl) {
+//         let response;
+//         if (err) {
+//             response = {
+//             statusCode: 500,
+//             headers: {
+//                 'Access-Control-Allow-Origin': '*',
+//             },
+//             body: JSON.stringify({
+//                 error: 'Did not receive signed url'
+//             }),
+//             };
+//             console.log("putObject url error : " + err );
+//             res.json(err);
+//         } else {
+//             response = {
+//             statusCode: 200,
+//             headers: {
+//                 'Access-Control-Allow-Origin': '*', // Required for CORS support to work
+//             },
+//             body: "",
+//             method: "put",
+//             url: signedUrl,
+//             fields: []
+//             };
+//             console.log("putObject url : " + signedUrl );
+//             res.json(signedUrl);
+//         }
+//     });
+// });
 // app.post('/objputurl/:_id', requiredAuthentication, function (req, res) {
 //     console.log("tryna get a puturl for : " + req.body.uid + " contentTYpe : " + req.body.contentType);
    
@@ -5270,91 +5716,92 @@ app.post('/puturl/', requiredAuthentication, function (req, res) {
 //     });
 // });
 
-app.post('/cubemap_puturl/:_id/:image_id', requiredAuthentication, function (req, res) {
-    console.log("tryna get a puturl for : " + req.body.uid + " contentTYpe : " + req.body.contentType);
-    var cType = req.body.contentType;
-    // if (cType = "application/octet-stream") {
-    //     cType = "binary/octet-stream";
-    // }
+
+// app.post('/cubemap_puturl/:_id/:image_id', requiredAuthentication, function (req, res) {
+//     console.log("tryna get a puturl for : " + req.body.uid + " contentTYpe : " + req.body.contentType);
+//     var cType = req.body.contentType;
+//     // if (cType = "application/octet-stream") {
+//     //     cType = "binary/octet-stream";
+//     // }
 
   
 
-    var u_id = ObjectID(req.params._id);
-    db.users.findOne({"_id": u_id}, function (err, user) {
-        if (err || !user) {
-            res.send("not a valid user!");
-            console.log("error getting user: " + err);
-        } else {
-            db.image_items.findOne({_id: ObjectID(req.params.image_id)}, function (err, picture_item) {
-                if (err || !picture_item) {
-                    res.send("not a valid pic!")
-                    console.log("error getting picture items: " + err);
-                } else {
-                    // console.log("gotsa picture ID for cubemap: " + JSON.stringify(picture_item));
-            // var timestamp = Math.round(Date.now());
-            let mapID = "px";
-            if (req.body.mapNumber == "2") {
-                mapID = "nx";
-            } else if (req.body.mapNumber == "3") {
-                mapID = "py";
-            } else if (req.body.mapNumber == "4") {
-                mapID = "ny";
-            } else if (req.body.mapNumber == "5") {
-                mapID = "pz";
-            } else if (req.body.mapNumber == "6") {
-                mapID = "nz";
-            }
-            const params = {
-                Bucket: process.env.S3_ROOT_BUCKET_NAME,
-                //meatadata aqui
-                // ACL: 'bucket-owner-full-control',
-                // ContentType: 'text/csv',
-                Body: '',
-                ContentType: 'image/jpeg',
-                // Key: 'staging/' + u_id + '/' + timestamp + '_' + req.body.filename,
-                Key: "users/" + picture_item.userID + "/cubemaps/" + req.params.image_id + "_"+mapID+".jpg",
-                Expires: 100
-                };
-            // var url = s3.getSignedUrl('putObject', {Bucket: 'servicemedia', Key: "users/" + u_id + "/staging" + req.params.platform_sig, Expires: 600});
-                s3.getSignedUrl('putObject', params, function(err, signedUrl) {
-                    let response;
-                    if (err) {
-                    response = {
-                        statusCode: 500,
-                        headers: {
-                            'Access-Control-Allow-Origin': '*',
-                        },
-                        body: JSON.stringify({
-                        error: 'Did not receive signed url'
-                        }),
-                    };
-                    console.log("putObject url error : " + err );
-                    res.json(err);
-                    } else {
-                    response = {
-                        statusCode: 200,
-                        headers: {
-                            'Access-Control-Allow-Origin': '*', // Required for CORS support to work
-                            'Content-Type': 'image/jpeg'
-                        },
-                        body: "",
-                        // body: JSON.stringify({
-                        //   message: `Url successfully created`,
-                        //   signedUrl,
-                        // }),
-                        method: "put",
-                        url: signedUrl,
-                        fields: []
-                        };
-                        console.log("putObject url : " + signedUrl );
-                        res.json(response);
-                        }
-                    });
-                }
-            });
-        }
-    });
-});
+//     var u_id = ObjectID(req.params._id);
+//     db.users.findOne({"_id": u_id}, function (err, user) {
+//         if (err || !user) {
+//             res.send("not a valid user!");
+//             console.log("error getting user: " + err);
+//         } else {
+//             db.image_items.findOne({_id: ObjectID(req.params.image_id)}, function (err, picture_item) {
+//                 if (err || !picture_item) {
+//                     res.send("not a valid pic!")
+//                     console.log("error getting picture items: " + err);
+//                 } else {
+//                     // console.log("gotsa picture ID for cubemap: " + JSON.stringify(picture_item));
+//             // var timestamp = Math.round(Date.now());
+//             let mapID = "px";
+//             if (req.body.mapNumber == "2") {
+//                 mapID = "nx";
+//             } else if (req.body.mapNumber == "3") {
+//                 mapID = "py";
+//             } else if (req.body.mapNumber == "4") {
+//                 mapID = "ny";
+//             } else if (req.body.mapNumber == "5") {
+//                 mapID = "pz";
+//             } else if (req.body.mapNumber == "6") {
+//                 mapID = "nz";
+//             }
+//             const params = {
+//                 Bucket: process.env.S3_ROOT_BUCKET_NAME,
+//                 //meatadata aqui
+//                 // ACL: 'bucket-owner-full-control',
+//                 // ContentType: 'text/csv',
+//                 Body: '',
+//                 ContentType: 'image/jpeg',
+//                 // Key: 'staging/' + u_id + '/' + timestamp + '_' + req.body.filename,
+//                 Key: "users/" + picture_item.userID + "/cubemaps/" + req.params.image_id + "_"+mapID+".jpg",
+//                 Expires: 100
+//                 };
+//             // var url = s3.getSignedUrl('putObject', {Bucket: 'servicemedia', Key: "users/" + u_id + "/staging" + req.params.platform_sig, Expires: 600});
+//                 s3.getSignedUrl('putObject', params, function(err, signedUrl) {
+//                     let response;
+//                     if (err) {
+//                     response = {
+//                         statusCode: 500,
+//                         headers: {
+//                             'Access-Control-Allow-Origin': '*',
+//                         },
+//                         body: JSON.stringify({
+//                         error: 'Did not receive signed url'
+//                         }),
+//                     };
+//                     console.log("putObject url error : " + err );
+//                     res.json(err);
+//                     } else {
+//                     response = {
+//                         statusCode: 200,
+//                         headers: {
+//                             'Access-Control-Allow-Origin': '*', // Required for CORS support to work
+//                             'Content-Type': 'image/jpeg'
+//                         },
+//                         body: "",
+//                         // body: JSON.stringify({
+//                         //   message: `Url successfully created`,
+//                         //   signedUrl,
+//                         // }),
+//                         method: "put",
+//                         url: signedUrl,
+//                         fields: []
+//                         };
+//                         console.log("putObject url : " + signedUrl );
+//                         res.json(response);
+//                         }
+//                     });
+//                 }
+//             });
+//         }
+//     });
+// });
 
 app.post('/imagetarget_puturl/:_id/:image_id', requiredAuthentication, function (req, res) {
     console.log("tryna get a puturl for : " + req.body.uid + " contentTYpe : " + req.body.contentType);
@@ -5377,7 +5824,7 @@ app.post('/imagetarget_puturl/:_id/:image_id', requiredAuthentication, function 
                     console.log("error getting picture items: " + err);
                 } else {
 
-            const params = {
+                const params = {
                 Bucket: process.env.S3_ROOT_BUCKET_NAME,
                 //meatadata aqui
                 // ACL: 'bucket-owner-full-control',
@@ -5389,40 +5836,67 @@ app.post('/imagetarget_puturl/:_id/:image_id', requiredAuthentication, function 
                 Expires: 100
                 };
             // var url = s3.getSignedUrl('putObject', {Bucket: 'servicemedia', Key: "users/" + u_id + "/staging" + req.params.platform_sig, Expires: 600});
-                s3.getSignedUrl('putObject', params, function(err, signedUrl) {
-                    let response;
-                    if (err) {
-                    response = {
-                        statusCode: 500,
-                        headers: {
-                            'Access-Control-Allow-Origin': '*',
-                        },
-                        body: JSON.stringify({
-                        error: 'Did not receive signed url'
-                        }),
-                    };
-                    console.log("putObject url error : " + err );
-                    res.json(err);
-                    } else {
-                    response = {
-                        statusCode: 200,
-                        headers: {
-                            'Access-Control-Allow-Origin': '*', // Required for CORS support to work
-                            'Content-Type': 'application/octet-stream'
-                        },
-                        body: "",
-                        // body: JSON.stringify({
-                        //   message: `Url successfully created`,
-                        //   signedUrl,
-                        // }),
-                        method: "put",
-                        url: signedUrl,
-                        fields: []
-                        };
-                        console.log("putObject url : " + signedUrl );
-                        res.json(response);
+                
+                    (async () => {
+                        try {
+                        const data = await ReturnPresignedUrlPut(params.Body, params.Key, 6000); 
+                        response = {
+                                statusCode: 200,
+                                headers: {
+                                    'Access-Control-Allow-Origin': '*', // Required for CORS support to work
+                                    'Content-Type': 'application/octet-stream'
+                                },
+                                body: "",
+                                // body: JSON.stringify({
+                                //   message: `Url successfully created`,
+                                //   signedUrl,
+                                // }),
+                                method: "put",
+                                url: signedUrl,
+                                fields: []
+                                };
+                            
+                            console.log("putObject url : " + signedUrl );
+                                
+                            res.json(response);
+                        } catch (e) {
+                            res.send(e);
                         }
-                    });
+                    })();
+                    // s3.getSignedUrl('putObject', params, function(err, signedUrl) {
+                    //     let response;
+                    //     if (err) {
+                    //     response = {
+                    //         statusCode: 500,
+                    //         headers: {
+                    //             'Access-Control-Allow-Origin': '*',
+                    //         },
+                    //         body: JSON.stringify({
+                    //         error: 'Did not receive signed url'
+                    //         }),
+                    //     };
+                    //     console.log("putObject url error : " + err );
+                    //     res.json(err);
+                    //     } else {
+                    //     response = {
+                    //         statusCode: 200,
+                    //         headers: {
+                    //             'Access-Control-Allow-Origin': '*', // Required for CORS support to work
+                    //             'Content-Type': 'application/octet-stream'
+                    //         },
+                    //         body: "",
+                    //         // body: JSON.stringify({
+                    //         //   message: `Url successfully created`,
+                    //         //   signedUrl,
+                    //         // }),
+                    //         method: "put",
+                    //         url: signedUrl,
+                    //         fields: []
+                    //         };
+                    //         console.log("putObject url : " + signedUrl );
+                    //         res.json(response);
+                    //         }
+                    //     });
                 }
             });
         }
@@ -5451,7 +5925,7 @@ app.post('/stagingputurl/:_id', requiredAuthentication, function (req, res) {
             // var params =
             var timestamp = Math.round(Date.now());
             const params = {
-                Bucket: 'archive1',
+                Bucket: process.env.STAGING_BUCKET_NAME,
                 //meatadata aqui
                 // ACL: 'bucket-owner-full-control',
                 // ContentType: 'text/csv',
@@ -5463,9 +5937,10 @@ app.post('/stagingputurl/:_id', requiredAuthentication, function (req, res) {
                 Expires: 100
               };
             // var url = s3.getSignedUrl('putObject', {Bucket: 'servicemedia', Key: "users/" + u_id + "/staging" + req.params.platform_sig, Expires: 600});
-            (async () => {  
+
                 try {
                     if (minioClient) {
+                        (async () => {    
                         minioClient.presignedPutObject(process.env.STAGING_BUCKET_NAME, req.body.filename, 1000, function(err, presignedUrl) {
                             if (err) {
                                 response = {
@@ -5502,87 +5977,103 @@ app.post('/stagingputurl/:_id', requiredAuthentication, function (req, res) {
                                 res.json(response);
                             }
                             
-                          })
+                          });
+                        })();
                     } else {
-                        s3.getSignedUrl('putObject', params, function(err, signedUrl) {
-                            let response;
-                            if (err) {
-                                response = {
-                                statusCode: 500,
-                                headers: {
-                                    'Access-Control-Allow-Origin': '*',
-                                },
-                                body: JSON.stringify({
-                                    error: 'Did not receive signed url'
-                                }),
-                                };
-                                console.log("putObject url error : " + err );
-                                res.json(err);
-                            } else {
-                                response = {
-                                statusCode: 200,
-                                headers: {
-                                    'Access-Control-Allow-Origin': '*', // Required for CORS support to work
-                                },
-                                // metadata: {
-                                //     'Content-Type': cType
-                                // },
-                                body: "",
-                                // body: JSON.stringify({
-                                //   message: `Url successfully created`,
-                                //   signedUrl,
-                                // }),
-                                method: "put",
-                                url: signedUrl,
-                                fields: []
-                                };
-                                console.log("putObject url : " + signedUrl );
-                                res.json(response);
-                            }
-                        });
+                        (async () => {    
+                        try {
+                        // const command = new PutObjectCommand({
+                        // Bucket: process.env.STAGING_BUCKET_NAME,
+                        // Key: req.body.filename,
+                        // ContentType: cType,
+                        // });
+                        // const signedUrl = getSignedUrl(s3, command, {
+                        // signableHeaders: new Set(["content-type"]),
+                        // expiresIn: expiration,
+                        // });
+                        const signedUrl = await ReturnPresignedUrlPut(process.env.STAGING_BUCKET_NAME, req.body.filename, 6000);
+                        
+                        // console.log("puturl: " + signedUrl );
+                        const response = {
+                            statusCode: 200,
+                            headers: {
+                                'Access-Control-Allow-Origin': '*', // Required for CORS support to work
+                            },
+                            // metadata: {
+                            //     'Content-Type': cType
+                            // },
+                            body: "",
+                            // body: JSON.stringify({
+                            //   message: `Url successfully created`,
+                            //   signedUrl,
+                            // }),
+                            method: "put",
+                            url: signedUrl,
+                            fields: []
+                            };
+                            
+                            console.log("putObject url : " + signedUrl );
+
+                            res.json(response);
+                        
+                        } catch (e) {
+                            
+                            response = {
+                            statusCode: 500,
+                            headers: {
+                                'Access-Control-Allow-Origin': '*',
+                            },
+                            body: JSON.stringify({
+                                error: 'Did not receive signed url'
+                            }),
+                            };
+                            console.log("putObject url error : " + e );
+                            res.json(e);
+                           
+                        }
+                    })();
+
+                        // s3.getSignedUrl('putObject', params, function(err, signedUrl) {
+                        //     let response;
+                        //     if (err) {
+                        //         response = {
+                        //         statusCode: 500,
+                        //         headers: {
+                        //             'Access-Control-Allow-Origin': '*',
+                        //         },
+                        //         body: JSON.stringify({
+                        //             error: 'Did not receive signed url'
+                        //         }),
+                        //         };
+                        //         console.log("putObject url error : " + err );
+                        //         res.json(err);
+                        //     } else {
+                        //         response = {
+                        //         statusCode: 200,
+                        //         headers: {
+                        //             'Access-Control-Allow-Origin': '*', // Required for CORS support to work
+                        //         },
+                        //         // metadata: {
+                        //         //     'Content-Type': cType
+                        //         // },
+                        //         body: "",
+                        //         // body: JSON.stringify({
+                        //         //   message: `Url successfully created`,
+                        //         //   signedUrl,
+                        //         // }),
+                        //         method: "put",
+                        //         url: signedUrl,
+                        //         fields: []
+                        //         };
+                        //         console.log("putObject url : " + signedUrl );
+                        //         res.json(response);
+                        //     }
+                        // });
                     }
                 } catch (e) {
-                    callback(e);
+                    res.json(e);
                 }
-            })();
-            // minioClient.presignedPutObject('mybucket', 'hello.txt', 24*60*60, function(err, presignedUrl) {
-            //     if (err) return console.log(err)
-            //     console.log(presignedUrl)
-            //   })
-
-            // s3.getSignedUrl('putObject', params, function(err, signedUrl) {
-            //     let response;
-            //     if (err) {
-            //       response = {
-            //         statusCode: 500,
-            //         headers: {
-            //           'Access-Control-Allow-Origin': '*',
-            //         },
-            //         body: JSON.stringify({
-            //           error: 'Did not receive signed url'
-            //         }),
-            //       };
-            //       console.log("putObject url error : " + err );
-            //       res.json(err);
-            //     } else {
-            //       response = {
-            //         statusCode: 200,
-            //         headers: {
-            //           'Access-Control-Allow-Origin': '*', // Required for CORS support to work
-            //         },
-            //         body: "",
-            //         // body: JSON.stringify({
-            //         //   message: `Url successfully created`,
-            //         //   signedUrl,
-            //         // }),
-            //         method: "put",
-            //         url: signedUrl,
-            //         fields: []
-            //         };
-            //         console.log("putObject url : " + signedUrl );
-            //         res.json(response);
-            //     }
-            // });
+  
         }
     });
 });
@@ -5590,10 +6081,10 @@ app.post('/stagingputurl/:_id', requiredAuthentication, function (req, res) {
 
 app.get('/staging/:_id', requiredAuthentication, function (req, res) {
 
-    u_id = req.params._id;
-    response = {};
-    rezponze = {};
-    stagedItems = [];
+    const u_id = req.params._id;
+    let response = {};
+    let rezponze = {};
+    let stagedItems = [];
     async.waterfall([
         function (callback) {
            
@@ -5625,20 +6116,34 @@ app.get('/staging/:_id', requiredAuthentication, function (req, res) {
 
 
                     } else {
-                        s3.listObjects(params, function(err, data) {
-                            if (err) {
-                                console.log(err);
-                                return callback(err);
-                            }
-                            if (data.Contents.length == 0) {
-                                console.log("no content found");
-                                callback(null);
-                            } else {
-                                // console.log(data.Contents);
-                                response = data.Contents;
+                        (async () => {                      
+                            try {
+                                
+                                const items = await ListObjects(process.env.STAGING_BUCKET_NAME,'staging/' + u_id + '/');
+                                // console.log("files: "+ items.Contents);
+                            
+                                response = items.Contents;
                                 callback();
+                            
+                            } catch (caught) {
+                                res.send(caught);
+                                callback(caught);
                             }
-                        });
+                        })();
+                        // s3.listObjects(params, function(err, data) {
+                        //     if (err) {
+                        //         console.log(err);
+                        //         return callback(err);
+                        //     }
+                        //     if (data.Contents.length == 0) {
+                        //         console.log("no content found");
+                        //         callback(null);
+                        //     } else {
+                        //         // console.log(data.Contents);
+                        //         response = data.Contents;
+                        //         callback();
+                        //     }
+                        // });
                     }
             //     } catch (e) {
             //         callback(e);
@@ -5738,289 +6243,295 @@ app.get('/staging/:_id', requiredAuthentication, function (req, res) {
 });
 
 
-app.get('/gltf/:_id', function (req, res) {
+// app.get('/gltf/:_id', function (req, res) { //unused
 
-    u_id = req.params._id;
-    response = {};
-    rezponze = {};
-    gltfItems = [];
-    async.waterfall([
-        function (callback) {
-            var params = {
-                Bucket: 'servicemedia',
-                Prefix: 'users/' + u_id + '/gltf/'
-            }
-            s3.listObjects(params, function(err, data) {
-                if (err) {
-                    console.log(err);
-                    return callback(err);
-                }
-                if (data.Contents.length == 0) {
-                    console.log("no content found");
-                    callback(null);
-                } else {
-                    response = data.Contents;
-                    callback();
-                }
-            });
-        },
-        function (callback) {
+//     u_id = req.params._id;
+//     response = {};
+//     rezponze = {};
+//     gltfItems = [];
+//     async.waterfall([
+//         function (callback) {
+//             var params = {
+//                 Bucket: 'servicemedia',
+//                 Prefix: 'users/' + u_id + '/gltf/'
+//             }
+//             s3.listObjects(params, function(err, data) {
+//                 if (err) {
+//                     console.log(err);
+//                     return callback(err);
+//                 }
+//                 if (data.Contents.length == 0) {
+//                     console.log("no content found");
+//                     callback(null);
+//                 } else {
+//                     response = data.Contents;
+//                     callback();
+//                 }
+//             });
+//         },
+//         function (callback) {
 
-            async.each (response, function (r, callbackz) { //loop tru w/ async
-                // console.log("r = " + JSON.stringify(r.Headers));
-                var name = r.Key;
-                name = name.replace('users/' + u_id + '/gltf/', "");
-                var itme = {}
-                itme.name = name;
-                // console.log("modding name : " + itme.name);
-                var assetURL = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: r.Key, Expires: 60000});
-                itme.url = assetURL;
+//             async.each (response, function (r, callbackz) { //loop tru w/ async
+//                 // console.log("r = " + JSON.stringify(r.Headers));
+//                 var name = r.Key;
+//                 name = name.replace('users/' + u_id + '/gltf/', "");
+//                 var itme = {}
+//                 itme.name = name;
+//                 // console.log("modding name : " + itme.name);
+//                 var assetURL = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: r.Key, Expires: 60000});
+//                 itme.url = assetURL;
 
-                gltfItems.push(itme);
-                callbackz();
-            }, function(err) {
+//                 gltfItems.push(itme);
+//                 callbackz();
+//             }, function(err) {
                
-                if (err) {
-                    console.log('A file failed to process');
-                    callbackz(err);
-                } else {
-                    console.log('All files have been processed successfully');
-                    gltfItems.reverse();
-                    rezponze.gltfItems = gltfItems;
-                    callback(null);
-                }
-            });
-        }
-    ],
-    function (err, result) { // #last function, close async
-        res.json(rezponze);
-        console.log("waterfall done: " + result);
-    });
-});
+//                 if (err) {
+//                     console.log('A file failed to process');
+//                     callbackz(err);
+//                 } else {
+//                     console.log('All files have been processed successfully');
+//                     gltfItems.reverse();
+//                     rezponze.gltfItems = gltfItems;
+//                     callback(null);
+//                 }
+//             });
+//         }
+//     ],
+//     function (err, result) { // #last function, close async
+//         res.json(rezponze);
+//         console.log("waterfall done: " + result);
+//     });
+// });
 
-app.get('/archived/:_id', requiredAuthentication, function (req, res) {
+// app.get('/archived/:_id', requiredAuthentication, function (req, res) {
 
-    u_id = req.params._id;
-    response = {};
-    rezponze = {};
-    stagedItems = [];
-    async.waterfall([
-        function (callback) {
-            var params = {
-                Bucket: 'archive1',
-                Prefix: 'archived/' + u_id + '/'
-            }
-            s3.listObjects(params, function(err, data) {
-                if (err) {
-                    console.log(err);
-                    return callback(err);
-                }
-                if (data.Contents.length == 0) {
-                    console.log("no content found");
-                    callback(null);
-                } else {
-                    response = data.Contents;
-                    callback();
-                }
-            });
-        },
-        function (callback) {
+//     u_id = req.params._id;
+//     response = {};
+//     rezponze = {};
+//     stagedItems = [];
+//     async.waterfall([
+//         function (callback) {
+//             var params = {
+//                 Bucket: 'archive1',
+//                 Prefix: 'archived/' + u_id + '/'
+//             }
+//             s3.listObjects(params, function(err, data) {
+//                 if (err) {
+//                     console.log(err);
+//                     return callback(err);
+//                 }
+//                 if (data.Contents.length == 0) {
+//                     console.log("no content found");
+//                     callback(null);
+//                 } else {
+//                     response = data.Contents;
+//                     callback();
+//                 }
+//             });
+//         },
+//         function (callback) {
 
-            async.each (response, function (r, callbackz) { //loop tru w/ async
-                // console.log("r = " + JSON.stringify(r.Headers));
-                var name = r.Key;
-                name = name.replace('staging/' + u_id + '/', "");
-                var itme = {}
-                itme.name = name;
-                var assetURL = s3.getSignedUrl('getObject', {Bucket: 'archive1', Key: r.Key, Expires: 60000});
-                itme.url = assetURL;
+//             async.each (response, function (r, callbackz) { //loop tru w/ async
+//                 // console.log("r = " + JSON.stringify(r.Headers));
+//                 var name = r.Key;
+//                 name = name.replace('staging/' + u_id + '/', "");
+//                 var itme = {}
+//                 itme.name = name;
+//                 var assetURL = s3.getSignedUrl('getObject', {Bucket: 'archive1', Key: r.Key, Expires: 60000});
+//                 itme.url = assetURL;
 
-                stagedItems.push(itme);
-                callbackz();
-            }, function(err) {
+//                 stagedItems.push(itme);
+//                 callbackz();
+//             }, function(err) {
                
-                if (err) {
-                    console.log('A file failed to process');
-                    callbackz(err);
-                } else {
-                    console.log('All files have been processed successfully');
-                    stagedItems.reverse();
-                    rezponze.stagedItems = stagedItems;
-                    callback(null);
-                }
-            });
-        }
-    ],
-    function (err, result) { // #last function, close async
-        res.json(rezponze);
-        console.log("waterfall done: " + result);
-    })
-});
-// route below returns "raw" s3 data, one above is parsed / saved/ updated from it on client
-app.get('/assets/:_id', checkAppID, requiredAuthentication, usercheck, function (req, res) {
+//                 if (err) {
+//                     console.log('A file failed to process');
+//                     callbackz(err);
+//                 } else {
+//                     console.log('All files have been processed successfully');
+//                     stagedItems.reverse();
+//                     rezponze.stagedItems = stagedItems;
+//                     callback(null);
+//                 }
+//             });
+//         }
+//     ],
+//     function (err, result) { // #last function, close async
+//         res.json(rezponze);
+//         console.log("waterfall done: " + result);
+//     })
+// });
+// // route below returns "raw" s3 data, one above is parsed / saved/ updated from it on client
+// app.get('/assets/:_id', checkAppID, requiredAuthentication, usercheck, function (req, res) {
 
-//       if (amirite("admin", req.session.user._id.toString())) { //check the acl
+// //       if (amirite("admin", req.session.user._id.toString())) { //check the acl
 
-    console.log("tryna get assets for user...");
-    var u_id = ObjectID(req.params._id);
-    db.users.findOne({"_id": u_id}, function (err, user) {
-        if (err || !user) {
-            console.log("error getting user: " + err);
-        } else {
-            assetsResponse = user;
-            assetsResponse.scenes_ios = {};
-            assetsResponse.scenes_android = {};
-            assetsResponse.scenes_win = {};
-            assetsResponse.bundles_ios = {};
-            assetsResponse.bundles_android = {};
-            assetsResponse.bundles_win = {};
-            console.log("gettting assets for user " + req.params._id);
+//     console.log("tryna get assets for user...");
+//     var u_id = ObjectID(req.params._id);
+//     db.users.findOne({"_id": u_id}, function (err, user) {
+//         if (err || !user) {
+//             console.log("error getting user: " + err);
+//         } else {
+//             assetsResponse = user;
+//             assetsResponse.scenes_ios = {};
+//             assetsResponse.scenes_android = {};
+//             assetsResponse.scenes_win = {};
+//             assetsResponse.bundles_ios = {};
+//             assetsResponse.bundles_android = {};
+//             assetsResponse.bundles_win = {};
+//             console.log("gettting assets for user " + req.params._id);
 
-            async.waterfall([
-                    function (callback) {
-                        var params = {
-                            Bucket: 'mvmv.us',
-//                            Delimiter: '/',
-                            Prefix: 'assets_2018_1/scenes_ios/'
-                        }
+//             async.waterfall([
+//                     function (callback) {
+//                         var params = {
+//                             Bucket: 'mvmv.us',
+// //                            Delimiter: '/',
+//                             Prefix: 'assets_2018_1/scenes_ios/'
+//                         }
 
-                        s3.listObjects(params, function(err, data) {
-                            if (err) {
-                                console.log(err);
-                                return callback(err);
-                            }
-                            if (data.Contents.length == 0) {
-                                console.log("no content found");
-                                callback(null);
-                            } else {
-                                assetsResponse.scenes_ios = data.Contents;
-                                callback();
-                            }
-                        });
-                    },
-                    function (callback) {
-                        var params = {
-                            Bucket: 'mvmv.us',
-//                            Delimiter: '/',
-                            Prefix: 'assets_2018_1/scenes_android/'
-                        }
-                        s3.listObjects(params, function(err, data) {
-                            if (err) {
-                                console.log(err);
-                                return callback(err);
-                            }
-                            if (data.Contents.length == 0) {
-                                console.log("no content found");
-                                callback(null);
-                            } else {
-                                assetsResponse.scenes_android = data.Contents;
-                                callback();
-                            }
-                        });
+//                         s3.listObjects(params, function(err, data) {
+//                             if (err) {
+//                                 console.log(err);
+//                                 return callback(err);
+//                             }
+//                             if (data.Contents.length == 0) {
+//                                 console.log("no content found");
+//                                 callback(null);
+//                             } else {
+//                                 assetsResponse.scenes_ios = data.Contents;
+//                                 callback();
+//                             }
+//                         });
+//                     },
+//                     function (callback) {
+//                         var params = {
+//                             Bucket: 'mvmv.us',
+// //                            Delimiter: '/',
+//                             Prefix: 'assets_2018_1/scenes_android/'
+//                         }
+//                         s3.listObjects(params, function(err, data) {
+//                             if (err) {
+//                                 console.log(err);
+//                                 return callback(err);
+//                             }
+//                             if (data.Contents.length == 0) {
+//                                 console.log("no content found");
+//                                 callback(null);
+//                             } else {
+//                                 assetsResponse.scenes_android = data.Contents;
+//                                 callback();
+//                             }
+//                         });
 
-                    },
-                    function (callback) {
-                        var params = {
-                            Bucket: 'mvmv.us',
-//                            Delimiter: '/',
-                            Prefix: 'assets_2018_1/scenes_win/'
-                        }
-                        s3.listObjects(params, function(err, data) {
-                            if (err) {
-                                console.log(err);
-                                return callback(err);
-                            }
-                            if (data.Contents.length == 0) {
-                                console.log("no content found");
-                                callback(null);
-                            } else {
-                                assetsResponse.scenes_win = data.Contents;
-                                callback();
-                            }
-                        });
+//                     },
+//                     function (callback) {
+//                         var params = {
+//                             Bucket: 'mvmv.us',
+// //                            Delimiter: '/',
+//                             Prefix: 'assets_2018_1/scenes_win/'
+//                         }
+//                         s3.listObjects(params, function(err, data) {
+//                             if (err) {
+//                                 console.log(err);
+//                                 return callback(err);
+//                             }
+//                             if (data.Contents.length == 0) {
+//                                 console.log("no content found");
+//                                 callback(null);
+//                             } else {
+//                                 assetsResponse.scenes_win = data.Contents;
+//                                 callback();
+//                             }
+//                         });
 
-                    },
-                    function (callback) {
-                        var params = {
-                            Bucket: 'mvmv.us',
-//                            Delimiter: '/',
-                            Prefix: 'assets_2018_1/bundles_ios/'
-                        }
-                        s3.listObjects(params, function(err, data) {
-                            if (err) {
-                                console.log(err);
-                                return callback(err);
-                            }
-                            if (data.Contents.length == 0) {
-                                console.log("no content found");
-                                callback(null);
-                            } else {
-                                assetsResponse.bundles_ios = data.Contents;
-                                callback();
-                            }
-                        });
-                    },
-                    function (callback) {
-                        var params = {
-                            Bucket: 'mvmv.us',
-//                            Delimiter: '/',
-                            Prefix: 'assets_2018_1/bundles_android/'
-                        }
-                        s3.listObjects(params, function(err, data) {
-                            if (err) {
-                                console.log(err);
-                                return callback(err);
-                            }
-                            if (data.Contents.length == 0) {
-                                console.log("no content found");
-                                callback(null);
-                            } else {
-                                assetsResponse.bundles_android = data.Contents;
-                                callback();
-                            }
-                        });
-                    },
-                    function (callback) {
-                        var params = {
-                            Bucket: 'mvmv.us',
-//                            Delimiter: '/',
-                            Prefix: 'assets_2018_1/bundles_win/'
-                        }
-                        s3.listObjects(params, function(err, data) {
-                            if (err) {
-                                console.log(err);
-                                return callback(err);
-                            }
-                            if (data.Contents.length == 0) {
-                                console.log("no content found");
-                                callback(null);
-                            } else {
-                                assetsResponse.bundles_win = data.Contents;
-                                callback();
-                            }
-                        });
+//                     },
+//                     function (callback) {
+//                         var params = {
+//                             Bucket: 'mvmv.us',
+// //                            Delimiter: '/',
+//                             Prefix: 'assets_2018_1/bundles_ios/'
+//                         }
+//                         s3.listObjects(params, function(err, data) {
+//                             if (err) {
+//                                 console.log(err);
+//                                 return callback(err);
+//                             }
+//                             if (data.Contents.length == 0) {
+//                                 console.log("no content found");
+//                                 callback(null);
+//                             } else {
+//                                 assetsResponse.bundles_ios = data.Contents;
+//                                 callback();
+//                             }
+//                         });
+//                     },
+//                     function (callback) {
+//                         var params = {
+//                             Bucket: 'mvmv.us',
+// //                            Delimiter: '/',
+//                             Prefix: 'assets_2018_1/bundles_android/'
+//                         }
+//                         s3.listObjects(params, function(err, data) {
+//                             if (err) {
+//                                 console.log(err);
+//                                 return callback(err);
+//                             }
+//                             if (data.Contents.length == 0) {
+//                                 console.log("no content found");
+//                                 callback(null);
+//                             } else {
+//                                 assetsResponse.bundles_android = data.Contents;
+//                                 callback();
+//                             }
+//                         });
+//                     },
+//                     function (callback) {
+//                         var params = {
+//                             Bucket: 'mvmv.us',
+// //                            Delimiter: '/',
+//                             Prefix: 'assets_2018_1/bundles_win/'
+//                         }
+//                         s3.listObjects(params, function(err, data) {
+//                             if (err) {
+//                                 console.log(err);
+//                                 return callback(err);
+//                             }
+//                             if (data.Contents.length == 0) {
+//                                 console.log("no content found");
+//                                 callback(null);
+//                             } else {
+//                                 assetsResponse.bundles_win = data.Contents;
+//                                 callback();
+//                             }
+//                         });
 
-                    },
-                    function (callback) {
-                        callback();
+//                     },
+//                     function (callback) {
+//                         callback();
 
 
-                    }],
-                function (err, result) { // #last function, close async
-                    res.json(assetsResponse);
-                    console.log("waterfall done: " + result);
-                }
-            );
-        }
-    });
-});
+//                     }],
+//                 function (err, result) { // #last function, close async
+//                     res.json(assetsResponse);
+//                     console.log("waterfall done: " + result);
+//                 }
+//             );
+//         }
+//     });
+// });
 
 app.get('/sharedasset/:assetstring', checkAppID, requiredAuthentication, function (req, res) {
 
     console.log("tryna get asset " + req.params.assetstring);
     var assetString = req.params.assetstring.replace("/", ".");
-    var assetURL = s3.getSignedUrl('getObject', {Bucket: 'mvmv.us', Key: assetString, Expires: 60000});
-    res.send(assetURL);
+    (async () => {
+        try {
+            var assetURL = await ReturnPresignedUrl('mvmv.us', assetString, 6000);
+            res.send(assetURL);
+        } catch (e) {
+            res.send(e);
+        } 
+    })();
 });
 
 app.post('/resetcheck', function (req, res) {
@@ -6269,9 +6780,17 @@ app.post('/invitation_req/', function (req,res) {
                                                     var halfName = 'half.' + baseName + item_string_filename_ext;
                                                     // var quarterName = 'quarter.' + baseName + item_string_filename_ext;
                                                     // var standardName = 'standard.' + baseName + item_string_filename_ext;
-                                                    var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + halfName, Expires: 6000}); //just send back thumbnail urls for list
-                                                    // var urlQuarter = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + quarterName, Expires: 6000}); //just send back thumbnail urls for list
-                                                    callback(null, urlHalf, scene);
+                                                    (async () => {
+                                                        try {
+                                                            // var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + halfName, Expires: 6000}); //just send back thumbnail urls for list
+                                                            // var urlQuarter = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + quarterName, Expires: 6000}); //just send back thumbnail urls for list
+                                                            urlHalf = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + halfName, 6000);
+                                                            callback(null, urlHalf, scene);
+                                                        } catch (e) {
+                                                            callback(e);
+                                                        }
+                                                    })();
+
                                                 }
                                             });
                                         } else {
@@ -7146,9 +7665,21 @@ app.post('/share_scene/', function (req, res) { //yep! //make it public?
                                         var halfName = 'half.' + baseName + item_string_filename_ext;
                                         // var quarterName = 'quarter.' + baseName + item_string_filename_ext;
                                         // var standardName = 'standard.' + baseName + item_string_filename_ext;
-                                        var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + halfName, Expires: 60000}); //just send back thumbnail urls for list
+                                        // var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + halfName, Expires: 60000}); //just send back thumbnail urls for list
                                         // var urlQuarter = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + quarterName, Expires: 6000}); //just send back thumbnail urls for list
-                                        callback(null, urlHalf, eData, scene);
+                                       
+                                        (async () => {
+                                            try {
+                                                // var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + halfName, Expires: 6000}); //just send back thumbnail urls for list
+                                                // var urlQuarter = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + quarterName, Expires: 6000}); //just send back thumbnail urls for list
+                                                urlHalf = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + halfName, 6000);
+                                               
+                                                callback(null, urlHalf, eData, scene);
+
+                                            } catch (e) {
+                                                callback(e);
+                                            }
+                                        })();
                                     }
                                 });
                             } else {
@@ -7720,240 +8251,240 @@ app.get('backupdata', function (req, res) {
 //db.audio_items.find({userID: req.params.u_id}).sort({otimestamp: -1}).limit(maxItems).toArray( function(err, audio_items) {
 
 
-app.get('/newaudiodata.json', checkAppID, requiredAuthentication,  function(req, res) {
-    console.log('tryna return newaudiodata.json');
-    db.audio_items.find({item_status: "public"}).sort({otimestamp: 1}).toArray( function(err,audio_items) {
-        if (err || !audio_items) {
-            console.log("error getting audio items: " + err);
-        } else {
+// app.get('/newaudiodata.json', checkAppID, requiredAuthentication,  function(req, res) {
+//     console.log('tryna return newaudiodata.json');
+//     db.audio_items.find({item_status: "public"}).sort({otimestamp: 1}).toArray( function(err,audio_items) {
+//         if (err || !audio_items) {
+//             console.log("error getting audio items: " + err);
+//         } else {
 
-            async.waterfall([
+//             async.waterfall([
 
-                    function(callback){ //randomize the returned array, takes a shake so async it...
+//                     function(callback){ //randomize the returned array, takes a shake so async it...
 
-                        audio_items.splice(0,audio_items.length - maxItems); //truncate randomized array, take only last 20
-                        audio_items.reverse();
-                        callback(null);
-                    },
-                    function(callback) { //add the signed URLs to the obj array
-                        for (var i = 0; i < audio_items.length; i++) {
+//                         audio_items.splice(0,audio_items.length - maxItems); //truncate randomized array, take only last 20
+//                         audio_items.reverse();
+//                         callback(null);
+//                     },
+//                     function(callback) { //add the signed URLs to the obj array
+//                         for (var i = 0; i < audio_items.length; i++) {
 
-                            var item_string_filename = JSON.stringify(audio_items[i].filename);
-                            item_string_filename = item_string_filename.replace(/\"/g, "");
-                            var item_string_filename_ext = getExtension(item_string_filename);
-                            var expiration = new Date();
-                            expiration.setMinutes(expiration.getMinutes() + 1000);
-                            var baseName = path.basename(item_string_filename, (item_string_filename_ext));
-                            console.log(baseName);
-                            var mp3Name = baseName + '.mp3';
-                            var oggName = baseName + '.ogg';
-                            var pngName = baseName + '.png';
-                            // var urlMp3 = knoxClient.signedUrl(audio_items[i]._id + "." + mp3Name, expiration);
-                            // var urlOgg = knoxClient.signedUrl(audio_items[i]._id + "." + oggName, expiration);
-                            // var urlPng = knoxClient.signedUrl(audio_items[i]._id + "." + pngName, expiration);
-                            var urlMp3 = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_items[i].userID + "/" + audio_items[i]._id + "." + mp3Name, Expires: 60000});
-                            var urlOgg = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_items[i].userID + "/" + audio_items[i]._id + "." + oggName, Expires: 60000});
-                            var urlPng = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_items[i].userID + "/" + audio_items[i]._id + "." + pngName, Expires: 60000});
-                            audio_items[i].URLmp3 = urlMp3; //jack in teh signed urls into the object array
-                            audio_items[i].URLogg = urlOgg;
-                            audio_items[i].URLpng = urlPng;
+//                             var item_string_filename = JSON.stringify(audio_items[i].filename);
+//                             item_string_filename = item_string_filename.replace(/\"/g, "");
+//                             var item_string_filename_ext = getExtension(item_string_filename);
+//                             var expiration = new Date();
+//                             expiration.setMinutes(expiration.getMinutes() + 1000);
+//                             var baseName = path.basename(item_string_filename, (item_string_filename_ext));
+//                             console.log(baseName);
+//                             var mp3Name = baseName + '.mp3';
+//                             var oggName = baseName + '.ogg';
+//                             var pngName = baseName + '.png';
+//                             // var urlMp3 = knoxClient.signedUrl(audio_items[i]._id + "." + mp3Name, expiration);
+//                             // var urlOgg = knoxClient.signedUrl(audio_items[i]._id + "." + oggName, expiration);
+//                             // var urlPng = knoxClient.signedUrl(audio_items[i]._id + "." + pngName, expiration);
+//                             var urlMp3 = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_items[i].userID + "/" + audio_items[i]._id + "." + mp3Name, Expires: 60000});
+//                             var urlOgg = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_items[i].userID + "/" + audio_items[i]._id + "." + oggName, Expires: 60000});
+//                             var urlPng = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_items[i].userID + "/" + audio_items[i]._id + "." + pngName, Expires: 60000});
+//                             audio_items[i].URLmp3 = urlMp3; //jack in teh signed urls into the object array
+//                             audio_items[i].URLogg = urlOgg;
+//                             audio_items[i].URLpng = urlPng;
 
-                            //audio_items[i].URLmp3 = urlMp3; //jack in teh signed urls into the object array
-                            //audio_items[i].URLogg = urlOgg;
-                            //audio_items[i].URLpng = urlPng;
+//                             //audio_items[i].URLmp3 = urlMp3; //jack in teh signed urls into the object array
+//                             //audio_items[i].URLogg = urlOgg;
+//                             //audio_items[i].URLpng = urlPng;
 
-                        }
-                        console.log('tryna send ' + audio_items.length + 'audio_items ');
-                        callback(null);
-                    }],
+//                         }
+//                         console.log('tryna send ' + audio_items.length + 'audio_items ');
+//                         callback(null);
+//                     }],
 
-                function(err, result) { // #last function, close async
-                    res.json(audio_items);
-                    console.log("waterfall done: " + result);
-                }
-            );
-        }
-    });
+//                 function(err, result) { // #last function, close async
+//                     res.json(audio_items);
+//                     console.log("waterfall done: " + result);
+//                 }
+//             );
+//         }
+//     });
 
-});
+// });
 
-app.get('/randomaudiodata.json', checkAppID, requiredAuthentication, function(req, res) {
-    console.log('tryna return randomaudiodata.json');
-    db.audio_items.find({item_status: "public"}, function(err,audio_items) {
-        if (err || !audio_items) {
-            console.log("error getting audio items: " + err);
-        } else {
+// app.get('/randomaudiodata.json', checkAppID, requiredAuthentication, function(req, res) {
+//     console.log('tryna return randomaudiodata.json');
+//     db.audio_items.find({item_status: "public"}, function(err,audio_items) {
+//         if (err || !audio_items) {
+//             console.log("error getting audio items: " + err);
+//         } else {
 
-            async.waterfall([
+//             async.waterfall([
 
-                    function(callback){ //randomize the returned array, takes a shake so async it...
-                        audio_items = Shuffle(audio_items);
-                        audio_items.splice(0,audio_items.length - maxItems); //truncate randomized array, take only last 20
-                        callback(null);
-                    },
+//                     function(callback){ //randomize the returned array, takes a shake so async it...
+//                         audio_items = Shuffle(audio_items);
+//                         audio_items.splice(0,audio_items.length - maxItems); //truncate randomized array, take only last 20
+//                         callback(null);
+//                     },
 
-                    function(callback) { //add the signed URLs to the obj array
-                        for (var i = 0; i < audio_items.length; i++) {
+//                     function(callback) { //add the signed URLs to the obj array
+//                         for (var i = 0; i < audio_items.length; i++) {
 
-                            var item_string_filename = JSON.stringify(audio_items[i].filename);
-                            item_string_filename = item_string_filename.replace(/\"/g, "");
-                            var item_string_filename_ext = getExtension(item_string_filename);
-                            var expiration = new Date();
-                            expiration.setMinutes(expiration.getMinutes() + 1000);
-                            var baseName = path.basename(item_string_filename, (item_string_filename_ext));
-                            console.log(baseName);
-                            var mp3Name = baseName + '.mp3';
-                            var oggName = baseName + '.ogg';
-                            var pngName = baseName + '.png';
-                            //var urlMp3 = knoxClient.signedUrl(audio_items[i]._id + "." + mp3Name, expiration);
-                            //var urlOgg = knoxClient.signedUrl(audio_items[i]._id + "." + oggName, expiration);
-                            //var urlPng = knoxClient.signedUrl(audio_items[i]._id + "." + pngName, expiration);
-                            var urlMp3 = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_items[i].userID + "/" + audio_items[i]._id + "." + mp3Name, Expires: 60000});
-                            var urlOgg = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_items[i].userID + "/" + audio_items[i]._id + "." + oggName, Expires: 60000});
-                            var urlPng = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_items[i].userID + "/" + audio_items[i]._id + "." + pngName, Expires: 60000});
-                            audio_items[i].URLmp3 = urlMp3; //jack in teh signed urls into the object array
-                            audio_items[i].URLogg = urlOgg;
-                            audio_items[i].URLpng = urlPng;
+//                             var item_string_filename = JSON.stringify(audio_items[i].filename);
+//                             item_string_filename = item_string_filename.replace(/\"/g, "");
+//                             var item_string_filename_ext = getExtension(item_string_filename);
+//                             var expiration = new Date();
+//                             expiration.setMinutes(expiration.getMinutes() + 1000);
+//                             var baseName = path.basename(item_string_filename, (item_string_filename_ext));
+//                             console.log(baseName);
+//                             var mp3Name = baseName + '.mp3';
+//                             var oggName = baseName + '.ogg';
+//                             var pngName = baseName + '.png';
+//                             //var urlMp3 = knoxClient.signedUrl(audio_items[i]._id + "." + mp3Name, expiration);
+//                             //var urlOgg = knoxClient.signedUrl(audio_items[i]._id + "." + oggName, expiration);
+//                             //var urlPng = knoxClient.signedUrl(audio_items[i]._id + "." + pngName, expiration);
+//                             var urlMp3 = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_items[i].userID + "/" + audio_items[i]._id + "." + mp3Name, Expires: 60000});
+//                             var urlOgg = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_items[i].userID + "/" + audio_items[i]._id + "." + oggName, Expires: 60000});
+//                             var urlPng = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_items[i].userID + "/" + audio_items[i]._id + "." + pngName, Expires: 60000});
+//                             audio_items[i].URLmp3 = urlMp3; //jack in teh signed urls into the object array
+//                             audio_items[i].URLogg = urlOgg;
+//                             audio_items[i].URLpng = urlPng;
 
-                        }
-                        console.log('tryna send ' + audio_items.length + 'audio_items ');
-                        callback(null);
-                    }],
+//                         }
+//                         console.log('tryna send ' + audio_items.length + 'audio_items ');
+//                         callback(null);
+//                     }],
 
-                function(err, result) { // #last function, close async
-                    res.json(audio_items);
-                    console.log("waterfall done: " + result);
-                }
-            );
-        }
-    });
+//                 function(err, result) { // #last function, close async
+//                     res.json(audio_items);
+//                     console.log("waterfall done: " + result);
+//                 }
+//             );
+//         }
+//     });
 
-});
+// });
 
-app.get('/playlist/:tag', function(req, res) {
-    console.log('tryna return playlist: ' + req.params.tag);
-    db.audio_items.find({tags: req.params.tag, item_status: "public"}).sort({otimestamp: -1}).limit(maxItems).toArray( function(err, audio_items) {
-        if (err || !audio_items) {
-            console.log("error getting audio items: " + err);
+// app.get('/playlist/:tag', function(req, res) {
+//     console.log('tryna return playlist: ' + req.params.tag);
+//     db.audio_items.find({tags: req.params.tag, item_status: "public"}).sort({otimestamp: -1}).limit(maxItems).toArray( function(err, audio_items) {
+//         if (err || !audio_items) {
+//             console.log("error getting audio items: " + err);
 
-        } else {
+//         } else {
 
-            async.waterfall([
+//             async.waterfall([
 
-                    function(callback){ //randomize the returned array, takes a shake so async it...
-                        //audio_items = Shuffle(audio_items);
-                        //audio_items.splice(0,audio_items.length - maxItems); //truncate randomized array, take only last 20
-                        callback(null);
-                    },
+//                     function(callback){ //randomize the returned array, takes a shake so async it...
+//                         //audio_items = Shuffle(audio_items);
+//                         //audio_items.splice(0,audio_items.length - maxItems); //truncate randomized array, take only last 20
+//                         callback(null);
+//                     },
 
-                    function(callback) { //add the signed URLs to the obj array
-                        for (var i = 0; i < audio_items.length; i++) {
+//                     function(callback) { //add the signed URLs to the obj array
+//                         for (var i = 0; i < audio_items.length; i++) {
 
-                            var item_string_filename = JSON.stringify(audio_items[i].filename);
-                            item_string_filename = item_string_filename.replace(/\"/g, "");
-                            var item_string_filename_ext = getExtension(item_string_filename);
-                            var expiration = new Date();
-                            expiration.setMinutes(expiration.getMinutes() + 1000);
-                            var baseName = path.basename(item_string_filename, (item_string_filename_ext));
-                            console.log(baseName);
-                            var mp3Name = baseName + '.mp3';
-                            var oggName = baseName + '.ogg';
-                            var pngName = baseName + '.png';
-                            var urlMp3 = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_items[0].userID + "/" + audio_items[0]._id + "." + mp3Name, Expires: 60000});
-                            var urlOgg = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_items[0].userID + "/" + audio_items[0]._id + "." + oggName, Expires: 60000});
-                            var urlPng = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_items[0].userID + "/" + audio_items[0]._id + "." + pngName, Expires: 60000});
-                            audio_items[i].URLmp3 = urlMp3; //jack in teh signed urls into the object array
-                            audio_items[i].URLogg = urlOgg;
-                            audio_items[i].URLpng = urlPng;
+//                             var item_string_filename = JSON.stringify(audio_items[i].filename);
+//                             item_string_filename = item_string_filename.replace(/\"/g, "");
+//                             var item_string_filename_ext = getExtension(item_string_filename);
+//                             var expiration = new Date();
+//                             expiration.setMinutes(expiration.getMinutes() + 1000);
+//                             var baseName = path.basename(item_string_filename, (item_string_filename_ext));
+//                             console.log(baseName);
+//                             var mp3Name = baseName + '.mp3';
+//                             var oggName = baseName + '.ogg';
+//                             var pngName = baseName + '.png';
+//                             var urlMp3 = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_items[0].userID + "/" + audio_items[0]._id + "." + mp3Name, Expires: 60000});
+//                             var urlOgg = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_items[0].userID + "/" + audio_items[0]._id + "." + oggName, Expires: 60000});
+//                             var urlPng = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_items[0].userID + "/" + audio_items[0]._id + "." + pngName, Expires: 60000});
+//                             audio_items[i].URLmp3 = urlMp3; //jack in teh signed urls into the object array
+//                             audio_items[i].URLogg = urlOgg;
+//                             audio_items[i].URLpng = urlPng;
 
-                        }
-                        console.log('tryna send ' + audio_items.length + 'audio_items ');
-                        callback(null);
-                    }],
+//                         }
+//                         console.log('tryna send ' + audio_items.length + 'audio_items ');
+//                         callback(null);
+//                     }],
 
-                function(err, result) { // #last function, close async
-                    res.json(audio_items);
-                    console.log("waterfall done: " + result);
-                }
-            );
-        }
-    });
+//                 function(err, result) { // #last function, close async
+//                     res.json(audio_items);
+//                     console.log("waterfall done: " + result);
+//                 }
+//             );
+//         }
+//     });
 
-});
+// });
 
-app.get('/audiofiles/:tag', function(req, res) {
-    console.log('tryna return playlist: ' + req.params.tag);
-    db.audio.find({tags: req.params.tag, item_status: "public"}).sort({otimestamp: -1}).limit(maxItems).toArray( function(err, audio_items) {
-        if (err || !audio_items) {
-            console.log("error getting audio items: " + err);
+// app.get('/audiofiles/:tag', function(req, res) {
+//     console.log('tryna return playlist: ' + req.params.tag);
+//     db.audio.find({tags: req.params.tag, item_status: "public"}).sort({otimestamp: -1}).limit(maxItems).toArray( function(err, audio_items) {
+//         if (err || !audio_items) {
+//             console.log("error getting audio items: " + err);
 
-        } else {
+//         } else {
 
-            async.waterfall([
+//             async.waterfall([
 
-                    function(callback){ //randomize the returned array, takes a shake so async it...
-                        //audio_items = Shuffle(audio_items);
-                        //audio_items.splice(0,audio_items.length - maxItems); //truncate randomized array, take only last 20
-                        callback(null);
-                    },
+//                     function(callback){ //randomize the returned array, takes a shake so async it...
+//                         //audio_items = Shuffle(audio_items);
+//                         //audio_items.splice(0,audio_items.length - maxItems); //truncate randomized array, take only last 20
+//                         callback(null);
+//                     },
 
-                    function(callback) { //add the signed URLs to the obj array
-                        for (var i = 0; i < audio_items.length; i++) {
+//                     function(callback) { //add the signed URLs to the obj array
+//                         for (var i = 0; i < audio_items.length; i++) {
 
-                            var item_string_filename = JSON.stringify(audio_items[i].filename);
-                            item_string_filename = item_string_filename.replace(/\"/g, "");
-                            var item_string_filename_ext = getExtension(item_string_filename);
-                            var expiration = new Date();
-                            expiration.setMinutes(expiration.getMinutes() + 1000);
-                            var baseName = path.basename(item_string_filename, (item_string_filename_ext));
-                            console.log(baseName);
-                            var mp3Name = baseName + '.mp3';
-                            var oggName = baseName + '.ogg';
-                            var pngName = baseName + '.png';
-                            var urlMp3 = knoxClient.signedUrl(audio_items[i]._id + "." + mp3Name, expiration);
-                            var urlOgg = knoxClient.signedUrl(audio_items[i]._id + "." + oggName, expiration);
-                            var urlPng = knoxClient.signedUrl(audio_items[i]._id + "." + pngName, expiration);
-                            audio_items[i].URLmp3 = urlMp3; //jack in teh signed urls into the object array
-                            audio_items[i].URLogg = urlOgg;
-                            audio_items[i].URLpng = urlPng;
+//                             var item_string_filename = JSON.stringify(audio_items[i].filename);
+//                             item_string_filename = item_string_filename.replace(/\"/g, "");
+//                             var item_string_filename_ext = getExtension(item_string_filename);
+//                             var expiration = new Date();
+//                             expiration.setMinutes(expiration.getMinutes() + 1000);
+//                             var baseName = path.basename(item_string_filename, (item_string_filename_ext));
+//                             console.log(baseName);
+//                             var mp3Name = baseName + '.mp3';
+//                             var oggName = baseName + '.ogg';
+//                             var pngName = baseName + '.png';
+//                             var urlMp3 = knoxClient.signedUrl(audio_items[i]._id + "." + mp3Name, expiration);
+//                             var urlOgg = knoxClient.signedUrl(audio_items[i]._id + "." + oggName, expiration);
+//                             var urlPng = knoxClient.signedUrl(audio_items[i]._id + "." + pngName, expiration);
+//                             audio_items[i].URLmp3 = urlMp3; //jack in teh signed urls into the object array
+//                             audio_items[i].URLogg = urlOgg;
+//                             audio_items[i].URLpng = urlPng;
 
-                        }
-                        console.log('tryna send ' + audio_items.length + 'audio_items ');
-                        callback(null);
-                    }],
+//                         }
+//                         console.log('tryna send ' + audio_items.length + 'audio_items ');
+//                         callback(null);
+//                     }],
 
-                function(err, result) { // #last function, close async
-                    res.json(audio_items);
-                    console.log("waterfall done: " + result);
-                }
-            );
-        }
-    });
+//                 function(err, result) { // #last function, close async
+//                     res.json(audio_items);
+//                     console.log("waterfall done: " + result);
+//                 }
+//             );
+//         }
+//     });
 
-});
+// });
 
-app.get('/audiolist/:tag', function(req, res) {
-    console.log('tryna return playlist: ' + req.params.tag);
-    db.audio_items.find({tags: req.params.tag, item_status: "public"}).sort({otimestamp: -1}).limit(maxItems).toArray( function(err, audio_items) {
-        if (err || !audio_items) {
-            console.log("error getting audio items: " + err);
+// app.get('/audiolist/:tag', function(req, res) {
+//     console.log('tryna return playlist: ' + req.params.tag);
+//     db.audio_items.find({tags: req.params.tag, item_status: "public"}).sort({otimestamp: -1}).limit(maxItems).toArray( function(err, audio_items) {
+//         if (err || !audio_items) {
+//             console.log("error getting audio items: " + err);
 
-        } else {
+//         } else {
 
-            res.json(audio_items);
-            console.log("returning audio_items tagged " + req.params.tag);
-        }
-    });
+//             res.json(audio_items);
+//             console.log("returning audio_items tagged " + req.params.tag);
+//         }
+//     });
 
-});
+// });
 
 
-app.post('/picarray/', checkAppID, requiredAuthentication, function(req,res) {
+// app.post('/picarray/', checkAppID, requiredAuthentication, function(req,res) {
 
-    console.log("picarray request: " + req.body);
-    res.json(req.body);
+//     console.log("picarray request: " + req.body);
+//     res.json(req.body);
 
-});
+// });
 
 // app.get('/userpics/:u_id', checkAppID, requiredAuthentication, function(req, res) {
 app.get('/userpics/:u_id', requiredAuthentication, function (req, res) {
@@ -8008,6 +8539,7 @@ app.get('/uservids/:u_id', requiredAuthentication, function(req, res) {
 
         } else {
             console.log("# " + video_items.length);
+            (async () => {
             for (var i = 0; i < video_items.length; i++) {
 
                 var item_string_filename = JSON.stringify(video_items[i].filename);
@@ -8023,15 +8555,25 @@ app.get('/uservids/:u_id', requiredAuthentication, function(req, res) {
 
                 //var pngName = baseName + '.png';
 
-                var vidUrl = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + video_items[i].userID + "/video/" + video_items[i]._id + "/" + video_items[i]._id + "." + video_items[i].filename, Expires: 6000}); //just send back thumbnail urls for list
+                    try {
+                        video_items[i].URLvid = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + video_items[i].userID + "/video/" + video_items[i]._id + "/" + video_items[i]._id + "." + video_items[i].filename, 6000); //just send back thumbnail urls for list
+                        // video_items[i].URLvid = vidUrl;
+                    } catch (e) {
+                        console.log(e);
+                    }
+                   
+               
+                // var vidUrl = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + video_items[i].userID + "/video/" + video_items[i]._id + "/" + video_items[i]._id + "." + video_items[i].filename, Expires: 6000}); //just send back thumbnail urls for list
                 //var urlPng = knoxClient.signedUrl(audio_item[0]._id + "." + pngName, expiration);
-                video_items[i].URLvid = vidUrl; //jack in teh signed urls into the object array
+                 //jack in teh signed urls into the object array
                 //console.log("picture item: " + urlThumb, picture_items[0]);
 
-            }
+                }
+            })();
 
             res.json(video_items);
             console.log("returning video_items for " + req.params.u_id);
+
         }
     });
 });
@@ -8540,146 +9082,168 @@ app.get('/usergroup/:p_id', requiredAuthentication, function(req, res) {
                     group.lastUpdateTimestamp = group.lastUpdate;
                 }
                 if (group.type.toLowerCase() == "audio") {
-                    console.log("tryna get some audio items: " + JSON.stringify(group.items));
+                    console.log("tryna get some audiogroup items: " + JSON.stringify(group.items));
                     db.audio_items.find({'_id': { $in: group.items}}).toArray(function (err, audio_items) {
                         if (err || !audio_items) {
                             console.log("error getting audio items: " + err);
                         } else {
                             var currentIndex = 0;
-                            for (var i = 0; i < audio_items.length; i++) {
-                                if (group.groupdata) {
-                                    var obj = group.groupdata.filter(function (obj) { //get index value from groupdata array
-                                        return obj.itemID === audio_items[i]._id.toString();
-                                    })[0];
-                                    if (obj != undefined && obj.itemIndex) {
-                                        audio_items[i].itemIndex = obj.itemIndex;
-                                    } else {
-                                        audio_items[i].itemIndex = i;
+                            (async () => {
+                                for (var i = 0; i < audio_items.length; i++) {
+                                    if (group.groupdata) {
+                                        var obj = group.groupdata.filter(function (obj) { //get index value from groupdata array
+                                            return obj.itemID === audio_items[i]._id.toString();
+                                        })[0];
+                                        if (obj != undefined && obj.itemIndex) {
+                                            audio_items[i].itemIndex = obj.itemIndex;
+                                        } else {
+                                            audio_items[i].itemIndex = i;
+                                        }
                                     }
-                                }
-                                if (audio_items[i].clipDuration = {}) {
-                                    audio_items[i].clipDuration = "";
-                                }
-                                var item_string_filename = JSON.stringify(audio_items[i].filename);
-                                item_string_filename = item_string_filename.replace(/\"/g, "");
-                                var item_string_filename_ext = getExtension(item_string_filename);
-                                var expiration = new Date();
-                                expiration.setMinutes(expiration.getMinutes() + 30);
-                                var baseName = path.basename(item_string_filename, (item_string_filename_ext));
-                                console.log("tryna jack in audio " + baseName + " to a group of " + group.type);
-                                var mp3Name = baseName + '.mp3';
-                                var oggName = baseName + '.ogg';
-                                var pngName = baseName + '.png';
-                                var urlMp3 = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + mp3Name, Expires: 60000});
-                                var urlOgg = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + oggName, Expires: 60000});
-                                var urlPng = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + pngName, Expires: 60000});
+                                    if (audio_items[i].clipDuration = {}) {
+                                        audio_items[i].clipDuration = "";
+                                    }
+                                    var item_string_filename = JSON.stringify(audio_items[i].filename);
+                                    item_string_filename = item_string_filename.replace(/\"/g, "");
+                                    var item_string_filename_ext = getExtension(item_string_filename);
+                                    var expiration = new Date();
+                                    expiration.setMinutes(expiration.getMinutes() + 30);
+                                    var baseName = path.basename(item_string_filename, (item_string_filename_ext));
+                                    // console.log("tryna jack in audio " + baseName + " to a group of " + group.type);
+                                    var mp3Name = baseName + '.mp3';
+                                    var oggName = baseName + '.ogg';
+                                    var pngName = baseName + '.png';
+                                    
 
-                                audio_items[i].URLmp3 = urlMp3; //jack in teh signed urls into the object array
-                                audio_items[i].URLogg = urlOgg;
-                                audio_items[i].URLpng = urlPng;
-                                currentIndex++;
-                            }
-                            audio_items.sort(function(a, b) {
-                                return a.itemIndex - b.itemIndex;
-                            });
+                                    const urlMp3 = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + mp3Name,6000);
+                                    const urlOgg = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + oggName,6000);
+                                    const urlPng = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + pngName,6000);
+                                    audio_items[i].URLmp3 = urlMp3; //jack in teh signed urls into the object array
+                                    audio_items[i].URLogg = urlOgg;
+                                    audio_items[i].URLpng = urlPng;
+                                   
+                                    // var urlMp3 = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + mp3Name, Expires: 60000});
+                                    // var urlOgg = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + oggName, Expires: 60000});
+                                    // var urlPng = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + pngName, Expires: 60000});
+
+       
+                                    currentIndex++;
+                                }
+                           
+                                audio_items.sort(function(a, b) {
+                                    
+                                    return a.itemIndex - b.itemIndex;
+                                });
+
+                                group.audio_items = audio_items;
+                                res.json(group);
+                                // console.log("returning group_item : " + JSON.stringify(group));
+                            })();
+                            
                         }
 //                            audio_items.sort(function(a, b) {
 //                                return a.itemIndex - b.itemIndex;
 //                            });
-                        group.audio_items = audio_items;
-                        res.json(group);
-                        // console.log("returning group_item : " + JSON.stringify(group));
+                       
                     });
                 } else if (group.type.toLowerCase() == "video") {
                     db.video_items.find({'_id': { $in: group.items}}).toArray(function (err, video_items) {
                         if (err || !video_items) {
-                            console.log("error getting audio items: " + err);
+                            console.log("error getting video items: " + err);
                         } else {
-                            for (var i = 0; i < video_items.length; i++) {
-                                if (group.groupdata) {
-                                    var obj = group.groupdata.filter(function (obj) { //get index value from groupdata array
-                                        return obj.itemID === video_items[i]._id.toString();
-                                    })[0];
-                                    if (obj != undefined && obj.itemIndex) {
-                                        video_items[i].itemIndex = obj.itemIndex;
-                                        console.log(video_items[i].itemIndex + "index for " + video_items[i]._id.toString() );
-                                    } else {
-                                        video_items[i].itemIndex = i;
-                                        console.log(video_items[i].itemIndex + "natchrul index for " + video_items[i]._id.toString() );
+                            (async () => { 
+                                for (var i = 0; i < video_items.length; i++) {
+                                    if (group.groupdata) {
+                                        var obj = group.groupdata.filter(function (obj) { //get index value from groupdata array
+                                            return obj.itemID === video_items[i]._id.toString();
+                                        })[0];
+                                        if (obj != undefined && obj.itemIndex) {
+                                            video_items[i].itemIndex = obj.itemIndex;
+                                            console.log(video_items[i].itemIndex + "index for " + video_items[i]._id.toString() );
+                                        } else {
+                                            video_items[i].itemIndex = i;
+                                            console.log(video_items[i].itemIndex + "natchrul index for " + video_items[i]._id.toString() );
+                                        }
                                     }
-                                }
-                                var item_string_filename = JSON.stringify(video_items[i].filename);
-                                item_string_filename = item_string_filename.replace(/\"/g, "");
-                                var item_string_filename_ext = getExtension(item_string_filename);
-                                var expiration = new Date();
-                                expiration.setMinutes(expiration.getMinutes() + 30);
-                                var baseName = path.basename(item_string_filename, (item_string_filename_ext));
-                                console.log("tryna jack in video " + baseName + " to a group of " + group.type.toLowerCase());
-                                var vidName = baseName + '.mp3';
-                                var urlVid = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + video_items[i].userID + "/video/" + video_items[i]._id + "/" + video_items[i]._id + "." + video_items[i].filename, Expires: 60000});
-                                video_items[i].vUrl = urlVid; //jack in teh signed urls into the object array
+                                    var item_string_filename = JSON.stringify(video_items[i].filename);
+                                    item_string_filename = item_string_filename.replace(/\"/g, "");
+                                    var item_string_filename_ext = getExtension(item_string_filename);
+                                    var expiration = new Date();
+                                    expiration.setMinutes(expiration.getMinutes() + 30);
+                                    var baseName = path.basename(item_string_filename, (item_string_filename_ext));
+                                    console.log("tryna jack in video " + baseName + " to a group of " + group.type.toLowerCase());
+                                    var vidName = baseName + '.mp3';
 
-                            }
-                            video_items.sort(function(a, b) {
-                                return a.itemIndex - b.itemIndex;
-                            });
+                                    video_items[i].vUrl = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + video_items[i].userID + "/video/" + video_items[i]._id + "/" + video_items[i]._id + "." + video_items[i].filename, 6000);
+                                    // var urlVid = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + video_items[i].userID + "/video/" + video_items[i]._id + "/" + video_items[i]._id + "." + video_items[i].filename, Expires: 60000});
+                                    // video_items[i].vUrl = urlVid; //jack in teh signed urls into the object array
+
+                                }
+                                video_items.sort(function(a, b) {
+                                    return a.itemIndex - b.itemIndex;
+                                });
+
+                                group.video_items = video_items;
+                                group.video_items.sort(function(a, b) {
+                                    return a.itemIndex - b.itemIndex;
+                                });
+                                res.json(group);
+                                // console.log("returning group_item : " + group);
+                            })();
                         }
 //                            video_items.sort(function(a, b) {
 //                                return a.itemIndex - b.itemIndex;
 //                            });
-                        group.video_items = video_items;
-                        group.video_items.sort(function(a, b) {
-                            return a.itemIndex - b.itemIndex;
-                        });
-                        res.json(group);
-                        console.log("returning group_item : " + group);
+                      
                     });
                 } else if (group.type.toLowerCase().includes("picture")) {
                     db.image_items.find({'_id': { $in: group.items}}).toArray(function (err, image_items) {
                         if (err || !image_items) {
                             console.log("error getting image items: " + err);
                         } else {
-                            for (var i = 0; i < image_items.length; i++) {
-                                if (group.groupdata) {
-                                    var obj = group.groupdata.filter(function (obj) { //get index value from groupdata array
-                                        return obj.itemID === image_items[i]._id.toString();
-                                    })[0];
-                                    if (obj != undefined && obj.itemIndex) {
-                                        image_items[i].itemIndex = obj.itemIndex;
-                                        console.log(image_items[i].itemIndex + "index for " + image_items[i]._id.toString() );
-                                    } else {
-                                        image_items[i].itemIndex = i;
-                                        console.log(image_items[i].itemIndex + "natchrul index for " + image_items[i]._id.toString() );
+                            (async () => {
+                                for (var i = 0; i < image_items.length; i++) {
+                                    if (group.groupdata) {
+                                        var obj = group.groupdata.filter(function (obj) { //get index value from groupdata array
+                                            return obj.itemID === image_items[i]._id.toString();
+                                        })[0];
+                                        if (obj != undefined && obj.itemIndex) {
+                                            image_items[i].itemIndex = obj.itemIndex;
+                                            console.log(image_items[i].itemIndex + "index for " + image_items[i]._id.toString() );
+                                        } else {
+                                            image_items[i].itemIndex = i;
+                                            console.log(image_items[i].itemIndex + "natchrul index for " + image_items[i]._id.toString() );
+                                        }
                                     }
-                                }
-                                var item_string_filename = JSON.stringify(image_items[i].filename);
-                                item_string_filename = item_string_filename.replace(/\"/g, "");
-                                var item_string_filename_ext = getExtension(item_string_filename);
-                                //var expiration = new Date();
-                                //expiration.setMinutes(expiration.getMinutes() + 30);
-                                var baseName = path.basename(item_string_filename, (item_string_filename_ext));
-                                console.log(baseName);
-                                var thumbName = 'thumb.' + baseName + item_string_filename_ext;
-                                var halfName = 'half.' + baseName + item_string_filename_ext;
-                                var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + image_items[i].userID + "/pictures/" + image_items[i]._id + "." + thumbName, Expires: 6000});
-                                var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + image_items[i].userID + "/pictures/" + image_items[i]._id + "." + halfName, Expires: 6000});
-                                image_items[i].urlThumb = urlThumb; //jack in teh signed urls into the object array
-                                image_items[i].urlHalf = urlHalf; //jack in teh signed urls into the object array
+                                    var item_string_filename = JSON.stringify(image_items[i].filename);
+                                    item_string_filename = item_string_filename.replace(/\"/g, "");
+                                    var item_string_filename_ext = getExtension(item_string_filename);
+                                    //var expiration = new Date();
+                                    //expiration.setMinutes(expiration.getMinutes() + 30);
+                                    var baseName = path.basename(item_string_filename, (item_string_filename_ext));
+                                    console.log(baseName);
+                                    var thumbName = 'thumb.' + baseName + item_string_filename_ext;
+                                    var halfName = 'half.' + baseName + item_string_filename_ext;
 
-                            }
-                            image_items.sort(function(a, b) {
-                                return a.itemIndex - b.itemIndex;
-                            });
+
+                                    // var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + image_items[i].userID + "/pictures/" + image_items[i]._id + "." + thumbName, Expires: 6000});
+                                    // var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + image_items[i].userID + "/pictures/" + image_items[i]._id + "." + halfName, Expires: 6000});
+                                    image_items[i].urlThumb = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + image_items[i].userID + "/pictures/" + image_items[i]._id + "." + thumbName,6000);
+                                    image_items[i].urlHalf = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + image_items[i].userID + "/pictures/" + image_items[i]._id + "." + halfName,6000);
+                                }
+                                image_items.sort(function(a, b) {
+                                    return a.itemIndex - b.itemIndex;
+                                });
+                        
+                                group.image_items = image_items;
+                                group.image_items.sort(function(a, b) {
+                                    return a.itemIndex - b.itemIndex;
+                                });
+                                res.json(group);
+                                // console.log("returning group_item : " + group);
+                            
+                            })();
                         }
-//                            video_items.sort(function(a, b) {
-//                                return a.itemIndex - b.itemIndex;
-//                            });
-                        group.image_items = image_items;
-                        group.image_items.sort(function(a, b) {
-                            return a.itemIndex - b.itemIndex;
-                        });
-                        res.json(group);
-                        console.log("returning group_item : " + group);
                     });
 
             } else if (group.type.toLowerCase() == "location") {
@@ -8832,10 +9396,12 @@ app.get('/usergroup/:p_id', requiredAuthentication, function(req, res) {
                                             //expiration.setMinutes(expiration.getMinutes() + 30);
                                             var baseName = path.basename(item_string_filename, (item_string_filename_ext));
                                             var thumbName = 'thumb.' + baseName + item_string_filename_ext;
-                                            var url1 = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + pic.userID + "/pictures/" + pic._id + "." + thumbName, Expires: 6000});
+                                            // var url1 = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + pic.userID + "/pictures/" + pic._id + "." + thumbName, Expires: 6000});\
+                                            var url1 = "";
                                             // console.log("postcard url : " + url1);
                                             var halfName = 'thumb.' + baseName + item_string_filename_ext;
-                                            var url2 = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + pic.userID + "/pictures/" + pic._id + "." + halfName, Expires: 6000});
+                                            // var url2 = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + pic.userID + "/pictures/" + pic._id + "." + halfName, Expires: 6000});
+                                            var url2 = "";
                                             // if (scene_items[i])
                                             scene.urlThumb = url1;
                                             scene.urlHalf = url2;
@@ -9496,34 +10062,34 @@ app.get('/usertext/:p_id', requiredAuthentication, function(req, res) {
     });
 });
 
-app.get('/userpics',  requiredAuthentication, function(req, res) {
-    console.log('tryna return userpics for: ' + req.body.userID);
-    db.image_items.find({userID: req.params.u_id}).sort({otimestamp: -1}).limit(maxItems).toArray( function(err, picture_items) {
-        if (err || !picture_items) {
-            console.log("error getting picture items: " + err);
-        } else {
-            for (var i = 0; i < picture_items.length; i++) {
-                var item_string_filename = JSON.stringify(picture_items[i].filename);
-                item_string_filename = item_string_filename.replace(/\"/g, "");
-                var item_string_filename_ext = getExtension(item_string_filename);
-                var expiration = new Date();
-                expiration.setMinutes(expiration.getMinutes() + 30);
-                var baseName = path.basename(item_string_filename, (item_string_filename_ext));
-                console.log(baseName);
-                var thumbName = 'thumb.' + baseName + item_string_filename_ext;
-                var halfName = 'half.' + baseName + item_string_filename_ext;
-                var standardName = 'standard.' + baseName + item_string_filename_ext;
-                var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_items[i].userID + "/pictures/" + picture_items[i]._id + "." + thumbName, Expires: 6000}); //just send back thumbnail urls for list
-                //var urlPng = knoxClient.signedUrl(audio_item[0]._id + "." + pngName, expiration);
-                picture_items[i].URLthumb = urlThumb; //jack in teh signed urls into the object array
+// app.get('/userpics',  requiredAuthentication, function(req, res) {
+//     console.log('tryna return userpics for: ' + req.body.userID);
+//     db.image_items.find({userID: req.params.u_id}).sort({otimestamp: -1}).limit(maxItems).toArray( function(err, picture_items) {
+//         if (err || !picture_items) {
+//             console.log("error getting picture items: " + err);
+//         } else {
+//             for (var i = 0; i < picture_items.length; i++) {
+//                 var item_string_filename = JSON.stringify(picture_items[i].filename);
+//                 item_string_filename = item_string_filename.replace(/\"/g, "");
+//                 var item_string_filename_ext = getExtension(item_string_filename);
+//                 var expiration = new Date();
+//                 expiration.setMinutes(expiration.getMinutes() + 30);
+//                 var baseName = path.basename(item_string_filename, (item_string_filename_ext));
+//                 console.log(baseName);
+//                 var thumbName = 'thumb.' + baseName + item_string_filename_ext;
+//                 var halfName = 'half.' + baseName + item_string_filename_ext;
+//                 var standardName = 'standard.' + baseName + item_string_filename_ext;
+//                 var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_items[i].userID + "/pictures/" + picture_items[i]._id + "." + thumbName, Expires: 6000}); //just send back thumbnail urls for list
+//                 //var urlPng = knoxClient.signedUrl(audio_item[0]._id + "." + pngName, expiration);
+//                 picture_items[i].URLthumb = urlThumb; //jack in teh signed urls into the object array
 
-            }
+//             }
 
-            res.json(picture_items);
-            console.log("returning picture_items for " + req.userID);
-        }
-    });
-});
+//             res.json(picture_items);
+//             console.log("returning picture_items for " + req.userID);
+//         }
+//     });
+// });
 
 // app.get('/userpic/:p_id', checkAppID, requiredAuthentication, function(req, res) {
 app.get('/userpic/:p_id', requiredAuthentication, function(req, res) {
@@ -9575,49 +10141,61 @@ app.get('/userpic/:p_id', requiredAuthentication, function(req, res) {
                     res.json(picture_item);
                     console.log("returning picture_item for " + req.params.u_id);    
                 } else {
-                var params = {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/" + picture_item.userID + "/pictures/originals/" + picture_item._id + "." + originalName};
-                s3.headObject(params, function(err, data) { //some old pix aren't saved with .original. in filename, check for that
-                    if (err) {
-                        console.log("dinna find that pic");
-                        originalName = baseName + item_string_filename_ext;
-                        urlOriginal = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/originals/" + originalName, Expires: 6000}); 
+                // var params = {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/" + picture_item.userID + "/pictures/originals/" + picture_item._id + "." + originalName};
+                // s3.headObject(params, function(err, data) { //some old pix aren't saved with .original. in filename, check for that
+                //     if (err) {
+                //         console.log("dinna find that pic");
+                //         originalName = baseName + item_string_filename_ext;
+                //         urlOriginal = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/originals/" + originalName, Expires: 6000}); 
+                //         picture_item.URLthumb = urlThumb; //jack in teh signed urls into the object array
+                //         picture_item.URLhalf = urlHalf;
+                //         picture_item.URLstandard = urlStandard;
+                //         picture_item.URLoriginal = urlOriginal;
+                //         picture_item.URLtarget = urlTarget;
+                //         // console.log("urlTarget " + urlTarget);
+                //         res.json(picture_item);
+                //         console.log("returning picture_item for " + picture_item);
+                //     } else {
+                //         console.log("found that orig pic");
+                        
+                
                         picture_item.URLthumb = urlThumb; //jack in teh signed urls into the object array
                         picture_item.URLhalf = urlHalf;
                         picture_item.URLstandard = urlStandard;
                         picture_item.URLoriginal = urlOriginal;
                         picture_item.URLtarget = urlTarget;
                         // console.log("urlTarget " + urlTarget);
+        
                         res.json(picture_item);
-                        console.log("returning picture_item for " + picture_item);
-                    } else {
-                        console.log("found that orig pic");
-                        urlOriginal = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/originals/" + picture_item._id + "." + originalName, Expires: 6000}); 
-                        var params = {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + standardName};
-                        s3.headObject(params, function(err, data) { //uploaded localfiles haven't been resized yet, only .original. has been saved
-                            if (err) {
-                                picture_item.URLthumb = "missing"; //jack in teh signed urls into the object array
-                                picture_item.URLhalf = "missing";
-                                picture_item.URLstandard = "missing";
-                                picture_item.URLoriginal = urlOriginal;
-                                picture_item.URLtarget = "missing";
-                                // console.log("urlTarget " + urlTarget);
-                   
-                                res.json(picture_item);
-                            } else {
-                                picture_item.URLthumb = urlThumb; //jack in teh signed urls into the object array
-                                picture_item.URLhalf = urlHalf;
-                                picture_item.URLstandard = urlStandard;
-                                picture_item.URLoriginal = urlOriginal;
-                                picture_item.URLtarget = urlTarget;
-                                // console.log("urlTarget " + urlTarget);
-                   
-                                res.json(picture_item);
-                            }
-                            
-                        });
+                      
+                        // // urlOriginal = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/originals/" + picture_item._id + "." + originalName, Expires: 6000}); 
+                        // var params = {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + standardName};
                         
-                    }
-                    });
+                        // s3.headObject(params, function(err, data) { //uploaded localfiles haven't been resized yet, only .original. has been saved
+                        //     if (err) {
+                        //         picture_item.URLthumb = "missing"; //jack in teh signed urls into the object array
+                        //         picture_item.URLhalf = "missing";
+                        //         picture_item.URLstandard = "missing";
+                        //         picture_item.URLoriginal = urlOriginal;
+                        //         picture_item.URLtarget = "missing";
+                        //         // console.log("urlTarget " + urlTarget);
+                   
+                        //         res.json(picture_item);
+                        //     } else {
+                        //         picture_item.URLthumb = urlThumb; //jack in teh signed urls into the object array
+                        //         picture_item.URLhalf = urlHalf;
+                        //         picture_item.URLstandard = urlStandard;
+                        //         picture_item.URLoriginal = urlOriginal;
+                        //         picture_item.URLtarget = urlTarget;
+                        //         // console.log("urlTarget " + urlTarget);
+                   
+                        //         res.json(picture_item);
+                        //     }
+                            
+                        // });
+                        
+                    // }
+                    // });
                 }
                 // res.json(picture_items);
                 // console.log("returning picture_items for " + req.params.u_id);    
@@ -9626,9 +10204,9 @@ app.get('/userpic/:p_id', requiredAuthentication, function(req, res) {
     });
 });
 
-app.get('/hls/:_id', function(req, res) {  //main playback route for hls vids
+app.get('/hls/:_id', function(req, res) {  //main playback route for hls vids //todo auth? send to tracker?
     var pID = req.params._id;
-    // console.log("hls pid " + req.params._id);
+    console.log("hls pid " + req.params._id);
     if (ObjectID.isValid(pID)) {
         var o_id = ObjectID(pID);
         db.video_items.findOne({"_id": o_id}, function(err, video_item) {
@@ -9636,116 +10214,92 @@ app.get('/hls/:_id', function(req, res) {  //main playback route for hls vids
                 console.log("error getting hls video item: " + err);
                 res.send("error getting hls video item: " + err);
             } else {
-
-                (async () => {
-                    if (minioClient) {
+                if (minioClient) {
+                    (async () => {
                         let buffer = [];
-                        await minioClient.getObject(process.env.S3_ROOT_BUCKET_NAME, 'users/' + video_item.userID + '/video/' + video_item._id + '/hls/output.m3u8', function(err, dataStream) {
-                            if (err) {
-                              console.log(err);
-                            }
-                            dataStream.on('data', function(chunk) {
-                            //   size += chunk.length
-                              buffer.push(chunk);
-                              // chunk.pipe(fileStream);
-                            })
-                            dataStream.on('end', function() {
-                                let manifestString = buffer.toString();
-                                // console.log(manifestString);
-
-                                var data = [];
-                                var stream = minioClient.listObjects(process.env.S3_ROOT_BUCKET_NAME,'users/' + video_item.userID + '/video/' + video_item._id + '/hls/', false);
-                                stream.on('data', function(obj) { 
-                                    data.push(obj) 
-                                } )
-                                stream.on("end", function (obj) { 
-                                    // console.log("minio bucket list: " + JSON.stringify(data)); 
-
-                                    async.each (data, function (s3Object, callbackz) { //takes a shake so async, and respond when it's done
-                                        // console.log("minio data element: " + JSON.stringify(s3Object));
-                                        if (getExtension(s3Object.name) == ".ts") { //swap out .ts files (e.g 001.ts) for signed urls
-                                            // console.log("minio key " + path.basename(s3Object.name)); 
-                                            // let url = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, s3Object.name.toString(), 36000);
-                                            minioClient.presignedGetObject(process.env.S3_ROOT_BUCKET_NAME, s3Object.name.toString(), 24*60*60, function(err, presignedUrl) { //use callback version here, can't await?
-                                                if (err) return console.log(err);
-                                                // console.log("url " + presignedUrl);
-                                                manifestString = manifestString.replace(path.basename(s3Object.name.toString()), presignedUrl); //rebuild the manifest with signed urls - brilliant!
-                                                callbackz();
-                                              });                                          
-                                        } else {
-                                            callbackz();
-                                        }
-                                            
-                                        }, function(err) {
-                                            if (err) {
-                                                // console.log('hls mangler failed to process');
-                                                res.send("error! " + err);
-                                            } else {
-                                                // console.log('All files have been processed successfully');
-                                                res.setHeader('content-type', 'application/x-mpegURL');
-                                                res.send(manifestString);
-                                            }
-                                    });
-                                })
-                                stream.on('error', function(err) { 
-                                    console.log(err)
-                                } );
-                            });
-                                dataStream.on('error', function(err) {
-                                console.log(err);
-                            
-                            });
-                        });
-                    } else {
-                    let chkParams = {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: 'users/' + video_item.userID + '/video/' + video_item._id + '/hls/output.m3u8'};
-                    s3.getObject(chkParams, function(err, manifest) { 
-                    if (err) { 
-                        res.send("no hls manifest found");
-                    } else {
-                        // console.log("gotsa m3u8: " + manifest.Body.toString());
-                        var params = {
-                            Bucket: process.env.S3_ROOT_BUCKET_NAME,
-                            Prefix: 'users/' + video_item.userID + '/video/' + video_item._id + '/hls/'
-                        }
                         
-                        s3.listObjects(params, function(err, data) {
+                        await minioClient.getObject(process.env.S3_ROOT_BUCKET_NAME, 'users/' + video_item.userID + '/video/' + video_item._id + '/hls/output.m3u8', function(err, dataStream) {
                         if (err) {
                             console.log(err);
-                            res.send("error: " + err);
                         }
-                        if (data.Contents.length == 0) {
-                            // console.log("no content found");
-                            res.send("no content found");
-                        } else {
-                            var manifestString = manifest.Body.toString();                                   
-                            async.each (data.Contents, function (s3Object, callbackz) { //takes a shake so async, and respond when it's done
-                                if (getExtension(s3Object.Key) == ".ts") { //swap out .ts files (e.g 001.ts) for signed urls
-                                    // console.log("filename " + path.basename(s3Object.Key)); 
-                                    let url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: s3Object.Key, Expires: 36000});
-                                    // console.log("url " + url);
-                                    manifestString = manifestString.replace(path.basename(s3Object.Key), url); //rebuild the manifest with signed urls
-                                }
-                                    callbackz();
-                                }, function(err) {
-                                    if (err) {
-                                        // console.log('hls mangler failed to process');
-                                        res.send("error! " + err);
+                        dataStream.on('data', function(chunk) {
+                        //   size += chunk.length
+                            buffer.push(chunk);
+                            // chunk.pipe(fileStream);
+                        })
+                        dataStream.on('end', function() {
+                            let manifestString = buffer.toString();
+                            // console.log(manifestString);
+
+                            var data = [];
+                            var stream = minioClient.listObjects(process.env.S3_ROOT_BUCKET_NAME,'users/' + video_item.userID + '/video/' + video_item._id + '/hls/', false);
+                            stream.on('data', function(obj) { 
+                                data.push(obj) 
+                            } )
+                            stream.on("end", function (obj) { 
+                                // console.log("minio bucket list: " + JSON.stringify(data)); 
+
+                                async.each (data, function (s3Object, callbackz) { //takes a shake so async, and respond when it's done
+                                    // console.log("minio data element: " + JSON.stringify(s3Object));
+                                    if (getExtension(s3Object.name) == ".ts") { //swap out .ts files (e.g 001.ts) for signed urls
+                                        // console.log("minio key " + path.basename(s3Object.name)); 
+                                        // let url = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, s3Object.name.toString(), 36000);
+                                        minioClient.presignedGetObject(process.env.S3_ROOT_BUCKET_NAME, s3Object.name.toString(), 24*60*60, function(err, presignedUrl) { //use callback version here, can't await?
+                                            if (err) return console.log(err);
+                                            // console.log("url " + presignedUrl);
+                                            manifestString = manifestString.replace(path.basename(s3Object.name.toString()), presignedUrl); //rebuild the manifest with signed urls - brilliant!
+                                            callbackz();
+                                            });                                          
                                     } else {
-                                        // console.log('All files have been processed successfully');
-                                        res.setHeader('content-type', 'application/x-mpegURL');
-                                        res.send(manifestString);
+                                        callbackz();
                                     }
+                                        
+                                    }, function(err) {
+                                        if (err) {
+                                            // console.log('hls mangler failed to process');
+                                            res.send("error! " + err);
+                                        } else {
+                                            // console.log('All files have been processed successfully');
+                                            res.setHeader('content-type', 'application/x-mpegURL');
+                                            res.send(manifestString);
+                                        }
                                 });
-                                
-                                }
-                            });
-                            }
+                            })
+                            stream.on('error', function(err) { 
+                                console.log(err)
+                            } );
                         });
-                    }
-                })();
+                            dataStream.on('error', function(err) {
+                            console.log(err);
+                        
+                        });
+                        });
+                    })();
+                } else { //below updated w/ aws sdk v3 - getSignedUrl must be async now... but no need for async.each!
+                    (async () => {
+                        try {
+                            let manifest = await GetObject(process.env.S3_ROOT_BUCKET_NAME,'users/' + video_item.userID + '/video/' + video_item._id + '/hls/output.m3u8');
+                            const files = await ListObjects(process.env.S3_ROOT_BUCKET_NAME,'users/' + video_item.userID + '/video/' + video_item._id + '/hls/');
+                            // console.log("files: "+ files.Contents.length);
+                            for (const s3Object of files.Contents) {
+                                if (getExtension(s3Object.Key) == ".ts") { //swap out .ts files (e.g 001.ts) for signed urls
+                                    let url = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, s3Object.Key);
+                                    // console.log("url " + url);
+                                    manifest = manifest.replace(path.basename(s3Object.Key), url); //rebuild the manifest with signed urls - clever girl!
+                                }
+                            }
+                            res.setHeader('content-type', 'application/x-mpegURL');
+                            res.send(manifest);
+                        
+                        } catch (caught) {
+                            res.send(caught);
+                        }
+                    })();
+                }
             }
         });
     } else {
+        console.log("error " + pID);
         res.send("error in id " + pID);
     }
 });
@@ -9806,60 +10360,60 @@ app.get('/uservid/:p_id', requiredAuthentication, function(req, res) {
         }
     });
 });
-// app.post('/scene_inventory_objex', requiredAuthentication, function(req, res) {
-app.post('/scene_inventory_objex_old', function(req, res) {
-    console.log("tryna get scene inventory objex" + JSON.stringify(req.body));
-    let response = {};
-    let objex = [];
-    response.objex = objex;
-    if (req.body.oIDs != undefined && req.body.oIDs.length > 0) {
-/////////
+
+// app.post('/scene_inventory_objex_old', function(req, res) {
+//     console.log("tryna get scene inventory objex" + JSON.stringify(req.body));
+//     let response = {};
+//     let objex = [];
+//     response.objex = objex;
+//     if (req.body.oIDs != undefined && req.body.oIDs.length > 0) {
+// /////////
         
-        async.each (req.body.oIDs, function (oID, callbackz) { 
-            //fetch obj and jack in the model url'
-            let objID = ObjectID(oID);
-            db.obj_items.findOne({_id: objID}, function (err, obj_item) {
-                if (err || !obj_item) {
-                    callbackz(err);
-                } else {
-                    // console.log("tryna get inventory modelID " + obj_item.modelID);
-                    let mid = obj_item.modelID;
-                    if (mid != null) {
-                        // console.log("tryna get inventory modelID2 " + oid);
-                        let m_id = ObjectID(mid);
-                        db.models.findOne({"_id": m_id}, function (err, model) {
-                        if (err || !model) {
-                            console.log("error getting model: " + err);
-                            callbackz(err);
-                            } else {
-                                (async () => {
-                                    console.log("got objjj model:" + model._id);
-                                    // let url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + model.userID + "/gltf/" + model.filename, Expires: 6000});
-                                    let url = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + model.userID + "/gltf/" + model.filename, 6000);
-                                    obj_item.modelURL = url;
-                                    response.objex.push(obj_item);
-                                    callbackz(null);
-                                })();
-                            }
-                        });
+//         async.each (req.body.oIDs, function (oID, callbackz) { 
+//             //fetch obj and jack in the model url'
+//             let objID = ObjectID(oID);
+//             db.obj_items.findOne({_id: objID}, function (err, obj_item) {
+//                 if (err || !obj_item) {
+//                     callbackz(err);
+//                 } else {
+//                     // console.log("tryna get inventory modelID " + obj_item.modelID);
+//                     let mid = obj_item.modelID;
+//                     if (mid != null) {
+//                         // console.log("tryna get inventory modelID2 " + oid);
+//                         let m_id = ObjectID(mid);
+//                         db.models.findOne({"_id": m_id}, function (err, model) {
+//                         if (err || !model) {
+//                             console.log("error getting model: " + err);
+//                             callbackz(err);
+//                             } else {
+//                                 (async () => {
+//                                     console.log("got objjj model:" + model._id);
+//                                     // let url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + model.userID + "/gltf/" + model.filename, Expires: 6000});
+//                                     let url = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + model.userID + "/gltf/" + model.filename, 6000);
+//                                     obj_item.modelURL = url;
+//                                     response.objex.push(obj_item);
+//                                     callbackz(null);
+//                                 })();
+//                             }
+//                         });
 
-                    } else {
-                        response.objex.push(obj_item);
-                        callbackz(null);
-                    }        
-                }
-            });
-        }, function(err) {
-            if (err) {
-                res.send("problem getting inventory " + err);
-            } else {
-                res.send(response);
-            }
-        });
+//                     } else {
+//                         response.objex.push(obj_item);
+//                         callbackz(null);
+//                     }        
+//                 }
+//             });
+//         }, function(err) {
+//             if (err) {
+//                 res.send("problem getting inventory " + err);
+//             } else {
+//                 res.send(response);
+//             }
+//         });
 
-        ////////
-    }
-});
+//         ////////
+//     }
+// });
 
 app.post('/scene_inventory_objex/', function(req, res) {
     console.log('tryna return userobj : ' + req.params.p_id);
@@ -10003,21 +10557,28 @@ app.get('/userobj/:p_id', requiredAuthentication, function(req, res) {
                                 // res.send("error: " + err);
                                 callback(err);
                             } else {
-                                objectPictures = [];
-                                pic_items.forEach(function(picture_item) {                
-                                    var imageItem = {};
-                                    var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".thumb." + picture_item.filename, Expires: 6000});
-                                    var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".half." + picture_item.filename, Expires: 6000});
-                                    var urlStandard = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".standard." + picture_item.filename, Expires: 6000});
-                                    imageItem.urlThumb = urlThumb;
-                                    imageItem.urlHalf = urlHalf;
-                                    imageItem.urlStandard = urlStandard;
-                                    imageItem._id = picture_item._id;
-                                    imageItem.filename = picture_item.filename;
-                                    objectPictures.push(imageItem);
-                                    obj_item.objectPictures = objectPictures;
-                                });
-                                callback(null);
+                                
+                                    objectPictures = [];
+                                    pic_items.forEach(function(picture_item) {
+                                        (async () => {                
+                                            var imageItem = {};
+                                            const urlThumb = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".thumb." + picture_item.filename, 6000);
+                                            const urlHalf = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".half." + picture_item.filename, 6000);
+                                            const urlStandard = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".standard." + picture_item.filename, 6000);
+
+                                            // var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".thumb." + picture_item.filename, Expires: 6000});
+                                            // var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".half." + picture_item.filename, Expires: 6000});
+                                            // var urlStandard = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".standard." + picture_item.filename, Expires: 6000});
+                                            imageItem.urlThumb = urlThumb;
+                                            imageItem.urlHalf = urlHalf;
+                                            imageItem.urlStandard = urlStandard;
+                                            imageItem._id = picture_item._id;
+                                            imageItem.filename = picture_item.filename;
+                                            objectPictures.push(imageItem);
+                                            obj_item.objectPictures = objectPictures;
+                                        })();
+                                    });
+                                    callback(null);
                             }
                         });
                     
@@ -10056,10 +10617,13 @@ app.get('/userobj/:p_id', requiredAuthentication, function(req, res) {
                             console.log("error getting model: " + err);
                             callback(err);
                             } else {
-                                console.log("got objj model:" + JSON.stringify(model));
-                                let url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + model.userID + "/gltf/" + model.filename, Expires: 6000});
-                                obj_item.modelURL = url;
-                                callback(null);
+                                (async () => {
+                                    console.log("got objj model:" + JSON.stringify(model));
+                                    // let url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + model.userID + "/gltf/" + model.filename, Expires: 6000});
+
+                                    obj_item.modelURL = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + model.userID + "/gltf/" + model.filename,6000);
+                                    callback(null);
+                                })();
                             }
                     });
                     } else {
@@ -10079,64 +10643,64 @@ app.get('/userobj/:p_id', requiredAuthentication, function(req, res) {
 
 
 
-app.get('/useraudio/:username', function(req, res) {
-    console.log('tryna return audiolist: ' + req.params.tag);
-    db.audio_items.find({username: req.params.username}).sort({otimestamp: -1}).limit(maxItems).toArray( function(err, audio_items) {
-        if (err || !audio_items) {
-            console.log("error getting audio items: " + err);
-        } else {
-            res.json(audio_items);
-//                console.log("returning audio_items for " + req.params.userName);
-        }
-    });
-});
+// app.get('/useraudio/:username', function(req, res) {
+//     console.log('tryna return audiolist: ' + req.params.tag);
+//     db.audio_items.find({username: req.params.username}).sort({otimestamp: -1}).limit(maxItems).toArray( function(err, audio_items) {
+//         if (err || !audio_items) {
+//             console.log("error getting audio items: " + err);
+//         } else {
+//             res.json(audio_items);
+// //                console.log("returning audio_items for " + req.params.userName);
+//         }
+//     });
+// });
 
-app.get('/audiodata.json', checkAppID, requiredAuthentication, function (req, res) {
-//	app.get("/audiodata.json", auth, function (req, res) {
-    db.audio_items.find({}, function(err,audio_items) {
-        if (err || !audio_items) {
-            console.log("error getting audio items: " + err);
-            //es.end(err);
-        } else { //don't add urls for this one...
+// app.get('/audiodata.json', checkAppID, requiredAuthentication, function (req, res) {
+// //	app.get("/audiodata.json", auth, function (req, res) {
+//     db.audio_items.find({}, function(err,audio_items) {
+//         if (err || !audio_items) {
+//             console.log("error getting audio items: " + err);
+//             //es.end(err);
+//         } else { //don't add urls for this one...
 
-            console.log('tryna send audio_items...');
-            res.json(audio_items);
+//             console.log('tryna send audio_items...');
+//             res.json(audio_items);
 
-        }
-    });
-});
+//         }
+//     });
+// });
 
-app.get('/item_sc/:sid', function (req, res) {
+// app.get('/item_sc/:sid', function (req, res) {
 
-    var shortID = req.params.sid;
-    db.audio_items.find({ "short_id" : shortID}, function(err, audio_item) {
-        if (err || !audio_item) {
-            console.log("error getting audio items: " + err);
-        } else {
-            var item_string_filename = JSON.stringify(audio_item[0].filename);
-            item_string_filename = item_string_filename.replace(/\"/g, "");
-            var item_string_filename_ext = getExtension(item_string_filename);
-            var expiration = new Date();
-            expiration.setMinutes(expiration.getMinutes() + 3);
-            var baseName = path.basename(item_string_filename, (item_string_filename_ext));
-            console.log(baseName);
-            var mp3Name = baseName + '.mp3';
-            var oggName = baseName + '.ogg';
-            var pngName = baseName + '.png';
-            //var urlMp3 = knoxClient.signedUrl(audio_item[0]._id + "." + mp3Name, expiration);
-            //var urlOgg = knoxClient.signedUrl(audio_item[0]._id + "." + oggName, expiration);
-            //var urlPng = knoxClient.signedUrl(audio_item[0]._id + "." + pngName, expiration);
+//     var shortID = req.params.sid;
+//     db.audio_items.find({ "short_id" : shortID}, function(err, audio_item) {
+//         if (err || !audio_item) {
+//             console.log("error getting audio items: " + err);
+//         } else {
+//             var item_string_filename = JSON.stringify(audio_item[0].filename);
+//             item_string_filename = item_string_filename.replace(/\"/g, "");
+//             var item_string_filename_ext = getExtension(item_string_filename);
+//             var expiration = new Date();
+//             expiration.setMinutes(expiration.getMinutes() + 3);
+//             var baseName = path.basename(item_string_filename, (item_string_filename_ext));
+//             console.log(baseName);
+//             var mp3Name = baseName + '.mp3';
+//             var oggName = baseName + '.ogg';
+//             var pngName = baseName + '.png';
+//             //var urlMp3 = knoxClient.signedUrl(audio_item[0]._id + "." + mp3Name, expiration);
+//             //var urlOgg = knoxClient.signedUrl(audio_item[0]._id + "." + oggName, expiration);
+//             //var urlPng = knoxClient.signedUrl(audio_item[0]._id + "." + pngName, expiration);
 
-            var urlMp3 = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_item[0].userID + "/audio/" + audio_item[0]._id + "." + mp3Name, Expires: 6000});
-            var urlOgg = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_item[0].userID + "/audio/" + audio_item[0]._id + "." + oggName, Expires: 6000});
-            var urlPng = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_item[0].userID + "/audio/" + audio_item[0]._id + "." + pngName, Expires: 6000});
-            audio_item[0].URLmp3 = urlMp3; //jack in teh signed urls into the object array
-            audio_item[0].URLogg = urlOgg;
-            audio_item[0].URLpng = urlPng;
-            res.json(audio_item);
-        }
-    });
-});
+//             var urlMp3 = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_item[0].userID + "/audio/" + audio_item[0]._id + "." + mp3Name, Expires: 6000});
+//             var urlOgg = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_item[0].userID + "/audio/" + audio_item[0]._id + "." + oggName, Expires: 6000});
+//             var urlPng = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_item[0].userID + "/audio/" + audio_item[0]._id + "." + pngName, Expires: 6000});
+//             audio_item[0].URLmp3 = urlMp3; //jack in teh signed urls into the object array
+//             audio_item[0].URLogg = urlOgg;
+//             audio_item[0].URLpng = urlPng;
+//             res.json(audio_item);
+//         }
+//     });
+// });
 
 
 app.get('/audio/:id', requiredAuthentication, function (req, res){ //TODO Authenticate below if Public/Private bool for this media item
@@ -10264,202 +10828,203 @@ app.post('/update/:_id', checkAppID, requiredAuthentication, function (req, res)
     });
 });
 
-app.get('/itemkeys/:_id', function (req, res) { //return keys for specific item id
+// app.get('/itemkeys/:_id', function (req, res) { //return keys for specific item id
 
-    console.log(req.params._id);
-    var o_id = ObjectID(req.params._id);
-    db.audio_item_keys.find({ "keyAudioItemID" : req.params._id}, function(err, itemKeys) {
-        if (err || !itemKeys) {
-            console.log("cain't get no itemKeys... " + err);
-        } else {
+//     console.log(req.params._id);
+//     var o_id = ObjectID(req.params._id);
+//     db.audio_item_keys.find({ "keyAudioItemID" : req.params._id}, function(err, itemKeys) {
+//         if (err || !itemKeys) {
+//             console.log("cain't get no itemKeys... " + err);
+//         } else {
 
-            for (var i = 0; i < itemKeys.length; i++) {
+//             for (var i = 0; i < itemKeys.length; i++) {
 
-                if (itemKeys[i].keyType == 2) {
-                    var item_string_filename = JSON.stringify(itemKeys[i].filename);
-                    item_string_filename = item_string_filename.replace(/\"/g, "");
-                    var item_string_filename_ext = getExtension(item_string_filename);
-                    var expiration = new Date();
-                    expiration.setMinutes(expiration.getMinutes() + 30);
-                    var baseName = path.basename(item_string_filename, (item_string_filename_ext));
-                    console.log(baseName);
-                    var thumbName = 'thumb.' + baseName + item_string_filename_ext;
-                    var halfName = 'half.' + baseName + item_string_filename_ext;
-                    var standardName = 'standard.' + baseName + item_string_filename_ext;
+//                 if (itemKeys[i].keyType == 2) {
+//                     var item_string_filename = JSON.stringify(itemKeys[i].filename);
+//                     item_string_filename = item_string_filename.replace(/\"/g, "");
+//                     var item_string_filename_ext = getExtension(item_string_filename);
+//                     var expiration = new Date();
+//                     expiration.setMinutes(expiration.getMinutes() + 30);
+//                     var baseName = path.basename(item_string_filename, (item_string_filename_ext));
+//                     console.log(baseName);
+//                     var thumbName = 'thumb.' + baseName + item_string_filename_ext;
+//                     var halfName = 'half.' + baseName + item_string_filename_ext;
+//                     var standardName = 'standard.' + baseName + item_string_filename_ext;
 
-                    var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + itemKeys[i].userID + "/" + itemKeys[i]._id + "." + thumbName, Expires: 6000}); //just send back thumbnail urls for list
-                    var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + itemKeys[i].userID + "/" + itemKeys[i]._id + "." + halfName, Expires: 6000}); //just send back thumbnail urls for list
-                    var urlStandard = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + itemKeys[i].userID + "/" + itemKeys[i]._id + "." + standardName, Expires: 6000}); //just send back thumbnail urls for list
+//                     var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + itemKeys[i].userID + "/" + itemKeys[i]._id + "." + thumbName, Expires: 6000}); //just send back thumbnail urls for list
+//                     var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + itemKeys[i].userID + "/" + itemKeys[i]._id + "." + halfName, Expires: 6000}); //just send back thumbnail urls for list
+//                     var urlStandard = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + itemKeys[i].userID + "/" + itemKeys[i]._id + "." + standardName, Expires: 6000}); //just send back thumbnail urls for list
 
-                    itemKeys[i].URLthumb = urlThumb; //jack in teh signed urls into the object array
-                    itemKeys[i].URLhalf = urlHalf;
-                    itemKeys[i].URLstandard = urlStandard;
+//                     itemKeys[i].URLthumb = urlThumb; //jack in teh signed urls into the object array
+//                     itemKeys[i].URLhalf = urlHalf;
+//                     itemKeys[i].URLstandard = urlStandard;
 
-                }
-            }
-            console.log(JSON.stringify(itemKeys));
-            res.json(itemKeys);
-        }
-    });
-});
+//                 }
+//             }
+//             console.log(JSON.stringify(itemKeys));
+//             res.json(itemKeys);
+//         }
+//     });
+// });
 
-app.post('/savedaudioitems', function (req, res) { //return audio items, referenced by keys in above method (when saved playlist selected)
-    console.log("tryna savekeys");
-    if (req.session.auth != "noauth") {
-        console.log(req.body);
-        var jObj = JSON.parse(req.body.json);
-        //console.log(jObj[0]);
-        var audioIDs = new Array();
-        jObj.audioItemIDs.forEach(function(item, index) {
-            var a_id = ObjectID(item); //convert to binary to search by _id beloiw
-            audioIDs.push(a_id); //populate array that can be fed to mongo find below
-        });
-        console.log("first audioID: " + audioIDs[0]);
+// app.post('/savedaudioitems', function (req, res) { //return audio items, referenced by keys in above method (when saved playlist selected)
+//     console.log("tryna savekeys");
+//     if (req.session.auth != "noauth") {
+//         console.log(req.body);
+//         var jObj = JSON.parse(req.body.json);
+//         //console.log(jObj[0]);
+//         var audioIDs = new Array();
+//         jObj.audioItemIDs.forEach(function(item, index) {
+//             var a_id = ObjectID(item); //convert to binary to search by _id beloiw
+//             audioIDs.push(a_id); //populate array that can be fed to mongo find below
+//         });
+//         console.log("first audioID: " + audioIDs[0]);
 
-        //db.audio_items.find({_id: { $in: audioIDs[0] } }, function(err,audio_items) {
-        db.audio_items.find({_id: { $in: audioIDs } }, function(err,audio_items) {
-            if (err || !audio_items) {
-                console.log("error getting audio items: " + err);
-            } else {
-                console.log(JSON.stringify(audio_items));
-                //res.json(audio_items);
-                async.waterfall([
+//         //db.audio_items.find({_id: { $in: audioIDs[0] } }, function(err,audio_items) {
+//         db.audio_items.find({_id: { $in: audioIDs } }, function(err,audio_items) {
+//             if (err || !audio_items) {
+//                 console.log("error getting audio items: " + err);
+//             } else {
+//                 console.log(JSON.stringify(audio_items));
+//                 //res.json(audio_items);
+//                 async.waterfall([
 
-                        function(callback){ //randomize the returned array, takes a shake so async it...
-                            audio_items = Shuffle(audio_items);
-                            audio_items.splice(0,audio_items.length - maxItems); //truncate randomized array, take only last 20
-                            callback(null);
-                        },
+//                         function(callback){ //randomize the returned array, takes a shake so async it...
+//                             audio_items = Shuffle(audio_items);
+//                             audio_items.splice(0,audio_items.length - maxItems); //truncate randomized array, take only last 20
+//                             callback(null);
+//                         },
 
-                        function(callback) { //add the signed URLs to the obj array
-                            for (var i = 0; i < audio_items.length; i++) {
-                                var item_string_filename = JSON.stringify(audio_items[i].filename);
-                                item_string_filename = item_string_filename.replace(/\"/g, "");
-                                var item_string_filename_ext = getExtension(item_string_filename);
-                                var expiration = new Date();
-                                expiration.setMinutes(expiration.getMinutes() + 1000);
-                                var baseName = path.basename(item_string_filename, (item_string_filename_ext));
-                                console.log(baseName);
-                                var mp3Name = baseName + '.mp3';
-                                var oggName = baseName + '.ogg';
-                                var pngName = baseName + '.png';
-                                var urlMp3 = knoxClient.signedUrl(audio_items[i]._id + "." + mp3Name, expiration);
-                                var urlOgg = knoxClient.signedUrl(audio_items[i]._id + "." + oggName, expiration);
-                                var urlPng = knoxClient.signedUrl(audio_items[i]._id + "." + pngName, expiration);
-                                audio_items[i].URLmp3 = urlMp3; //jack in teh signed urls into the object array
-                                audio_items[i].URLogg = urlOgg;
-                                audio_items[i].URLpng = urlPng;
-                            }
-                            console.log('tryna send ' + audio_items.length + 'audio_items ');
-                            callback(null);
-                        }],
+//                         function(callback) { //add the signed URLs to the obj array
+//                             for (var i = 0; i < audio_items.length; i++) {
+//                                 var item_string_filename = JSON.stringify(audio_items[i].filename);
+//                                 item_string_filename = item_string_filename.replace(/\"/g, "");
+//                                 var item_string_filename_ext = getExtension(item_string_filename);
+//                                 var expiration = new Date();
+//                                 expiration.setMinutes(expiration.getMinutes() + 1000);
+//                                 var baseName = path.basename(item_string_filename, (item_string_filename_ext));
+//                                 console.log(baseName);
+//                                 var mp3Name = baseName + '.mp3';
+//                                 var oggName = baseName + '.ogg';
+//                                 var pngName = baseName + '.png';
+//                                 var urlMp3 = knoxClient.signedUrl(audio_items[i]._id + "." + mp3Name, expiration);
+//                                 var urlOgg = knoxClient.signedUrl(audio_items[i]._id + "." + oggName, expiration);
+//                                 var urlPng = knoxClient.signedUrl(audio_items[i]._id + "." + pngName, expiration);
+//                                 audio_items[i].URLmp3 = urlMp3; //jack in teh signed urls into the object array
+//                                 audio_items[i].URLogg = urlOgg;
+//                                 audio_items[i].URLpng = urlPng;
+//                             }
+//                             console.log('tryna send ' + audio_items.length + 'audio_items ');
+//                             callback(null);
+//                         }],
 
-                    function(err, result) { // #last function, close async
-                        res.json(audio_items);
-                        console.log("waterfall done: " + result);
-                    }
-                );
+//                     function(err, result) { // #last function, close async
+//                         res.json(audio_items);
+//                         console.log("waterfall done: " + result);
+//                     }
+//                 );
 
-            }
-        });
-    }
-});
+//             }
+//         });
+//     }
+// });
 
 
-app.post('/savekeysall', checkAppID, requiredAuthentication, function (req, res) { //save item keys set oon client
+// app.post('/savekeysall', checkAppID, requiredAuthentication, function (req, res) { //save item keys set oon client
 
-    console.log("tryna savekeys");
-    if (req.session.auth != "noauth") {
-        //console.log(req.session.auth);
-        console.log(req.body);
-        //var jObj = JSON.parse(req.body.json);
-        //var itemKeys =  JSON.parse(keysJson.itemKeys);
-        console.log("itemKeys: " + JSON.stringify(jObj.itemKeys));
-        //var saveKeysFunction =
-        //res.json(JSON.stringify(jObj));
-        // for (var i = 0; i < itemKeys.length; i++) {
-        //  	jObj.itemKeys.forEach(function(item, index) {
-        console.log(JSON.stringify(item.keyString));
-//		});
-//	/*
-//		var saveKeyFunction = function (itemKey, callback) {
+//     console.log("tryna savekeys");
+//     if (req.session.auth != "noauth") {
+//         //console.log(req.session.auth);
+//         console.log(req.body);
+//         //var jObj = JSON.parse(req.body.json);
+//         //var itemKeys =  JSON.parse(keysJson.itemKeys);
+//         console.log("itemKeys: " + JSON.stringify(jObj.itemKeys));
+//         //var saveKeysFunction =
+//         //res.json(JSON.stringify(jObj));
+//         // for (var i = 0; i < itemKeys.length; i++) {
+//         //  	jObj.itemKeys.forEach(function(item, index) {
+//         console.log(JSON.stringify(item.keyString));
+// //		});
+// //	/*
+// //		var saveKeyFunction = function (itemKey, callback) {
 
-        db.audio_item_keys.save(
-            req.body.json,
-            function (err, saved) {
-                if (err || !saved) {
-                } else {
-                    var key_id = saved._id.toString();
-                    console.log('new key id: ' + key_id);
-                    //              	callback();
-                    res.send(key_id)
-                }
-            });
-    }
-    /*
-     async.forEach(Object.keys(jObj),saveKeyFunction,function(err){
-     console.log("async #");
-     }, function(err) {console.log("DONE SAVING KEYS");});
-     */
-});
+//         db.audio_item_keys.save(
+//             req.body.json,
+//             function (err, saved) {
+//                 if (err || !saved) {
+//                 } else {
+//                     var key_id = saved._id.toString();
+//                     console.log('new key id: ' + key_id);
+//                     //              	callback();
+//                     res.send(key_id)
+//                 }
+//             });
+//     }
+//     /*
+//      async.forEach(Object.keys(jObj),saveKeyFunction,function(err){
+//      console.log("async #");
+//      }, function(err) {console.log("DONE SAVING KEYS");});
+//      */
+// });
 
-app.post('/savekeys', checkAppID, requiredAuthentication, function (req, res) { //save item keys set oon client
+// app.post('/savekeys', checkAppID, requiredAuthentication, function (req, res) { //save item keys set oon client
 
-    console.log("tryna savekeys");
-    if (req.session.auth != "noauth") {
-        //console.log(req.session.auth);
-        console.log(req.body);
-        var jObj = JSON.parse(req.body.json);
-        console.log("itemKeys: " + JSON.stringify(jObj.itemKeys));
+//     console.log("tryna savekeys");
+//     if (req.session.auth != "noauth") {
+//         //console.log(req.session.auth);
+//         console.log(req.body);
+//         var jObj = JSON.parse(req.body.json);
+//         console.log("itemKeys: " + JSON.stringify(jObj.itemKeys));
 
-        jObj.itemKeys.forEach(function(item, index) {
-            console.log(JSON.stringify(item.keyString));
+//         jObj.itemKeys.forEach(function(item, index) {
+//             console.log(JSON.stringify(item.keyString));
 
-            db.audio_item_keys.save(
-                {keyType : item.keyType,
-                    keyUserID : item.keyUserID,
-                    keyAudioItemID : item.keyAudioItemID,
-                    keyContentID : item.keyContentID,
-                    keyTime : item.keyTime,
-                    keySample : item.keySample,
-                    keyString : item.keyString},
-                function (err, saved) {
-                    if (err || !saved) {
-                    } else {
-                        var key_id = saved._id.toString();
-                        console.log('new key id: ' + key_id);
-                        //                callback();
-                        res.send(key_id)
-                    }
-                });
-        });
-    }
+//             db.audio_item_keys.save(
+//                 {keyType : item.keyType,
+//                     keyUserID : item.keyUserID,
+//                     keyAudioItemID : item.keyAudioItemID,
+//                     keyContentID : item.keyContentID,
+//                     keyTime : item.keyTime,
+//                     keySample : item.keySample,
+//                     keyString : item.keyString},
+//                 function (err, saved) {
+//                     if (err || !saved) {
+//                     } else {
+//                         var key_id = saved._id.toString();
+//                         console.log('new key id: ' + key_id);
+//                         //                callback();
+//                         res.send(key_id)
+//                     }
+//                 });
+//         });
+//     }
 
-});
+// });
 
-app.post('/savekey', checkAppID, requiredAuthentication, function (req, res) {
+// app.post('/savekey', checkAppID, requiredAuthentication, function (req, res) {
 
-    //if (req.session.auth != "noauth") { //maybe check if uid is valid?
-    var jObj = JSON.parse(req.body.json);
+//     //if (req.session.auth != "noauth") { //maybe check if uid is valid?
+//     var jObj = JSON.parse(req.body.json);
 
-    db.audio_item_keys.save(
-        {keyType : jObj.keyType,
-            keyUserID : jObj.keyUserID,
-            keyAudioItemID : jObj.keyAudioItemID,
-            keyContentID : jObj.keyContentID,
-            keyTime : jObj.keyTime,
-            keySample : jObj.keySample,
-            keyString : jObj.keyString},
-        function (err, saved) {
-            if (err || !saved) {
-            } else {
-                var key_id = saved._id.toString();
-                console.log('new key id: ' + key_id);
-                //                callback();
-                res.send(key_id)
-            }
-        });
-});
+//     db.audio_item_keys.save(
+//         {keyType : jObj.keyType,
+//             keyUserID : jObj.keyUserID,
+//             keyAudioItemID : jObj.keyAudioItemID,
+//             keyContentID : jObj.keyContentID,
+//             keyTime : jObj.keyTime,
+//             keySample : jObj.keySample,
+//             keyString : jObj.keyString},
+//         function (err, saved) {
+//             if (err || !saved) {
+//             } else {
+//                 var key_id = saved._id.toString();
+//                 console.log('new key id: ' + key_id);
+//                 //                callback();
+//                 res.send(key_id)
+//             }
+//         });
+// });
+
 /*
  db.audio_item_keys.save(
  {user_id : "1",
@@ -10475,34 +11040,34 @@ app.post('/savekey', checkAppID, requiredAuthentication, function (req, res) {
  });
  */
 
-app.post('/delete_key', checkAppID, requiredAuthentication, function (req, res) {
-    console.log("tryna delete key: " + req.body.keyID);
-    var o_id = ObjectID(req.body.keyID);
-    db.audio_item_keys.remove( { "_id" : o_id }, 1 );
-    res.send("deleted");
+// app.post('/delete_key', checkAppID, requiredAuthentication, function (req, res) {
+//     console.log("tryna delete key: " + req.body.keyID);
+//     var o_id = ObjectID(req.body.keyID);
+//     db.audio_item_keys.remove( { "_id" : o_id }, 1 );
+//     res.send("deleted");
 
-});
+// });
 
-app.post('/update_key', checkAppID, requiredAuthentication, function (req, res) {
-    console.log("tryna delete key: " + req.body.keyID);
-    var o_id = ObjectID(req.body.keyID);
-    //db.audio_item_keys.remove( { "_id" : o_id }, 1 );
-    //                              res.send("deleted");
+// app.post('/update_key', checkAppID, requiredAuthentication, function (req, res) {
+//     console.log("tryna delete key: " + req.body.keyID);
+//     var o_id = ObjectID(req.body.keyID);
+//     //db.audio_item_keys.remove( { "_id" : o_id }, 1 );
+//     //                              res.send("deleted");
 
-    db.audio_item_keys.update( { _id: o_id }, { $set: { keyString: req.body.keyText,
-        keySample: parseInt(req.body.keySample),
-        keyTime: parseFloat(req.body.keyTime)
-        }
-    }, function (err, rezponse) {
-        if (err || !rezponse) {
-            console.log("error updating item key: " + err);
-            res.send(err);
-        } else {
-            console.log("item key updated: " + req.body.keyID);
-            res.send("item key updated");
-        }
-    });
-});
+//     db.audio_item_keys.update( { _id: o_id }, { $set: { keyString: req.body.keyText,
+//         keySample: parseInt(req.body.keySample),
+//         keyTime: parseFloat(req.body.keyTime)
+//         }
+//     }, function (err, rezponse) {
+//         if (err || !rezponse) {
+//             console.log("error updating item key: " + err);
+//             res.send(err);
+//         } else {
+//             console.log("item key updated: " + req.body.keyID);
+//             res.send("item key updated");
+//         }
+//     });
+// });
 ///////////////
 app.get('/pathinfo',  checkAppID, requiredAuthentication, function (req, res) { //get default path info
 
@@ -10844,17 +11409,20 @@ app.get('/get_available_storeitems/:app_id', checkAppID, requiredAuthentication,
                         } else {
                             async.each (pic_items, function (picture_item, pcallbackz) {
                                 // console.log("gotsa picture item for store item: " + JSON.stringify(picture_item));
-                                var imageItem = {};
-                                var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".thumb." + picture_item.filename, Expires: 6000});
-                                // var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".half." + picture_item.filename, Expires: 6000});
-                                // var urlStandard = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".standard." + picture_item.filename, Expires: 6000});
-                                imageItem.urlThumb = urlThumb;
-                                // imageItem.urlHalf = urlHalf;
-                                // imageItem.urlStandard = urlStandard;
-                                imageItem._id = picture_item._id;
-                                imageItem.filename = picture_item.filename;
-                                storeItemPictures.push(imageItem);
-                                pcallbackz();
+                                (async () => {
+                                    var imageItem = {};
+                                    // var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".thumb." + picture_item.filename, Expires: 6000});
+                                    
+                                    // var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".half." + picture_item.filename, Expires: 6000});
+                                    // var urlStandard = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".standard." + picture_item.filename, Expires: 6000});
+                                    imageItem.urlThumb = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + picture_item.userID + "/pictures/" + picture_item._id + ".thumb." + picture_item.filename,6000);
+                                    // imageItem.urlHalf = urlHalf;
+                                    // imageItem.urlStandard = urlStandard;
+                                    imageItem._id = picture_item._id;
+                                    imageItem.filename = picture_item.filename;
+                                    storeItemPictures.push(imageItem);
+                                    pcallbackz();
+                                })();
                             }, function(err) {
                                
                                 if (err) {
@@ -10924,18 +11492,20 @@ app.get('/get_storeitems_all/',  requiredAuthentication, admin, function (req, r
                             console.log("error getting picture items: " + err);
                         } else {
                             async.each (pic_items, function (picture_item, pcallbackz) {
-                                // console.log("gotsa picture item for store item: " + JSON.stringify(picture_item));
-                                var imageItem = {};
-                                var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".thumb." + picture_item.filename, Expires: 6000});
-                                // var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".half." + picture_item.filename, Expires: 6000});
-                                // var urlStandard = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".standard." + picture_item.filename, Expires: 6000});
-                                imageItem.urlThumb = urlThumb;
-                                // imageItem.urlHalf = urlHalf;
-                                // imageItem.urlStandard = urlStandard;
-                                imageItem._id = picture_item._id;
-                                imageItem.filename = picture_item.filename;
-                                storeItemPictures.push(imageItem);
-                                pcallbackz();
+                                (async () => {
+                                    // console.log("gotsa picture item for store item: " + JSON.stringify(picture_item));
+                                    var imageItem = {};
+                                    // var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".thumb." + picture_item.filename, Expires: 6000});
+                                    // var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".half." + picture_item.filename, Expires: 6000});
+                                    // var urlStandard = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".standard." + picture_item.filename, Expires: 6000});
+                                    imageItem.urlThumb = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + picture_item.userID + "/pictures/" + picture_item._id + ".thumb." + picture_item.filename,6000);
+                                    // imageItem.urlHalf = urlHalf;
+                                    // imageItem.urlStandard = urlStandard;
+                                    imageItem._id = picture_item._id;
+                                    imageItem.filename = picture_item.filename;
+                                    storeItemPictures.push(imageItem);
+                                    pcallbackz();
+                                })();
                             }, function(err) {
                                
                                 if (err) {
@@ -11006,17 +11576,19 @@ app.get('/get_storeitems/:app_id', requiredAuthentication, admin, function (req,
                         } else {
                             async.each (pic_items, function (picture_item, pcallbackz) {
                                 // console.log("gotsa picture item for store item: " + JSON.stringify(picture_item));
-                                var imageItem = {};
-                                var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".thumb." + picture_item.filename, Expires: 6000});
-                                // var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".half." + picture_item.filename, Expires: 6000});
-                                // var urlStandard = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".standard." + picture_item.filename, Expires: 6000});
-                                imageItem.urlThumb = urlThumb;
-                                // imageItem.urlHalf = urlHalf;
-                                // imageItem.urlStandard = urlStandard;
-                                imageItem._id = picture_item._id;
-                                imageItem.filename = picture_item.filename;
-                                storeItemPictures.push(imageItem);
-                                pcallbackz();
+                                (async () => {
+                                    var imageItem = {};
+                                    // var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".thumb." + picture_item.filename, Expires: 6000});
+                                    // var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".half." + picture_item.filename, Expires: 6000});
+                                    // var urlStandard = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".standard." + picture_item.filename, Expires: 6000});
+                                    imageItem.urlThumb = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + picture_item.userID + "/pictures/" + picture_item._id + ".thumb." + picture_item.filename,6000);
+                                    // imageItem.urlHalf = urlHalf;
+                                    // imageItem.urlStandard = urlStandard;
+                                    imageItem._id = picture_item._id;
+                                    imageItem.filename = picture_item.filename;
+                                    storeItemPictures.push(imageItem);
+                                    pcallbackz();
+                                })();
                             }, function(err) {
                                
                                 if (err) {
@@ -11099,20 +11671,25 @@ app.get('/get_storeitem/:_id',  requiredAuthentication, admin, function (req, re
                                 callback(err);
                             } else {
                                 storeItemPictures = [];
-                                pic_items.forEach(function(picture_item){                
-                                    var imageItem = {};
-                                    var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".thumb." + picture_item.filename, Expires: 6000});
-                                    var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".half." + picture_item.filename, Expires: 6000});
-                                    var urlStandard = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".standard." + picture_item.filename, Expires: 6000});
-                                    imageItem.urlThumb = urlThumb;
-                                    imageItem.urlHalf = urlHalf;
-                                    imageItem.urlStandard = urlStandard;
-                                    imageItem._id = picture_item._id;
-                                    imageItem.filename = picture_item.filename;
-                                    storeItemPictures.push(imageItem);
-                                    storeitem.storeItemPictures = storeItemPictures;
+                               
+                                pic_items.forEach(function(picture_item){               
+                                    (async () => { 
+                                        var imageItem = {};
+                                        // var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".thumb." + picture_item.filename, Expires: 6000});
+                                        // var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".half." + picture_item.filename, Expires: 6000});
+                                        // var urlStandard = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".standard." + picture_item.filename, Expires: 6000});
+                                        
+                                        imageItem.urlThumb = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".thumb." + picture_item.filename, 6000);
+                                        imageItem.urlHalf = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".half." + picture_item.filename, 6000);
+                                        imageItem.urlStandard = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".standard." + picture_item.filename, 6000);
+                                        imageItem._id = picture_item._id;
+                                        imageItem.filename = picture_item.filename;
+                                        storeItemPictures.push(imageItem);
+                                        storeitem.storeItemPictures = storeItemPictures;
+                                    })();
                                 });
                                 callback();
+                           
                                 // res.json(storeitem);
                             }
                         });
@@ -11773,7 +12350,7 @@ app.post('/add_scene_mods/:s_id', requiredAuthentication, admin, function (req, 
                             function (callback) { 
                                 if (req.body.localFiles != null) {
                                 // console.log("tryna save localfiles: " + JSON.stringify(req.body.localFiles));
-                                newfile = {};
+                                let newfile = {};
 
                                 async.each (req.body.localFiles, function (file, callbackz) {
                                     let timestamp = Math.round(Date.now() / 1000);
@@ -11790,15 +12367,9 @@ app.post('/add_scene_mods/:s_id', requiredAuthentication, admin, function (req, 
                                             ContentType: 'application/octet-stream',
                                             Body: buffer};
                                             console.log("tryna upload w/key " + awskey);
-            
-                                            s3.upload(params, function(err, data) { //upload model
-                                                if (err) {
-
-                                                    console.log("Error uploading data. ", err);
-                                                    callbackz(err)
-                                                } else {
-                                                    console.log("Success uploading data " + JSON.stringify(data));
-                                                    console.log('uploaded ' + file.name);
+                                            (async () => {
+                                                try {
+                                                    const status = await PutObject(params.Bucket, params.Key, params.Body);
                                                     db.models.save({ //add to models collection
                                                         userID : req.session.user._id.toString(),
                                                         username : req.session.user.userName,
@@ -11827,8 +12398,50 @@ app.post('/add_scene_mods/:s_id', requiredAuthentication, admin, function (req, 
                                                                 callbackz();
                                                             }
                                                     });
+                                                } catch (e) {
+                                                    callbackz (err);
                                                 }
-                                            });
+                                                
+                                            
+                                            })();
+                                            // s3.upload(params, function(err, data) { //upload model
+                                            //     if (err) {
+
+                                            //         console.log("Error uploading data. ", err);
+                                            //         callbackz(err)
+                                            //     } else {
+                                            //         console.log("Success uploading data " + JSON.stringify(data));
+                                            //         console.log('uploaded ' + file.name);
+                                            //         db.models.save({ //add to models collection
+                                            //             userID : req.session.user._id.toString(),
+                                            //             username : req.session.user.userName,
+                                            //             name : timestamp + "_" + file.name,
+                                            //             filename : timestamp + "_" + file.name,
+                                            //             item_type : 'glb',
+                                            //             tags: [],
+                                            //             item_status: "private",
+                                            //             otimestamp : timestamp,
+                                            //             ofilesize : file.size },
+                                            //             function (err, saved) {
+                                            //                 if ( err || !saved ) {
+                                            //                     console.log('glb not saved..');
+                                            //                     callbackz (err);
+                                            //                 } else {
+                                            //                     console.log("glb saved with id " + saved._id)
+                                            //                     newfile.name = file.name.replace("local_","");
+                                                                
+                                            //                     newfile._id = saved._id;
+                                            //                     newFiles.push(newfile);
+                                            //                     var s_id = ObjectID(scene._id);   
+                                            //                     var sceneModels = (scene.sceneModels != undefined && scene.sceneModels != null && scene.sceneModels.length > 0) ? scene.sceneModels : new Array();
+                                            //                     // console.log("XXX sceneModels: " + JSON.stringify(sceneModels));
+                                            //                     sceneModels.push(saved._id);
+                                            //                     db.scenes.update({ "_id": s_id }, { $set: {sceneModels: sceneModels}}); //add model to scene
+                                            //                     callbackz();
+                                            //                 }
+                                            //         });
+                                            //     }
+                                            // });
                                             
                                         } else if (getExtension(file.name) == ".jpg" || getExtension(file.name) == ".png") { 
                                             let hasAlpha = false;
@@ -11851,10 +12464,11 @@ app.post('/add_scene_mods/:s_id', requiredAuthentication, admin, function (req, 
                                                 // function (err, saved) {
                                                 function (err, saved) {
                                                     if ( err || !saved ) {
-                                                        console.log('glb not saved..');
+                                                        console.log('image Item not saved..');
                                                         callbackz (err);
                                                     } else {
-                                                        console.log("jpg saved with id " + saved._id)
+                                                        console.log("jpg saved with id " + saved._id);
+                                                        let newfile = {};
                                                         newfile.name = file.name;
                                                         newfile.name.replace("local_","");
                                                         newfile._id = saved._id;
@@ -11868,35 +12482,67 @@ app.post('/add_scene_mods/:s_id', requiredAuthentication, admin, function (req, 
                                                             // ContentEncoding: 'base64',
                                                             ContentType: 'application/octet-stream',
                                                             Body: buffer};
-                                                            s3.upload(params, function(err, data) { //upload
-                                                            if (err) {
-                                                                console.log("Error uploading data. ", err);
-                                                                callbackz(err)
-                                                            } else {
-                                                                console.log("Success uploading data " + JSON.stringify(data));
-                                                                console.log('uploaded ' + file.name);
+
+                                                            (async () => {
+                                                                try {
+                                                                    const status = await PutObject(params.Bucket, params.Key, params.Body);
+
+                                                                    console.log("put a pic: " + JSON.stringify(status));
+                                                                    console.log('uploaded ' + file.name);
                                                                 // callbackz();
                                                                 // console.log("tryna push pic to GS " + groupType);
-                                                                var token=jwt.sign({userId:req.session.user._id},process.env.JWT_SECRET);
-                                                                const options = {
-                                                                    headers: {'X-Access-Token': token}
-                                                                    };
-                                                                axios.get(process.env.GS_HOST + "/resize_uploaded_picture/"+saved._id, options)
-                                                                .then((response) => {
-                                                                    console.log("grabAndSqueeze response: " + response.status);
-                                                                    var s_id = ObjectID(scene._id);   
-                                                                    var scenePictures = (scene.scenePictures != undefined && scene.scenePictures != null && scene.scenePictures.length > 0) ? scene.scenePictures : new Array();
-                                                                    // console.log("XXX sceneModels: " + JSON.stringify(sceneModels));
-                                                                    scenePictures.push(saved._id);
-                                                                    db.scenes.update({ "_id": s_id }, { $set: {scenePictures: scenePictures}}); //add pictureID to scene
-                                                                    callbackz();
-                                                                })                                                     
-                                                                .catch(function (error) {
-                                                                    callbackz(error);
-                                                                });
-                                                            }
 
-                                                        });
+                                                                    var token=jwt.sign({userId:req.session.user._id},process.env.JWT_SECRET);
+                                                                    const options = {
+                                                                        headers: {'X-Access-Token': token}
+                                                                    };
+                                                                    axios.get(process.env.GS_HOST + "/resize_uploaded_picture/"+saved._id, options)
+                                                                    .then((response) => {
+                                                                        console.log("grabAndSqueezepic response: " + response.status);
+                                                                        var s_id = ObjectID(scene._id);   
+                                                                        var scenePictures = (scene.scenePictures != undefined && scene.scenePictures != null && scene.scenePictures.length > 0) ? scene.scenePictures : new Array();
+                                                                        // console.log("XXX sceneModels: " + JSON.stringify(sceneModels));
+                                                                        scenePictures.push(saved._id);
+                                                                        db.scenes.update({ "_id": s_id }, { $set: {scenePictures: scenePictures}}); //add pictureID to scene
+                                                                        callbackz();
+                                                                    })                                                     
+                                                                    .catch(function (error) {
+                                                                        callbackz(error);
+                                                                    });
+                                                                } catch (e) {
+                                                                    console.log("Error uploading file. ", err);
+                                                                    callbackz(err)
+                                                                }
+                                                            })();
+
+                                                        //     s3.upload(params, function(err, data) { //upload
+                                                        //     if (err) {
+                                                               
+                                                        //     } else {
+                                                        //         console.log("Success uploading data " + JSON.stringify(data));
+                                                        //         console.log('uploaded ' + file.name);
+                                                        //         // callbackz();
+                                                        //         // console.log("tryna push pic to GS " + groupType);
+                                                        //         var token=jwt.sign({userId:req.session.user._id},process.env.JWT_SECRET);
+                                                        //         const options = {
+                                                        //             headers: {'X-Access-Token': token}
+                                                        //             };
+                                                        //         axios.get(process.env.GS_HOST + "/resize_uploaded_picture/"+saved._id, options)
+                                                        //         .then((response) => {
+                                                        //             console.log("grabAndSqueeze response: " + response.status);
+                                                        //             var s_id = ObjectID(scene._id);   
+                                                        //             var scenePictures = (scene.scenePictures != undefined && scene.scenePictures != null && scene.scenePictures.length > 0) ? scene.scenePictures : new Array();
+                                                        //             // console.log("XXX sceneModels: " + JSON.stringify(sceneModels));
+                                                        //             scenePictures.push(saved._id);
+                                                        //             db.scenes.update({ "_id": s_id }, { $set: {scenePictures: scenePictures}}); //add pictureID to scene
+                                                        //             callbackz();
+                                                        //         })                                                     
+                                                        //         .catch(function (error) {
+                                                        //             callbackz(error);
+                                                        //         });
+                                                        //     }
+
+                                                        // });
                                                     }
                                                 });
                                         } else {
@@ -13087,19 +13733,22 @@ app.get('/uscene/:user_id/:scene_id',  requiredAuthentication, uscene, function 
                                 if (err || !weblink) {
                                     console.log("can't find weblink");
                                 } else {
-                                    console.log(JSON.stringify(weblink));
-                                    let link = {};
-                                    var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia.web', Key: weblink._id + "/" + weblink._id + ".thumb.jpg", Expires: 6000});
-                                    var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia.web', Key:  weblink._id + "/" + weblink._id + ".half.jpg", Expires: 6000});
-                                    var urlStandard = s3.getSignedUrl('getObject', {Bucket: 'servicemedia.web', Key:  weblink._id + "/" + weblink._id + ".standard.jpg", Expires: 6000});
-                                    
-                                    link.urlThumb = urlThumb;
-                                    link.urlHalf = urlHalf;
-                                    link.urlStandard = urlStandard;
-                                    link.link_url = weblink.link_url;
-                                    link.link_title = weblink.link_title;
-                                    link._id = weblink._id;
-                                    weblinx.push(link);
+                                    (async () => { 
+                                        console.log(JSON.stringify(weblink));
+                                        let link = {};
+                                        // var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia.web', Key: weblink._id + "/" + weblink._id + ".thumb.jpg", Expires: 6000});
+                                        // var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia.web', Key:  weblink._id + "/" + weblink._id + ".half.jpg", Expires: 6000});
+                                        // var urlStandard = s3.getSignedUrl('getObject', {Bucket: 'servicemedia.web', Key:  weblink._id + "/" + weblink._id + ".standard.jpg", Expires: 6000});
+                                        const urlHalf = await ReturnPresignedUrl(process.env.S3_WEBSCRAPE_BUCKET_NAME,weblink._id + "/" + weblink._id + ".half.jpg",6000);
+                                        const urlStandard = await ReturnPresignedUrl(process.env.S3_WEBSCRAPE_BUCKET_NAME,weblink._id + "/" + weblink._id + ".standard.jpg",6000);
+                                        link.urlThumb = "";
+                                        link.urlHalf = urlHalf;
+                                        link.urlStandard = urlStandard;
+                                        link.link_url = weblink.link_url;
+                                        link.link_title = weblink.link_title;
+                                        link._id = weblink._id;
+                                        weblinx.push(link);
+                                    })();
                                 }
                             });
                         }
@@ -13111,23 +13760,27 @@ app.get('/uscene/:user_id/:scene_id',  requiredAuthentication, uscene, function 
             },
             function (callback) { 
                 if (sceneResponse.sceneVideos != null && sceneResponse.sceneVideos != undefined && sceneResponse.sceneVideos.length > 0) {
-                    moids = sceneResponse.sceneVideos.map(convertStringToObjectID);
+                    const moids = sceneResponse.sceneVideos.map(convertStringToObjectID);
                     db.video_items.find({_id: {$in: moids }}, function (err, video_items){
                         if (err || !video_items) {
                             console.log("error getting video items: " + err);
                             callback(null);
                         } else {
-                            for (let i = 0; i < video_items.length; i++) {
-                                let item_string_filename = JSON.stringify(video_items[i].filename);
-                                item_string_filename = item_string_filename.replace(/\"/g, "");
-                                let item_string_filename_ext = getExtension(item_string_filename);
-                                let expiration = new Date();
-                                expiration.setMinutes(expiration.getMinutes() + 30);
-                                var urlVid = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + video_items[i].userID + "/video/" + video_items[i]._id + "/" + video_items[i]._id + "." + video_items[i].filename, Expires: 60000});
-                                video_items[i].vUrl = urlVid;
-                            }
-                            sceneResponse.sceneVideoItems = video_items;
-                            callback(null)
+                            (async () => { 
+                                for (let i = 0; i < video_items.length; i++) {
+                                    let item_string_filename = JSON.stringify(video_items[i].filename);
+                                    item_string_filename = item_string_filename.replace(/\"/g, "");
+                                    let item_string_filename_ext = getExtension(item_string_filename);
+                                    let expiration = new Date();
+                                    expiration.setMinutes(expiration.getMinutes() + 30);
+
+                                    // var urlVid = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + video_items[i].userID + "/video/" + video_items[i]._id + "/" + video_items[i]._id + "." + video_items[i].filename, Expires: 60000});
+                                    const urlVid = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + video_items[i].userID + "/video/" + video_items[i]._id + "/" + video_items[i]._id + "." + video_items[i].filename,6000 );
+                                    video_items[i].vUrl = urlVid;
+                                }
+                                sceneResponse.sceneVideoItems = video_items;
+                                callback(null);
+                             })();
                         }
                     });
                 } else {
@@ -13136,7 +13789,7 @@ app.get('/uscene/:user_id/:scene_id',  requiredAuthentication, uscene, function 
             },
             function (callback) { 
                 if (sceneResponse.sceneTextItems != null && sceneResponse.sceneTextItems != undefined && sceneResponse.sceneTextItems.length > 0) {
-                    moids = sceneResponse.sceneTextItems.map(convertStringToObjectID);
+                    const moids = sceneResponse.sceneTextItems.map(convertStringToObjectID);
                     db.text_items.find({_id: {$in: moids }}, function (err, text_items){
                         if (err || !text_items) {
                             console.log("error getting text items: " + err);
@@ -13189,7 +13842,7 @@ app.get('/uscene/:user_id/:scene_id',  requiredAuthentication, uscene, function 
                     allgroups.push(...sceneResponse.sceneLocationGroups);
                 };
                 if (allgroups.length > 0) {
-                    moids = allgroups.map(convertStringToObjectID);
+                    const moids = allgroups.map(convertStringToObjectID);
                     db.groups.find({_id: {$in: moids }}, function (err, items){
                         if (err || !items) {
                             console.log("error getting groupz items: " + err);
@@ -13227,14 +13880,32 @@ app.get('/uscene/:user_id/:scene_id',  requiredAuthentication, uscene, function 
                     var mp3Name = baseName + '.mp3';
                     var oggName = baseName + '.ogg';
                     var pngName = baseName + '.png';
-                    var urlMp3 = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + mp3Name, Expires: 60000});
-                    var urlOgg = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + oggName, Expires: 60000});
-                    var urlPng = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + pngName, Expires: 60000});
-//                            audio_items.URLmp3 = urlMp3; //jack in teh signed urls into the object array
-                    audio_items[i].URLmp3 = urlMp3; //jack in teh signed urls into the object array
-                    audio_items[i].URLogg = urlOgg;
-                    audio_items[i].URLpng = urlPng;
-                    if (audio_items[i].tags != null && audio_items[i].tags.length < 1) {audio_items[i].tags = [""]}
+
+                    (async () => {
+                        try {
+                            const urlMp3 = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + mp3Name, 6000);
+                            const urlOgg = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + oggName, 6000);
+                            const urlPng = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + pngName, 6000);
+
+        //                            audio_items.URLmp3 = urlMp3; //jack in teh signed urls into the object array
+                            audio_items[i].URLmp3 = urlMp3; //jack in teh signed urls into the object array
+                            audio_items[i].URLogg = urlOgg;
+                            audio_items[i].URLpng = urlPng;
+                            if (audio_items[i].tags != null) {
+                                if (audio_items[i].tags.length < 1) {
+                                    audio_items[i].tags = [""];
+                                } else {
+                                    audio_items[i].tags = [""];
+                                }
+                            }
+  
+                            // callback(null);
+                        } catch (e) {
+                           
+                            // callback(null);
+                            console.log("error in audioResponse " + e);
+                        }
+                    })();
 
                 }
                 //   console.log('tryna send ' + audio_items);
@@ -13259,46 +13930,59 @@ app.get('/uscene/:user_id/:scene_id',  requiredAuthentication, uscene, function 
             },
 
             function (picture_items, callback) {
-                for (var i = 0; i < picture_items.length; i++) {
-                    //    console.log("picture_item: ", picture_items[i]);
-                    var item_string_filename = JSON.stringify(picture_items[i].filename);
-                    item_string_filename = item_string_filename.replace(/\"/g, "");
-                    var item_string_filename_ext = getExtension(item_string_filename);
-                    var expiration = new Date();
-                    expiration.setMinutes(expiration.getMinutes() + 1000);
-                    var baseName = path.basename(item_string_filename, (item_string_filename_ext));
-                    //console.log(baseName);
-                    var thumbName = 'thumb.' + baseName + item_string_filename_ext;
-                    var quarterName = 'quarter.' + baseName + item_string_filename_ext;
-                    var halfName = 'half.' + baseName + item_string_filename_ext;
-                    var standardName = 'standard.' + baseName + item_string_filename_ext;
-                    var originalName = 'original.' + baseName + item_string_filename_ext;
+                (async () => {
+                    for (var i = 0; i < picture_items.length; i++) {
+                        //    console.log("picture_item: ", picture_items[i]);
+                        var item_string_filename = JSON.stringify(picture_items[i].filename);
+                        item_string_filename = item_string_filename.replace(/\"/g, "");
+                        var item_string_filename_ext = getExtension(item_string_filename);
+                        var expiration = new Date();
+                        expiration.setMinutes(expiration.getMinutes() + 1000);
+                        var baseName = path.basename(item_string_filename, (item_string_filename_ext));
+                        //console.log(baseName);
+                        var thumbName = 'thumb.' + baseName + item_string_filename_ext;
+                        var quarterName = 'quarter.' + baseName + item_string_filename_ext;
+                        var halfName = 'half.' + baseName + item_string_filename_ext;
+                        var standardName = 'standard.' + baseName + item_string_filename_ext;
+                        var originalName = 'original.' + baseName + item_string_filename_ext;
 
-                    var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_items[i].userID + "/pictures/" + picture_items[i]._id + "." + thumbName, Expires: 6000}); //just send back thumbnail urls for list
-                    var urlQuarter = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_items[i].userID + "/pictures/" + picture_items[i]._id + "." + quarterName, Expires: 6000});
-                    var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_items[i].userID + "/pictures/" + picture_items[i]._id + "." + halfName, Expires: 6000});
-                    var urlStandard = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_items[i].userID + "/pictures/" + picture_items[i]._id + "." + standardName, Expires: 6000});
-                    var urlTarget = "";
-                    if (picture_items[i].useTarget) {
-                        urlTarget = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_items[i].userID + "/pictures/targets/" + picture_items[i]._id + ".mind", Expires: 6000});
-                    }
-                    //var urlPng = knoxClient.signedUrl(audio_item[0]._id + "." + pngName, expiration);
-                    picture_items[i].urlThumb = urlThumb; //jack in teh signed urls into the object array
-                    picture_items[i].urlQuarter = urlQuarter; //jack in teh signed urls into the object array
-                    picture_items[i].urlHalf = urlHalf; //jack in teh signed urls into the object array
-                    picture_items[i].urlStandard = urlStandard; //jack in teh signed urls into the object array
-                    picture_items[i].urlTarget = urlTarget;
-                    if (picture_items[i].orientation != null && picture_items[i].orientation.toLowerCase() == "equirectangular") { //add the big one for skyboxes
-                        var urlOriginal = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_items[i].userID + "/pictures/originals/" + picture_items[i]._id + "." + originalName, Expires: 6000});
-                        picture_items[i].urlOriginal = urlOriginal;
-                    }
-                    if (picture_items[i].hasAlphaChannel == null) {picture_items[i].hasAlphaChannel = false}
-                    //pathResponse.path.pictures.push(urlThumb, urlQuarter, urlHalf, urlStandard);
-                    if (picture_items[i].tags != null && picture_items[i].tags.length < 1) {picture_items.tags = [""]}
+                        // var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_items[i].userID + "/pictures/" + picture_items[i]._id + "." + thumbName, Expires: 6000}); //just send back thumbnail urls for list
+                        // var urlQuarter = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_items[i].userID + "/pictures/" + picture_items[i]._id + "." + quarterName, Expires: 6000});
+                        // var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_items[i].userID + "/pictures/" + picture_items[i]._id + "." + halfName, Expires: 6000});
+                        // var urlStandard = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_items[i].userID + "/pictures/" + picture_items[i]._id + "." + standardName, Expires: 6000});
+                        
+                        // if (picture_items[i].useTarget) {
+                        //     urlTarget = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_items[i].userID + "/pictures/targets/" + picture_items[i]._id + ".mind", Expires: 6000});
+                        // }
+                        let urlTarget = "";
+                        const urlThumb = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + picture_items[i].userID + "/pictures/" + picture_items[i]._id + "." + thumbName,6000);
+                        const urlQuarter = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + picture_items[i].userID + "/pictures/" + picture_items[i]._id + "." + quarterName,6000);
+                        const urlHalf = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + picture_items[i].userID + "/pictures/" + picture_items[i]._id + "." + halfName,6000);
+                        const urlStandard = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + picture_items[i].userID + "/pictures/" + picture_items[i]._id + "." + standardName,6000);
+                        if (picture_items[i].useTarget) {
+                            urlTarget = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + picture_items[i].userID + "/pictures/targets/" + picture_items[i]._id + ".mind",6000);
+                        }
 
-                }
-                pictureResponse = picture_items ;
-                callback(null);
+                        //var urlPng = knoxClient.signedUrl(audio_item[0]._id + "." + pngName, expiration);
+                        picture_items[i].urlThumb = urlThumb; //jack in teh signed urls into the object array
+                        picture_items[i].urlQuarter = urlQuarter; //jack in teh signed urls into the object array
+                        picture_items[i].urlHalf = urlHalf; //jack in teh signed urls into the object array
+                        picture_items[i].urlStandard = urlStandard; //jack in teh signed urls into the object array
+                        picture_items[i].urlTarget = urlTarget;
+                        if (picture_items[i].orientation != null && picture_items[i].orientation.toLowerCase() == "equirectangular") { //add the big one for skyboxes
+                            // var urlOriginal = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_items[i].userID + "/pictures/originals/" + picture_items[i]._id + "." + originalName, Expires: 6000});
+                            const urlOriginal = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + picture_items[i].userID + "/pictures/originals/" + picture_items[i]._id + "." + originalName,6000);
+                            
+                            picture_items[i].urlOriginal = urlOriginal;
+                        }
+                        if (picture_items[i].hasAlphaChannel == null) {picture_items[i].hasAlphaChannel = false}
+                        //pathResponse.path.pictures.push(urlThumb, urlQuarter, urlHalf, urlStandard);
+                        if (picture_items[i].tags != null && picture_items[i].tags.length < 1) {picture_items.tags = [""]}
+
+                    }
+                    pictureResponse = picture_items ;
+                    callback(null);
+                })();
             },
 
             function (callback) {
@@ -13313,21 +13997,26 @@ app.get('/uscene/:user_id/:scene_id',  requiredAuthentication, uscene, function 
 //                                        callback(null);
                                 callbackz();
                             } else {
-                                var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".thumb." + picture_item.filename, Expires: 6000});
-                                var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".half." + picture_item.filename, Expires: 6000});
-                                var urlStandard = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".standard." + picture_item.filename, Expires: 6000});
+                                (async () => {
+                                    // var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".thumb." + picture_item.filename, Expires: 6000});
+                                    // var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".half." + picture_item.filename, Expires: 6000});
+                                    // var urlStandard = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".standard." + picture_item.filename, Expires: 6000});
 
-                                var postcard = {};
-                                postcard.userID = picture_item.userID;
-                                postcard._id = picture_item._id;
-                                postcard.sceneID = picture_item.postcardForScene;
-                                postcard.urlThumb = urlThumb;
-                                postcard.urlHalf = urlHalf;
-                                postcard.urlStandard = urlStandard;
-                                if (postcards.length < 9)
-                                    postcards.push(postcard);
-//                                        console.log("pushing postcard: " + JSON.stringify(postcard));
-                                callbackz();
+                                    const urlThumb = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + picture_item.userID + "/pictures/" + picture_item._id + ".thumb." + picture_item.filename,6000);
+                                    const urlHalf = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + picture_item.userID + "/pictures/" + picture_item._id + ".half." + picture_item.filename,6000);
+                                    const urlStandard = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + picture_item.userID + "/pictures/" + picture_item._id + ".standard." + picture_item.filename,6000);
+                                    var postcard = {};
+                                    postcard.userID = picture_item.userID;
+                                    postcard._id = picture_item._id;
+                                    postcard.sceneID = picture_item.postcardForScene;
+                                    postcard.urlThumb = urlThumb;
+                                    postcard.urlHalf = urlHalf;
+                                    postcard.urlStandard = urlStandard;
+                                    if (postcards.length < 9)
+                                        postcards.push(postcard);
+    //                                        console.log("pushing postcard: " + JSON.stringify(postcard));
+                                    callbackz();
+                                })();
                             }
                         });
 
@@ -13373,12 +14062,15 @@ app.get('/uscene/:user_id/:scene_id',  requiredAuthentication, uscene, function 
                                 modelz.push(model);
                                 callbackz();
                             } else {
-                                // console.log("got user models:" + JSON.stringify(models));
-                                let url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + model.userID + "/gltf/" + model.filename, Expires: 6000});
-                                model.url = url;
-                                // console.log("scene update route pushing to sceneModelz " + model._id);
-                                modelz.push(model);
-                                callbackz();
+                                (async () => {
+                                    // console.log("got user models:" + JSON.stringify(models));
+                                    // let url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + model.userID + "/gltf/" + model.filename, Expires: 6000});\
+
+                                    model.url = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + model.userID + "/gltf/" + model.filename );
+                                    // console.log("scene update route pushing to sceneModelz " + model._id);
+                                    modelz.push(model);
+                                    callbackz();
+                                })();
                             }
                         });
                     }, function(err) {
@@ -13517,149 +14209,150 @@ app.get('/uscene/:user_id/:scene_id',  requiredAuthentication, uscene, function 
     );
 });
 
-//is this still used?
-app.get('/uuscene/:user_id/:scene_id',  checkAppID, requiredAuthentication, uscene, function (req, res) { //view for updating scene for this user
+// //is this still used?
+// app.get('/uuscene/:user_id/:scene_id',  checkAppID, requiredAuthentication, uscene, function (req, res) { //view for updating scene for this user
 
-    console.log("tryna get scene " + req.params.scene_id);
-    var sceneID = req.params.scene_id.toString().replace(":", "");
-    // var o_id = new ObjectId.createFromHexString(sceneID);
-    var o_id = ObjectID(sceneID);
-    console.log("tryna get scene: " + sceneID);
-    db.scenes.findOne({ _id : o_id}, function(err, scene) {
-        if (err || !scene) {
-            console.log("cain't get no scene... " + err);
-        } else {
-//            console.log(JSON.stringify(scenes));
+//     console.log("tryna get scene " + req.params.scene_id);
+//     var sceneID = req.params.scene_id.toString().replace(":", "");
+//     // var o_id = new ObjectId.createFromHexString(sceneID);
+//     var o_id = ObjectID(sceneID);
+//     console.log("tryna get scene: " + sceneID);
+//     db.scenes.findOne({ _id : o_id}, function(err, scene) {
+//         if (err || !scene) {
+//             console.log("cain't get no scene... " + err);
+//         } else {
+// //            console.log(JSON.stringify(scenes));
 
-            if (scene.sceneWebLinks != null && scene.sceneWebLinks.length > 0) {
-                for (var i = 0; i < scene.sceneWebLinks.length; i++) { //refresh themz
-                    console.log("sceneWebLink id: " + scene.sceneWebLinks[i].link_id);
-                    var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia.web', Key: scene.sceneWebLinks[i].link_id + ".thumb.jpg", Expires: 6000});
-                    var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia.web', Key: scene.sceneWebLinks[i].link_id + ".half.jpg", Expires: 6000});
-                    var urlStandard = s3.getSignedUrl('getObject', {Bucket: 'servicemedia.web', Key: scene.sceneWebLinks[i].link_id + ".standard.jpg", Expires: 6000});
-                    scene.sceneWebLinks[i].urlThumb = urlThumb;
-                    scene.sceneWebLinks[i].urlHalf = urlHalf;
-                    scene.sceneWebLinks[i].urlStandard = urlStandard;
+//             if (scene.sceneWebLinks != null && scene.sceneWebLinks.length > 0) {
+//                 for (var i = 0; i < scene.sceneWebLinks.length; i++) { //refresh themz
+//                     console.log("sceneWebLink id: " + scene.sceneWebLinks[i].link_id);
+//                     var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia.web', Key: scene.sceneWebLinks[i].link_id + ".thumb.jpg", Expires: 6000});
+//                     var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia.web', Key: scene.sceneWebLinks[i].link_id + ".half.jpg", Expires: 6000});
+//                     var urlStandard = s3.getSignedUrl('getObject', {Bucket: 'servicemedia.web', Key: scene.sceneWebLinks[i].link_id + ".standard.jpg", Expires: 6000});
+//                     scene.sceneWebLinks[i].urlThumb = urlThumb;
+//                     scene.sceneWebLinks[i].urlHalf = urlHalf;
+//                     scene.sceneWebLinks[i].urlStandard = urlStandard;
 
-                }
-            }
+//                 }
+//             }
 
-            if (scene.scenePostcards != null && scene.scenePostcards.length > 0) {
-                var postcards = [];
-//              for (var i = 0; i < sceneResponse.scenePostcards.length; i++) { //refresh themz
-                async.each (scene.scenePostcards, function (postcardID, callbackz) {
-//                                console.log("scenepostcard id: " + sceneResponse.scenePostcards[i]);
-//                    console.log("scenepostcard id: " + postcardID);
-                    var oo_id = ObjectID(postcardID);
-                    db.image_items.findOne({"_id": oo_id}, function (err, picture_item) {
-                        if (err || !picture_item) {
-                            console.log("error getting picture items 1: " + err);
-//                                        callback(err);
-//                                        callback(null);
-                            callbackz();
-                        } else {
-                            var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".thumb." + picture_item.filename, Expires: 6000});
-                            var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".half." + picture_item.filename, Expires: 6000});
+//             if (scene.scenePostcards != null && scene.scenePostcards.length > 0) {
+//                 var postcards = [];
+// //              for (var i = 0; i < sceneResponse.scenePostcards.length; i++) { //refresh themz
+//                 async.each (scene.scenePostcards, function (postcardID, callbackz) {
+// //                                console.log("scenepostcard id: " + sceneResponse.scenePostcards[i]);
+// //                    console.log("scenepostcard id: " + postcardID);
+//                     var oo_id = ObjectID(postcardID);
+//                     db.image_items.findOne({"_id": oo_id}, function (err, picture_item) {
+//                         if (err || !picture_item) {
+//                             console.log("error getting picture items 1: " + err);
+// //                                        callback(err);
+// //                                        callback(null);
+//                             callbackz();
+//                         } else {
+//                             var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".thumb." + picture_item.filename, Expires: 6000});
+//                             var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".half." + picture_item.filename, Expires: 6000});
 
-                            var postcard = {};
-                            postcard.userID = picture_item.userID;
-                            postcard._id = picture_item._id;
-                            postcard.sceneID = scene._id;
-                            postcard.sceneShortID = scene.short_id;
-                            postcard.urlThumb = urlThumb;
-                            postcard.urlHalf = urlHalf;
-                            postcards.push(postcard);
-//                            console.log("pushing postcard: " + JSON.stringify(postcard));
-                            callbackz();
-                        }
+//                             var postcard = {};
+//                             postcard.userID = picture_item.userID;
+//                             postcard._id = picture_item._id;
+//                             postcard.sceneID = scene._id;
+//                             postcard.sceneShortID = scene.short_id;
+//                             postcard.urlThumb = urlThumb;
+//                             postcard.urlHalf = urlHalf;
+//                             postcards.push(postcard);
+// //                            console.log("pushing postcard: " + JSON.stringify(postcard));
+//                             callbackz();
+//                         }
 
-                    });
+//                     });
 
-                }, function(err) {
+//                 }, function(err) {
                    
-                    if (err) {
+//                     if (err) {
                         
                         
-                        console.log('A file failed to process');
-//                        callback(null, postcards);
-                    } else {
-                        console.log('All files have been processed successfully');
-//                        callback(null, postcards);
-//                                        };
-                        scene.postcards = postcards;
-                        res.send(scene);
-                    }
-                });
+//                         console.log('A file failed to process');
+// //                        callback(null, postcards);
+//                     } else {
+//                         console.log('All files have been processed successfully');
+// //                        callback(null, postcards);
+// //                                        };
+//                         scene.postcards = postcards;
+//                         res.send(scene);
+//                     }
+//                 });
 
-            } else {
-                res.send(scene);
-            }
-        }
-    });
-});
+//             } else {
+//                 res.send(scene);
+//             }
+//         }
+//     });
+// });
 
-app.get('/availablescenes/:_id',  requiredAuthentication, function (req, res) {
+// app.get('/availablescenes/:_id',  requiredAuthentication, function (req, res) {
 
-    var availableScenesResponse = {};
-    var availableScenes = [];
-    availableScenesResponse.availableScenes = availableScenes;
+//     var availableScenesResponse = {};
+//     var availableScenes = [];
+//     availableScenesResponse.availableScenes = availableScenes;
 
-    //mongolian "OR" syntax...
-    db.scenes.find( {$and: [{ "user_id": req.params._id}, { sceneShareWithPublic: true }]}, function (err, scenes) {
-        if (err || !scenes) {
-            console.log("cain't get no scenes... " + err)
-        } else {
-            async.each(scenes,
-                function (scene, callback) {
-                    if (scene.scenePostcards != null && scene.scenePostcards.length > 0) {
-                        var oo_id = ObjectID(scene.scenePostcards[0]); //TODO randomize? or ensure latest?  or use assigned default?
-                        db.image_items.findOne({"_id": oo_id}, function (err, picture_item) {
-                            if (err || !picture_item || picture_item.length == 0) {
-                                console.log("error getting postcard for availablescenes: 2" + err);
-                            } else {
-                                var item_string_filename = JSON.stringify(picture_item.filename);
-                                item_string_filename = item_string_filename.replace(/\"/g, "");
-                                var item_string_filename_ext = getExtension(item_string_filename);
-                                var expiration = new Date();
-                                expiration.setMinutes(expiration.getMinutes() + 30);
-                                var baseName = path.basename(item_string_filename, (item_string_filename_ext));
-//                                    console.log(baseName);
-                                var thumbName = 'thumb.' + baseName + item_string_filename_ext;
-                                var halfName = 'half.' + baseName + item_string_filename_ext;
-                                var quarterName = 'quarter.' + baseName + item_string_filename_ext;
-                                var standardName = 'standard.' + baseName + item_string_filename_ext;
-                                var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + halfName, Expires: 6000}); //just send back thumbnail urls for list
-                                var urlQuarter = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + quarterName, Expires: 6000}); //just send back thumbnail urls for list
-                                var availableScene = {
-                                    sceneDomain: scene.sceneDomain,
-                                    sceneTitle: scene.sceneTitle,
-                                    sceneKey: scene.short_id,
-                                    sceneDescription: scene.sceneDescription,
-                                    sceneKeynote: scene.sceneKeynote,
-                                    sceneAndroidOK: scene.sceneAndroidOK,
-                                    sceneIosOK: scene.sceneIosOK,
-                                    sceneWindowsOK: scene.sceneWindowsOK,
-                                    sceneWebGLOK: scene.sceneWebGLOK,
-                                    sceneStatus: scene.sceneShareWithPublic ? "public" : "private",
-                                    sceneOwner: scene.userName ? "" : scene.userName,
-                                    scenePostcardQuarter: urlQuarter,
-                                    scenePostcardHalf: urlHalf
-                                };
-                                availableScenesResponse.availableScenes.push(availableScene);
-                            }
-                            callback();
-                        });
-                    } else {
-                        callback();
-                    }
-                },
-                function (err) {
-                    res.send(availableScenesResponse);
-                }
-            );
-        }
-    });
-});
+//     //mongolian "OR" syntax...
+//     db.scenes.find( {$and: [{ "user_id": req.params._id}, { sceneShareWithPublic: true }]}, function (err, scenes) {
+//         if (err || !scenes) {
+//             console.log("cain't get no scenes... " + err)
+//         } else {
+//             async.each(scenes,
+//                 function (scene, callback) {
+//                     if (scene.scenePostcards != null && scene.scenePostcards.length > 0) {
+//                         var oo_id = ObjectID(scene.scenePostcards[0]); //TODO randomize? or ensure latest?  or use assigned default?
+//                         db.image_items.findOne({"_id": oo_id}, function (err, picture_item) {
+//                             if (err || !picture_item || picture_item.length == 0) {
+//                                 console.log("error getting postcard for availablescenes: 2" + err);
+//                             } else {
+//                                 var item_string_filename = JSON.stringify(picture_item.filename);
+//                                 item_string_filename = item_string_filename.replace(/\"/g, "");
+//                                 var item_string_filename_ext = getExtension(item_string_filename);
+//                                 var expiration = new Date();
+//                                 expiration.setMinutes(expiration.getMinutes() + 30);
+//                                 var baseName = path.basename(item_string_filename, (item_string_filename_ext));
+// //                                    console.log(baseName);
+//                                 var thumbName = 'thumb.' + baseName + item_string_filename_ext;
+//                                 var halfName = 'half.' + baseName + item_string_filename_ext;
+//                                 var quarterName = 'quarter.' + baseName + item_string_filename_ext;
+//                                 var standardName = 'standard.' + baseName + item_string_filename_ext;
+//                                 var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + halfName, Expires: 6000}); //just send back thumbnail urls for list
+//                                 var urlQuarter = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + quarterName, Expires: 6000}); //just send back thumbnail urls for list
+//                                 var availableScene = {
+//                                     sceneDomain: scene.sceneDomain,
+//                                     sceneTitle: scene.sceneTitle,
+//                                     sceneKey: scene.short_id,
+//                                     sceneDescription: scene.sceneDescription,
+//                                     sceneKeynote: scene.sceneKeynote,
+//                                     sceneAndroidOK: scene.sceneAndroidOK,
+//                                     sceneIosOK: scene.sceneIosOK,
+//                                     sceneWindowsOK: scene.sceneWindowsOK,
+//                                     sceneWebGLOK: scene.sceneWebGLOK,
+//                                     sceneStatus: scene.sceneShareWithPublic ? "public" : "private",
+//                                     sceneOwner: scene.userName ? "" : scene.userName,
+//                                     scenePostcardQuarter: urlQuarter,
+//                                     scenePostcardHalf: urlHalf
+//                                 };
+//                                 availableScenesResponse.availableScenes.push(availableScene);
+//                             }
+//                             callback();
+//                         });
+//                     } else {
+//                         callback();
+//                     }
+//                 },
+//                 function (err) {
+//                     res.send(availableScenesResponse);
+//                 }
+//             );
+//         }
+//     });
+// });
+
 /* //superfluous
 app.get('/domain_scenes/:domain',  function (req, res) {
     var availableScenesResponse = {};
@@ -13746,6 +14439,8 @@ app.get('/domain_scenes/:domain',  function (req, res) {
     });
 });
 */
+
+//unused....but maybe later
 app.get('/available_user_scenes/:user_id', requiredAuthentication, function(req,res){ //authenticated scenes, either owned by user or accessible via acl
     var availableScenesResponse = {};
     var availableScenes = [];
@@ -13778,6 +14473,7 @@ app.get('/available_user_scenes/:user_id', requiredAuthentication, function(req,
                                             console.log("error getting postcard for availablescenes: 2" + err);
                                             cb();
                                         } else {
+                                            (async () => {
                                             var item_string_filename = JSON.stringify(picture_item.filename);
                                             item_string_filename = item_string_filename.replace(/\"/g, "");
                                             var item_string_filename_ext = getExtension(item_string_filename);
@@ -13789,8 +14485,10 @@ app.get('/available_user_scenes/:user_id', requiredAuthentication, function(req,
                                             var halfName = 'half.' + baseName + item_string_filename_ext;
                                             var quarterName = 'quarter.' + baseName + item_string_filename_ext;
 
-                                            var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + halfName, Expires: 6000}); //just send back thumbnail urls for list
-                                            var urlQuarter = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + quarterName, Expires: 6000}); //just send back thumbnail urls for list
+                                            // var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + halfName, Expires: 6000}); //just send back thumbnail urls for list
+                                            // var urlQuarter = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + quarterName, Expires: 6000}); //just send back thumbnail urls for list
+                                            const urlHalf = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + halfName,6000 );
+                                            const urlQuarter = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + quar,6000 );
                                             availableScene = {
                                                 sceneTitle: scene.sceneTitle,
                                                 sceneKey: scene.short_id,
@@ -13808,6 +14506,7 @@ app.get('/available_user_scenes/:user_id', requiredAuthentication, function(req,
                                                 scenePostcardHalf: urlHalf
                                             };
                                             callback(null, availableScene);
+                                        })();
                                         }
                                     });
                                 } else {
@@ -14308,7 +15007,6 @@ app.get('/publicscenes', function (req, res) { //deprecated, see available scene
 
         } else {
 
-            // let scenesPicked = [];
             let count = 0;
            
             async.each(sampleScenes(scenes, 30),
@@ -14319,7 +15017,7 @@ app.get('/publicscenes', function (req, res) { //deprecated, see available scene
                     if (scene.scenePostcards != null && scene.scenePostcards.length > 0 && scene.scenePostcards[0] != undefined) {
                         // console.log("count is " + count);
                         // count++;
-                        postcardIndex = getRandomInt(0, scene.scenePostcards.length - 1);
+                        let postcardIndex = getRandomInt(0, scene.scenePostcards.length - 1);
                         var oo_id = ObjectID(scene.scenePostcards[postcardIndex]); //TODO randomize? or ensure latest?  or use assigned default?
                         db.image_items.findOne({"_id": oo_id}, function (err, picture_item) {
 
@@ -15456,821 +16154,834 @@ app.get('/checktitle/:type', checkAppID, requiredAuthentication, function (req, 
 
 });
 
-app.get('/update_public_scene/:_id', requiredAuthentication, function (req, res) { //TODO lock down w/ checkAppID, requiredAuthentication
 
-    console.log("tryna update public scene id: ", req.params._id + " excaped " + entities.decodeHTML(req.params._id));
+// app.get('/update_public_scene/:_id', requiredAuthentication, function (req, res) { //TODO lock down w/ checkAppID, requiredAuthentication
 
-    var reqstring = entities.decodeHTML(req.params._id);
-    var audioResponse = {};
-    var pictureResponse = {};
-    var postcardResponse = {};
-    var sceneResponse = {};
-    var requestedPictureItems = [];
-    var requestedAudioItems = [];
-    var requestedVideoItems = [];
-    var requestedTextItems = [];
-    sceneResponse.audio = [];
-    sceneResponse.pictures = [];
-    sceneResponse.postcards = [];
+//     console.log("tryna update public scene id: ", req.params._id + " excaped " + entities.decodeHTML(req.params._id));
 
-    var mp3url = "";
-    var oggurl = "";
-    var pngurl = "";
-    var mp4url = "";
-    var postcard1 = "";
-    var image1url = "";
-    var short_id = "";
-    var picArray = new Array;
-    var postcardArray = new Array;
-    var imageAssets = "";
-    var imageEntities = "";
-    var skyboxUrl = "";
-    var skyboxID = "";
-    var skySettings = "";
-    var fogSettings = "";
-    var ground = "";
-    var ocean = "";
-    var targetObjectAsset = "";
-    var targetObjectEntity = "";
-    var skyParticles;
-    var videoAsset = "";
-    var videoEntity = "";
-    var nextLink = "";
-    var prevLink = "";
-    var loopable = "";
-    var autoplay = false;
-    var bucketFolder = "eloquentnoise.com";
-    var winOK = "";
-    var androidOK = "";
-    var iosOK = "";
-    var primaryText = "";
-    var keynoteText = "";
-    var descText = "";
-    var iosInstallUrl = "https://itunes.apple.com/us/app/servicemedia/id1016515870?mt=8";
-    var androidInstallUrl = "https://play.google.com/store/apps/details?id=net.servicemedia.servmed";
-    var windowsInstallUrl = "https://servicemedia.s3.amazonaws.com/builds/sm2018.zip";
-    var theUrl = "";
+//     var reqstring = entities.decodeHTML(req.params._id);
+//     var audioResponse = {};
+//     var pictureResponse = {};
+//     var postcardResponse = {};
+//     var sceneResponse = {};
+//     var requestedPictureItems = [];
+//     var requestedAudioItems = [];
+//     var requestedVideoItems = [];
+//     var requestedTextItems = [];
+//     sceneResponse.audio = [];
+//     sceneResponse.pictures = [];
+//     sceneResponse.postcards = [];
 
-    async.waterfall([
+//     var mp3url = "";
+//     var oggurl = "";
+//     var pngurl = "";
+//     var mp4url = "";
+//     var postcard1 = "";
+//     var image1url = "";
+//     var short_id = "";
+//     var picArray = new Array;
+//     var postcardArray = new Array;
+//     var imageAssets = "";
+//     var imageEntities = "";
+//     var skyboxUrl = "";
+//     var skyboxID = "";
+//     var skySettings = "";
+//     var fogSettings = "";
+//     var ground = "";
+//     var ocean = "";
+//     var targetObjectAsset = "";
+//     var targetObjectEntity = "";
+//     var skyParticles;
+//     var videoAsset = "";
+//     var videoEntity = "";
+//     var nextLink = "";
+//     var prevLink = "";
+//     var loopable = "";
+//     var autoplay = false;
+//     var domainBucket = "eloquentnoise.com";
+//     var winOK = "";
+//     var androidOK = "";
+//     var iosOK = "";
+//     var primaryText = "";
+//     var keynoteText = "";
+//     var descText = "";
+//     var iosInstallUrl = "https://itunes.apple.com/us/app/servicemedia/id1016515870?mt=8";
+//     var androidInstallUrl = "https://play.google.com/store/apps/details?id=net.servicemedia.servmed";
+//     var windowsInstallUrl = "https://servicemedia.s3.amazonaws.com/builds/sm2018.zip";
+//     var theUrl = "";
+
+//     async.waterfall([
 
 
-                function (callback) {
-                    var o_id = ObjectID(reqstring);
-                    db.scenes.findOne({"_id": o_id},
-                        function (err, sceneData) { //fetch the path info by title TODO: urlsafe string
+//                 function (callback) {
+//                     var o_id = ObjectID(reqstring);
+//                     db.scenes.findOne({"_id": o_id},
+//                         function (err, sceneData) { //fetch the path info by title TODO: urlsafe string
 
-                            if (err || !sceneData) {
-                                console.log("4 error getting scene data: " + err);
-                                callback(err);
-                            } else { //make arrays of the pics and audio items
-                                console.log("creating sceneResponse data : audio id " + sceneData.scenePrimaryAudioID);
-                                short_id = sceneData.short_id;
-                                sceneResponse = sceneData;
-                                if (sceneResponse.sceneDomain != null && sceneResponse.sceneDomain != "") {
-                                    bucketFolder = sceneResponse.sceneDomain;
+//                             if (err || !sceneData) {
+//                                 console.log("4 error getting scene data: " + err);
+//                                 callback(err);
+//                             } else { //make arrays of the pics and audio items
+//                                 console.log("creating sceneResponse data : audio id " + sceneData.scenePrimaryAudioID);
+//                                 short_id = sceneData.short_id;
+//                                 sceneResponse = sceneData;
+//                                 if (sceneResponse.sceneDomain != null && sceneResponse.sceneDomain != "") {
+//                                     domainBucket = sceneResponse.sceneDomain;
                                     
-                                    sceneData.scenePictures.forEach(function (picture) {
-                                        var p_id = ObjectID(picture); //convert to binary to search by _id beloiw
-                                        requestedPictureItems.push(p_id); //populate array
-                                    });
+//                                     sceneData.scenePictures.forEach(function (picture) {
+//                                         var p_id = ObjectID(picture); //convert to binary to search by _id beloiw
+//                                         requestedPictureItems.push(p_id); //populate array
+//                                     });
 
-                                    sceneResponse.scenePostcards = sceneData.scenePostcards;
-                                    if (sceneResponse.sceneUseGlobalFog) {
-                                        fogSettings = "fog=\x22type: linear; density:.005; near: 1; far: 30; color: " + sceneResponse.sceneColor1 + "\x22";
-                                    }
-                                    if (sceneResponse.sceneSkyParticles != undefined && sceneResponse.sceneSkyParticles != null && sceneResponse.sceneSkyParticles != "None") { 
-                                        skyParticles = "<a-entity scale='.5 .5 .5' position='0 3 0' particle_mangler particle-system=\x22preset: dust; randomize: true color: " + sceneResponse.sceneColor1 + "," + sceneResponse.sceneColor2 +"\x22></a-entity>";
-                                    }
-                                    if (sceneResponse.sceneUseFloorPlane) {
-                                        ground = "<a-plane rotation='-90 0 0' position='0 -5 0' width='150' height='150' color=\x22" + sceneResponse.sceneColor2 + "\x22></a-plane>";
-                                    }
-                                    if (sceneResponse.sceneWater != null && sceneResponse.sceneWater.name != "none") {
-                                        console.log("ocean! " + JSON.stringify(sceneResponse.sceneWater));
-                                        ocean = "<a-ocean></a-ocean>";
-                                    }
-                                    if (sceneResponse.sceneUseTargetObject && sceneResponse.sceneTargetObject != null) {
-                                        if (sceneResponse.sceneTargetObject.name == "gltftest" ) {
-                                        targetObjectAsset = "<a-asset-item id=\x22targetObj\x22 src=\x22../assets/models/korkus/KorkusOnly.gltf\x22></a-asset-item>";
-                                        targetObjectEntity = "<a-entity class=\x22gltf\x22 gltf-model=\x22#targetObj\x22 position='-5 5 5'></a-entity>";
-                                        }
-                                    }
+//                                     sceneResponse.scenePostcards = sceneData.scenePostcards;
+//                                     if (sceneResponse.sceneUseGlobalFog) {
+//                                         fogSettings = "fog=\x22type: linear; density:.005; near: 1; far: 30; color: " + sceneResponse.sceneColor1 + "\x22";
+//                                     }
+//                                     if (sceneResponse.sceneSkyParticles != undefined && sceneResponse.sceneSkyParticles != null && sceneResponse.sceneSkyParticles != "None") { 
+//                                         skyParticles = "<a-entity scale='.5 .5 .5' position='0 3 0' particle_mangler particle-system=\x22preset: dust; randomize: true color: " + sceneResponse.sceneColor1 + "," + sceneResponse.sceneColor2 +"\x22></a-entity>";
+//                                     }
+//                                     if (sceneResponse.sceneUseFloorPlane) {
+//                                         ground = "<a-plane rotation='-90 0 0' position='0 -5 0' width='150' height='150' color=\x22" + sceneResponse.sceneColor2 + "\x22></a-plane>";
+//                                     }
+//                                     if (sceneResponse.sceneWater != null && sceneResponse.sceneWater.name != "none") {
+//                                         console.log("ocean! " + JSON.stringify(sceneResponse.sceneWater));
+//                                         ocean = "<a-ocean></a-ocean>";
+//                                     }
+//                                     if (sceneResponse.sceneUseTargetObject && sceneResponse.sceneTargetObject != null) {
+//                                         if (sceneResponse.sceneTargetObject.name == "gltftest" ) {
+//                                         targetObjectAsset = "<a-asset-item id=\x22targetObj\x22 src=\x22../assets/models/korkus/KorkusOnly.gltf\x22></a-asset-item>";
+//                                         targetObjectEntity = "<a-entity class=\x22gltf\x22 gltf-model=\x22#targetObj\x22 position='-5 5 5'></a-entity>";
+//                                         }
+//                                     }
 
-                                    if (sceneResponse.sceneLoopPrimaryAudio) {
-                                        loopable = " loop ";
-                                    }
-                                    if (sceneResponse.scenePrimaryAudioID != null && sceneResponse.scenePrimaryAudioID.length > 8 ) {
-                                        var pid = ObjectID(sceneResponse.scenePrimaryAudioID);
-                                        console.log("pid audio " + ObjectID(sceneResponse.scenePrimaryAudioID));
-                                        // requestedAudioItems.push(sceneData.scenePrimaryAudioID);
-                                        requestedAudioItems.push(ObjectID(sceneResponse.scenePrimaryAudioID));
-                                    } 
-                                    callback();
-                                } else {
-                                    callback("error - domain name required");
-                                }
-                            }
-                        });
+//                                     if (sceneResponse.sceneLoopPrimaryAudio) {
+//                                         loopable = " loop ";
+//                                     }
+//                                     if (sceneResponse.scenePrimaryAudioID != null && sceneResponse.scenePrimaryAudioID.length > 8 ) {
+//                                         var pid = ObjectID(sceneResponse.scenePrimaryAudioID);
+//                                         console.log("pid audio " + ObjectID(sceneResponse.scenePrimaryAudioID));
+//                                         // requestedAudioItems.push(sceneData.scenePrimaryAudioID);
+//                                         requestedAudioItems.push(ObjectID(sceneResponse.scenePrimaryAudioID));
+//                                     } 
+//                                     callback();
+//                                 } else {
+//                                     callback("error - domain name required");
+//                                 }
+//                             }
+//                         });
 
-                },
+//                 },
 
 
-                // "<li>" +
-                // "<a class=\x22mx-2 btn btn-primary btn-sm\x22" + nextLink + " target=\x22_blank\x22>Next Scene</a>" +
-                // "</li>" +
-//
-//            function(callback) { //check for target bucket, create if absent
-//
-//                bucketFolder = "mvmv.us" + short_id;
-//                console.log("target bucket : " + bucketFolder);
-//                s3.headBucket({Bucket: bucketFolder}, function (err, data) {
-//                        if (err) {
-//                            s3.createBucket({Bucket: bucketFolder}, function (err2, data) {
-//                                if (err2) {
-//                                    console.log(err2);
-//                                    callback(err2);
-//                                } else {
-//                                    console.log("tryna create bucket " + bucketFolder);
-//                                    callback(null);
-//                                }
-//                            });
-//                        } else {
-//                            console.log("Bucket exists and we have access");
-//                            callback(null);
-//                        }
-//                    },
+//                 // "<li>" +
+//                 // "<a class=\x22mx-2 btn btn-primary btn-sm\x22" + nextLink + " target=\x22_blank\x22>Next Scene</a>" +
+//                 // "</li>" +
+// //
+// //            function(callback) { //check for target bucket, create if absent
+// //
+// //                bucketFolder = "mvmv.us" + short_id;
+// //                console.log("target bucket : " + bucketFolder);
+// //                s3.headBucket({Bucket: bucketFolder}, function (err, data) {
+// //                        if (err) {
+// //                            s3.createBucket({Bucket: bucketFolder}, function (err2, data) {
+// //                                if (err2) {
+// //                                    console.log(err2);
+// //                                    callback(err2);
+// //                                } else {
+// //                                    console.log("tryna create bucket " + bucketFolder);
+// //                                    callback(null);
+// //                                }
+// //                            });
+// //                        } else {
+// //                            console.log("Bucket exists and we have access");
+// //                            callback(null);
+// //                        }
+// //                    },
             
 
-            function (callback){
-                var params = {
-                    Bucket: bucketFolder,
-                    Prefix: short_id + '/'
-                };
+//             function (callback){
+//                 var params = {
+//                     Bucket: domainBucket,
+//                     Prefix: short_id + '/'
+//                 };
 
-                s3.listObjects(params, function(err, data) { //delete all the things in the target bucket, to cleanup kruft..
-                    if (err) {
-                        console.log("error listing objs " + err);
-                        return callback(err);
-                    } else {
-                      console.log("fixing to delete objs: " + data);
+//                 s3.listObjects(params, function(err, data) { //delete all the things in the target bucket, to cleanup kruft..
+//                     if (err) {
+//                         console.log("error listing objs " + err);
+//                         return callback(err);
+//                     } else {
+//                       console.log("fixing to delete objs: " + data);
 
-                    if (data.Contents.length == 0) {
-                        callback(null);
-                        } else {
-                        params = {Bucket: bucketFolder};
-                        params.Delete = {Objects:[]};
+//                     if (data.Contents.length == 0) {
+//                         callback(null);
+//                         } else {
+//                         params = {Bucket: domainBucket};
+//                         params.Delete = {Objects:[]};
 
-                        data.Contents.forEach(function(content) {
-                            params.Delete.Objects.push({Key: content.Key});
-                        });
-                        console.log("delete params: " + JSON.stringify(params));
-                        s3.deleteObjects(params, function(err, data) {
-                            if (err) {
-                                console.log("error deleting " + err)
-                                return callback(err);
-                            } else {
-                                callback(null);
-                            }
-                        });
-                    }
-                }
-            });
-            },
+//                         data.Contents.forEach(function(content) {
+//                             params.Delete.Objects.push({Key: content.Key});
+//                         });
+//                         console.log("delete params: " + JSON.stringify(params));
+//                         s3.deleteObjects(params, function(err, data) {
+//                             if (err) {
+//                                 console.log("error deleting " + err)
+//                                 return callback(err);
+//                             } else {
+//                                 callback(null);
+//                             }
+//                         });
+//                     }
+//                 }
+//             });
+//             },
 
-            function (callback) {
-                if (sceneResponse.sceneNextScene != null && sceneResponse.sceneNextScene != "") {
-                    db.scenes.findOne({$or: [ { short_id: sceneResponse.sceneNextScene }, { sceneTitle: sceneResponse.sceneNextScene } ]}, function (err, scene) {
-                        if (scene == err) {
-                            console.log("didn't find next scene");
-                        } else {
+//             function (callback) {
+//                 if (sceneResponse.sceneNextScene != null && sceneResponse.sceneNextScene != "") {
+//                     db.scenes.findOne({$or: [ { short_id: sceneResponse.sceneNextScene }, { sceneTitle: sceneResponse.sceneNextScene } ]}, function (err, scene) {
+//                         if (scene == err) {
+//                             console.log("didn't find next scene");
+//                         } else {
 
-                            nextLink == "<li>" +
-                            "<a class=\x22mx-2 btn btn-primary btn-sm\x22href=\x22../" + scene.short_id + "/index.html\x22 target=\x22_blank\x22>Next Scene</a>" +
-                            "</li>";
-                        }
-                    }); 
-                }
-                if (sceneResponse.scenePreviousScene != null && sceneResponse.scenePreviousScene != "") {
-                    db.scenes.findOne({$or: [ { short_id: sceneResponse.scenePreviousScene }, { sceneTitle: sceneResponse.scenePreviousScene } ]}, function (err, scene) {
-                        if (scene == err) {
-                            console.log("didn't find previous scene");
-                        } else {
-                            prevLink = "<li>" +
-                                        "<a class=\x22mx-2 btn btn-primary btn-sm\x22href=\x22../" + scene.short_id + "/index.html\x22 target=\x22_blank\x22>Previous Scene</a>" +
-                                        "</li>";
-                        }
-                    }); 
-                }
-                callback();
-            },
+//                             nextLink == "<li>" +
+//                             "<a class=\x22mx-2 btn btn-primary btn-sm\x22href=\x22../" + scene.short_id + "/index.html\x22 target=\x22_blank\x22>Next Scene</a>" +
+//                             "</li>";
+//                         }
+//                     }); 
+//                 }
+//                 if (sceneResponse.scenePreviousScene != null && sceneResponse.scenePreviousScene != "") {
+//                     db.scenes.findOne({$or: [ { short_id: sceneResponse.scenePreviousScene }, { sceneTitle: sceneResponse.scenePreviousScene } ]}, function (err, scene) {
+//                         if (scene == err) {
+//                             console.log("didn't find previous scene");
+//                         } else {
+//                             prevLink = "<li>" +
+//                                         "<a class=\x22mx-2 btn btn-primary btn-sm\x22href=\x22../" + scene.short_id + "/index.html\x22 target=\x22_blank\x22>Previous Scene</a>" +
+//                                         "</li>";
+//                         }
+//                     }); 
+//                 }
+//                 callback();
+//             },
             
-            function (callback) { //update the install urls //TODO - use app id instead
-                console.log("sceneAppName " + sceneResponse.sceneAppName + " appdomain " + sceneResponse.sceneDomain);
-                db.apps.findOne({$and: [{"appname": sceneResponse.sceneAppName}, {"appdomain": sceneResponse.sceneDomain}]}, function (err, app) {
-                    if (err || !app) {
-                        console.log("error getting audio items: " + err);
-                        callback(null);
-                    } else {
-                        androidInstallUrl = app.androidInstallUrl;
-                        iosInstallUrl = app.iosInstallUrl;
-                        windowsInstallUrl = app.windowsInstallUrl;
-                        callback(null);
-                    }
-                });
-            },
+//             function (callback) { //update the install urls //TODO - use app id instead
+//                 console.log("sceneAppName " + sceneResponse.sceneAppName + " appdomain " + sceneResponse.sceneDomain);
+//                 db.apps.findOne({$and: [{"appname": sceneResponse.sceneAppName}, {"appdomain": sceneResponse.sceneDomain}]}, function (err, app) {
+//                     if (err || !app) {
+//                         console.log("error getting audio items: " + err);
+//                         callback(null);
+//                     } else {
+//                         androidInstallUrl = app.androidInstallUrl;
+//                         iosInstallUrl = app.iosInstallUrl;
+//                         windowsInstallUrl = app.windowsInstallUrl;
+//                         callback(null);
+//                     }
+//                 });
+//             },
 
-            function (callback) { //get the qr code
-                QRCode.toDataURL(sceneResponse.short_id, function (err, url) {
-                    theUrl = url;
-                    // console.log("qrcode: " + theUrl);
-                });
-                callback(null);
-            },
+//             function (callback) { //get the qr code
+//                 QRCode.toDataURL(sceneResponse.short_id, function (err, url) {
+//                     theUrl = url;
+//                     // console.log("qrcode: " + theUrl);
+//                 });
+//                 callback(null);
+//             },
 
-            function (callback) { //fethc audio items
-                    console.log("requestedAUdioItems " + requestedAudioItems[0]);
-                    db.audio_items.find({_id: {$in: requestedAudioItems }}, function (err, audio_items) {
-                        if (err || !audio_items) {
-                            console.log("error getting audio items: " + err);
-                            callback(null);
-                        } else {
+//             function (callback) { //fethc audio items
+//                     console.log("requestedAUdioItems " + requestedAudioItems[0]);
+//                     db.audio_items.find({_id: {$in: requestedAudioItems }}, function (err, audio_items) {
+//                         if (err || !audio_items) {
+//                             console.log("error getting audio items: " + err);
+//                             callback(null);
+//                         } else {
 
-                            callback(null, audio_items) //send them along
-                        }
-                    });
-                },
+//                             callback(null, audio_items) //send them along
+//                         }
+//                     });
+//                 },
 
-            function (audio_items, callback) { //add the signed URLs to the obj array
-                    for (var i = 0; i < audio_items.length; i++) {
-                        // console.log("audio_item: ", audio_items[i]);
-                        var item_string_filename = JSON.stringify(audio_items[i].filename);
-                        item_string_filename = item_string_filename.replace(/\"/g, "");
-                        var item_string_filename_ext = getExtension(item_string_filename);
-                        var expiration = new Date();
-                        expiration.setMinutes(expiration.getMinutes() + 1000);
-                        var baseName = path.basename(item_string_filename, (item_string_filename_ext));
-                        //console.log(baseName);
-                        var mp3Name = baseName + '.mp3';
-                        var oggName = baseName + '.ogg';
-                        var pngName = baseName + '.png';
-                        s3.copyObject({Bucket: bucketFolder, CopySource: 'servicemedia/users/' + audio_items[i].userID +"/"+ audio_items[i]._id + "." + mp3Name, Key: short_id +"/"+ audio_items[i]._id + "." + mp3Name}, function (err,data){
-                            if (err) {
-                                console.log("ERROR copyObject");
-                                console.log(err);
-                            }
-                            else {
-                                console.log('SUCCESS copyObject');
+//             function (audio_items, callback) { //add the signed URLs to the obj array
+//                     for (var i = 0; i < audio_items.length; i++) {
+//                         // console.log("audio_item: ", audio_items[i]);
+//                         var item_string_filename = JSON.stringify(audio_items[i].filename);
+//                         item_string_filename = item_string_filename.replace(/\"/g, "");
+//                         var item_string_filename_ext = getExtension(item_string_filename);
+//                         var expiration = new Date();
+//                         expiration.setMinutes(expiration.getMinutes() + 1000);
+//                         var baseName = path.basename(item_string_filename, (item_string_filename_ext));
+//                         //console.log(baseName);
+//                         var mp3Name = baseName + '.mp3';
+//                         var oggName = baseName + '.ogg';
+//                         var pngName = baseName + '.png';
+//                         s3.copyObject({Bucket: domainBucket, CopySource: 'servicemedia/users/' + audio_items[i].userID +"/"+ audio_items[i]._id + "." + mp3Name, Key: short_id +"/"+ audio_items[i]._id + "." + mp3Name}, function (err,data){
+//                             if (err) {
+//                                 console.log("ERROR copyObject");
+//                                 console.log(err);
+//                             }
+//                             else {
+//                                 console.log('SUCCESS copyObject');
 
-                            }
-                        });
+//                             }
+//                         });
 
-                        s3.copyObject({Bucket: bucketFolder, CopySource: 'servicemedia/users/' + audio_items[i].userID +"/"+ audio_items[i]._id + "." + oggName, Key: short_id +"/"+ audio_items[i]._id + "." + oggName}, function (err,data){
-                            if (err) {
-                                console.log("ERROR copyObject");
-                                console.log(err);
-                            }
-                            else {
-                                console.log('SUCCESS copyObject');
+//                         s3.copyObject({Bucket: domainBucket, CopySource: 'servicemedia/users/' + audio_items[i].userID +"/"+ audio_items[i]._id + "." + oggName, Key: short_id +"/"+ audio_items[i]._id + "." + oggName}, function (err,data){
+//                             if (err) {
+//                                 console.log("ERROR copyObject");
+//                                 console.log(err);
+//                             }
+//                             else {
+//                                 console.log('SUCCESS copyObject');
 
-                            }
-                        });
-                        s3.copyObject({Bucket: bucketFolder, CopySource: 'servicemedia/users/' + audio_items[i].userID +"/pictures/"+ audio_items[i]._id + "." + pngName, Key: short_id +"/"+ audio_items[i]._id + "." + pngName}, function (err,data){
-                            if (err) {
-                                console.log("ERROR copyObject" + err);
-                            }
-                            else {
-                                console.log('SUCCESS copyObject');
-                            }
-                        });
-                        mp3url = audio_items[i]._id + "." + mp3Name;
-                        oggurl = audio_items[i]._id + "." + oggName;
-                        pngurl = audio_items[i]._id + "." + pngName;
+//                             }
+//                         });
+//                         s3.copyObject({Bucket: domainBucket, CopySource: 'servicemedia/users/' + audio_items[i].userID +"/pictures/"+ audio_items[i]._id + "." + pngName, Key: short_id +"/"+ audio_items[i]._id + "." + pngName}, function (err,data){
+//                             if (err) {
+//                                 console.log("ERROR copyObject" + err);
+//                             }
+//                             else {
+//                                 console.log('SUCCESS copyObject');
+//                             }
+//                         });
+//                         mp3url = audio_items[i]._id + "." + mp3Name;
+//                         oggurl = audio_items[i]._id + "." + oggName;
+//                         pngurl = audio_items[i]._id + "." + pngName;
 
-                        console.log("copying audio to s3...");
-                    }
+//                         console.log("copying audio to s3...");
+//                     }
 
-                    callback(null);
-            },
-            function (callback) {
-                if (mp3url == null || mp3url == undefined || mp3url.length < 10) {
-                    if (sceneResponse.scenePrimaryAudioStreamURL != null && sceneResponse.scenePrimaryAudioStreamURL.length > 8 ) {
-                        mp3url = sceneResponse.scenePrimaryAudioStreamURL + "/stream";   
-                        oggurl = sceneResponse.scenePrimaryAudioStreamURL + "/stream";                    
-                        callback();
-                    } else {
-                        callback();
-                    }
-                } else {
-                    callback();
-                }  
-            },
+//                     callback(null);
+//             },
+//             function (callback) {
+//                 if (mp3url == null || mp3url == undefined || mp3url.length < 10) {
+//                     if (sceneResponse.scenePrimaryAudioStreamURL != null && sceneResponse.scenePrimaryAudioStreamURL.length > 8 ) {
+//                         mp3url = sceneResponse.scenePrimaryAudioStreamURL + "/stream";   
+//                         oggurl = sceneResponse.scenePrimaryAudioStreamURL + "/stream";                    
+//                         callback();
+//                     } else {
+//                         callback();
+//                     }
+//                 } else {
+//                     callback();
+//                 }  
+//             },
 
-            function (callback) { //fethc video items
-                if (sceneResponse.sceneVideos != null) {
-                    sceneResponse.sceneVideos.forEach(function (vid) {
-                        console.log("looking for sceneVideo : " + JSON.stringify(vid));
-                        var p_id = ObjectID(vid); //convert to binary to search by _id beloiw
-                        requestedVideoItems.push(p_id); //populate array
-                    });
-                    db.video_items.find({_id: {$in: requestedVideoItems}}, function (err, video_items) {
-                        if (err || !video_items) {
-                            console.log("error getting video items: " + err);
-                            callback(null, new Array());
-                        } else {
-                            console.log("gotsome video items: " + JSON.stringify(video_items[0]));
+//             function (callback) { //fethc video items
+//                 if (sceneResponse.sceneVideos != null) {
+//                     sceneResponse.sceneVideos.forEach(function (vid) {
+//                         console.log("looking for sceneVideo : " + JSON.stringify(vid));
+//                         var p_id = ObjectID(vid); //convert to binary to search by _id beloiw
+//                         requestedVideoItems.push(p_id); //populate array
+//                     });
+//                     db.video_items.find({_id: {$in: requestedVideoItems}}, function (err, video_items) {
+//                         if (err || !video_items) {
+//                             console.log("error getting video items: " + err);
+//                             callback(null, new Array());
+//                         } else {
+//                             console.log("gotsome video items: " + JSON.stringify(video_items[0]));
 
-                            callback(null, video_items) //send them along
-                        }
-                    });
-                } else {
-                    callback(null, new Array());
-                }
-            },
+//                             callback(null, video_items) //send them along
+//                         }
+//                     });
+//                 } else {
+//                     callback(null, new Array());
+//                 }
+//             },
 
-            function (video_items, callback) { //add the signed URLs to the obj array
+//             function (video_items, callback) { //add the signed URLs to the obj array
 
-                    //for (var i = 0; i < 1; i++) { //only do first one for now..
-                        if (video_items != null && video_items[0] != null) {
-                            console.log("video_item: " + JSON.stringify(video_items[0]));
-                            var item_string_filename = JSON.stringify(video_items[0].filename);
-                            item_string_filename = item_string_filename.replace(/\"/g, "");
-                            var item_string_filename_ext = getExtension(item_string_filename);
-                            var expiration = new Date();
-                            expiration.setMinutes(expiration.getMinutes() + 1000);
-                            var baseName = path.basename(item_string_filename, (item_string_filename_ext));
-                            //console.log(baseName);
-                            var mp4Name = baseName + '.mp4';
-                            console.log("mp4 video: " + mp4Name + " " + video_items[0]._id);
-                            var vid = video_items[0]._id;
-                            var ori = video_items[0].orientation != null ? video_items[0].orientation : "";
-                            mp4url = vid + "." + mp4Name;
-                            s3.copyObject({
-                                Bucket: bucketFolder,
-                                CopySource: 'servicemedia/users' + video_items[0].userID + "/" + video_items[0]._id + "." + mp4Name,
-                                Key: short_id + "/" + video_items[0]._id + "." + mp4Name
-                            }, function (err, data) {
-                                if (err) {
-                                    console.log("ERROR copyObject");
-                                    console.log(err);
-                                    callback(null);
-                                } else {
-                                    console.log('SUCCESS copyObject for video item ');
+//                     //for (var i = 0; i < 1; i++) { //only do first one for now..
+//                         if (video_items != null && video_items[0] != null) {
+//                             console.log("video_item: " + JSON.stringify(video_items[0]));
+//                             var item_string_filename = JSON.stringify(video_items[0].filename);
+//                             item_string_filename = item_string_filename.replace(/\"/g, "");
+//                             var item_string_filename_ext = getExtension(item_string_filename);
+//                             var expiration = new Date();
+//                             expiration.setMinutes(expiration.getMinutes() + 1000);
+//                             var baseName = path.basename(item_string_filename, (item_string_filename_ext));
+//                             //console.log(baseName);
+//                             var mp4Name = baseName + '.mp4';
+//                             console.log("mp4 video: " + mp4Name + " " + video_items[0]._id);
+//                             var vid = video_items[0]._id;
+//                             var ori = video_items[0].orientation != null ? video_items[0].orientation : "";
+//                             mp4url = vid + "." + mp4Name;
 
-//                                    videoAsset = "<video id=\x22video1\x22 src=\x22" + mp4url + "\x22 autoplay='true' loop='true'>";
-                                    if (ori == "equirectangular") {
-                                        // videosphereAsset =  
+//                             s3.copyObject({
+//                                 Bucket: domainBucket,
+//                                 CopySource: 'servicemedia/users' + video_items[0].userID + "/" + video_items[0]._id + "." + mp4Name,
+//                                 Key: short_id + "/" + video_items[0]._id + "." + mp4Name
+//                             }, function (err, data) {
+//                                 if (err) {
+//                                     console.log("ERROR copyObject");
+//                                     console.log(err);
+//                                     callback(null);
+//                                 } else {
+//                                     console.log('SUCCESS copyObject for video item ');
+
+// //                                    videoAsset = "<video id=\x22video1\x22 src=\x22" + mp4url + "\x22 autoplay='true' loop='true'>";
+//                                     if (ori == "equirectangular") {
+//                                         // videosphereAsset =  
                                         
-                                        console.log("vidoe item zero: " + JSON.stringify(video_items[0]));
-                                        if (video_items[0].tags.includes("hls")) {
-                                            let vProps = {};
+//                                         console.log("vidoe item zero: " + JSON.stringify(video_items[0]));
+//                                         if (video_items[0].tags.includes("hls")) {
+//                                             let vProps = {};
                                             
-                                            vProps.id = video_items[0]._id;
+//                                             vProps.id = video_items[0]._id;
                                             
-                                            vProps.videoTitle = video_items[0].title;
+//                                             vProps.videoTitle = video_items[0].title;
                                             
-                                            videoEntity = "<a-videosphere vrotation=\x220 180 0\x22 material=\x22shader: flat; transparent: true;\x22></a-videosphere>";
+//                                             videoEntity = "<a-videosphere vrotation=\x220 180 0\x22 material=\x22shader: flat; transparent: true;\x22></a-videosphere>";
                                             
-                                        } else {
-                                            videoEntity = "<a-videosphere src=\x22" + mp4url + "\x22 rotation=\x220 180 0\x22 material=\x22shader: flat; transparent: true;\x22></a-videosphere>";
-                                        }
+//                                         } else {
+//                                             videoEntity = "<a-videosphere src=\x22" + mp4url + "\x22 rotation=\x220 180 0\x22 material=\x22shader: flat; transparent: true;\x22></a-videosphere>";
+//                                         }
 
                                        
-//                                        skySettings = "transparent='true'";
+// //                                        skySettings = "transparent='true'";
 
-                                    } else {
-                                        videoEntity = "<a-video src=\x22#video1\x22 position='25 5 -15' width='8' height='4.5' look-at=\x22#player\x22></a-video>";
-                                        console.log("VIDEO ENTITIE 11396 " + videoEntity);
-                                    }
-                                    console.log("copying video to s3...");
-                                    callback(null);
+//                                     } else {
+//                                         videoEntity = "<a-video src=\x22#video1\x22 position='25 5 -15' width='8' height='4.5' look-at=\x22#player\x22></a-video>";
+//                                         console.log("VIDEO ENTITIE 11396 " + videoEntity);
+//                                     }
+//                                     console.log("copying video to s3...");
+//                                     callback(null);
 
-                                }
-                            });
-                    } else {
-                        callback(null);
-                    }
-            },
+//                                 }
+//                             });
+//                     } else {
+//                         callback(null);
+//                     }
+//             },
 
-            function (callback) {
-                var postcards = [];
-                console.log("sceneResponse.scenePostcards: " + JSON.stringify(sceneResponse.scenePostcards));
-                if (sceneResponse.scenePostcards != null && sceneResponse.scenePostcards.length > 0) {
-                    var index = 0;
-                    async.each(sceneResponse.scenePostcards, function (postcardID, callbackz) { //nested async-ery!
-                        var oo_id = ObjectID(postcardID);
+//             function (callback) {
+//                 var postcards = [];
+//                 console.log("sceneResponse.scenePostcards: " + JSON.stringify(sceneResponse.scenePostcards));
+//                 if (sceneResponse.scenePostcards != null && sceneResponse.scenePostcards.length > 0) {
+//                     var index = 0;
+//                     async.each(sceneResponse.scenePostcards, function (postcardID, callbackz) { //nested async-ery!
+//                         var oo_id = ObjectID(postcardID);
 
-                        db.image_items.findOne({"_id": oo_id}, function (err, picture_item) {
-                            if (err || !picture_item) {
-                                console.log("error getting postcard " + postcardID + err);
-                                callbackz();
-                            } else {
+//                         db.image_items.findOne({"_id": oo_id}, function (err, picture_item) {
+//                             if (err || !picture_item) {
+//                                 console.log("error getting postcard " + postcardID + err);
+//                                 callbackz();
+//                             } else {
 
-                                s3.copyObject({Bucket: bucketFolder, CopySource: 'servicemedia/users/' + picture_item.userID +"/"+ picture_item._id + ".standard." + picture_item.filename,
-                                    Key: short_id +"/"+ picture_item._id + ".standard." + picture_item.filename}, function (err, data) {
-                                    if (err) {
-                                        console.log("ERROR copyObject" + err);
-                                    }
-                                    else {
-                                        console.log('SUCCESS copyObject');
+//                                 s3.copyObject({Bucket: domainBucket, CopySource: 'servicemedia/users/' + picture_item.userID +"/"+ picture_item._id + ".standard." + picture_item.filename,
+//                                     Key: short_id +"/"+ picture_item._id + ".standard." + picture_item.filename}, function (err, data) {
+//                                     if (err) {
+//                                         console.log("ERROR copyObject" + err);
+//                                     }
+//                                     else {
+//                                         console.log('SUCCESS copyObject');
 
-                                    }
+//                                     }
 
-                                });
-                                index++;
-                                postcard1 = picture_item._id + ".standard." + picture_item.filename;
-                                postcardArray.push(postcard1);
-//                                imageAssets = imageAssets + "<img id=\x22smimage" + index + "\x22 src='"+ image1url +"'>";
-//                                imageEntities = imageEntities + "<a-image look-at=\x22#player\x22 width='10' segments-height='4' segments-width='2' height='10' position='-2 6 2' rotation='0 180 0' visible='true' src=\x22#smimage" + index + "\x22></a-image>";
-                                callbackz();
-                            }
-                        });
-                        },
-                        function (err) {
+//                                 });
+//                                 index++;
+//                                 postcard1 = picture_item._id + ".standard." + picture_item.filename;
+//                                 postcardArray.push(postcard1);
+// //                                imageAssets = imageAssets + "<img id=\x22smimage" + index + "\x22 src='"+ image1url +"'>";
+// //                                imageEntities = imageEntities + "<a-image look-at=\x22#player\x22 width='10' segments-height='4' segments-width='2' height='10' position='-2 6 2' rotation='0 180 0' visible='true' src=\x22#smimage" + index + "\x22></a-image>";
+//                                 callbackz();
+//                             }
+//                         });
+//                         },
+//                         function (err) {
                        
-                            if (err) {
-                                console.log('A file failed to process');
-                                callback(null);
-                            } else {
-                                console.log('All files have been processed successfully');
-                                callback(null);
-                            }
-                        });
-                    } else {
-    //                      callback(null);
-                        callback(null);
-                    }
-         },
-            function (callback) { //checks for equirect, should just get 'em
-                var postcards = [];
-                console.log("sceneResponse.scenePictures: " + JSON.stringify(sceneResponse.scenePictures));
-                if (sceneResponse.scenePictures != null && sceneResponse.scenePictures.length > 0) {
-                    var index = 0;
-                    async.each(sceneResponse.scenePictures, function (picID, callbackz) { //nested async-ery!
-                            var oo_id = ObjectID(picID);
+//                             if (err) {
+//                                 console.log('A file failed to process');
+//                                 callback(null);
+//                             } else {
+//                                 console.log('All files have been processed successfully');
+//                                 callback(null);
+//                             }
+//                         });
+//                     } else {
+//     //                      callback(null);
+//                         callback(null);
+//                     }
+//          },
+//             function (callback) { //checks for equirect, should just get 'em
+//                 var postcards = [];
+//                 console.log("sceneResponse.scenePictures: " + JSON.stringify(sceneResponse.scenePictures));
+//                 if (sceneResponse.scenePictures != null && sceneResponse.scenePictures.length > 0) {
+//                     var index = 0;
+//                     async.each(sceneResponse.scenePictures, function (picID, callbackz) { //nested async-ery!
+//                             var oo_id = ObjectID(picID);
 
 
-                            db.image_items.findOne({"_id": oo_id}, function (err, picture_item) {
-                                if (err || !picture_item) {
-                                    console.log("error getting scenePictures " + picID + err);
-                                    callbackz();
-                                } else {
-                                    console.log("tryna copy picID " + picID + " orientation " + picture_item.orientation);
-                                    if (picture_item.orientation.toLowerCase() == "equirectangular") {
-                                        skyboxID = picID;
-                                    }
-                                    s3.copyObject({Bucket: bucketFolder, CopySource: 'servicemedia/users/' + picture_item.userID +"/"+ picture_item.filename, //use full rez pic for skyboxen
-                                        Key: short_id +"/"+ picture_item._id + ".original." + picture_item.filename}, function (err, data) {
-                                        if (err) {
-                                            console.log("ERROR copyObject" + err);
-                                        } else {
-                                            console.log('SUCCESS copyObject');
-                                        }
-                                    });
-                                    if (picture_item.orientation.toLowerCase() != "equirectangular") {
-                                        index++;
-                                        image1url = picture_item._id + ".standard." + picture_item.filename;
-                                        picArray.push(image1url);
-                                        // imageAssets = imageAssets + "<img id=\x22smimage" + index + "\x22 src='" + image1url + "'>";
-                                        // imageEntities = imageEntities + "<a-image look-at=\x22#player\x22 width='10' segments-height='4' segments-width='2' height='10' position='-2 6 2' rotation='0 180 0' visible='true' src=\x22#smimage" + index + "\x22></a-image>";
-                                    }
-                                    callbackz();
-                                }
-                            });
-                        },
-                        function (err) {
+//                             db.image_items.findOne({"_id": oo_id}, function (err, picture_item) {
+//                                 if (err || !picture_item) {
+//                                     console.log("error getting scenePictures " + picID + err);
+//                                     callbackz();
+//                                 } else {
+//                                     console.log("tryna copy picID " + picID + " orientation " + picture_item.orientation);
+//                                     if (picture_item.orientation.toLowerCase() == "equirectangular") {
+//                                         skyboxID = picID;
+//                                     }
+//                                     s3.copyObject({Bucket: domainBucket, CopySource: 'servicemedia/users/' + picture_item.userID +"/"+ picture_item.filename, //use full rez pic for skyboxen
+//                                         Key: short_id +"/"+ picture_item._id + ".original." + picture_item.filename}, function (err, data) {
+//                                         if (err) {
+//                                             console.log("ERROR copyObject" + err);
+//                                         } else {
+//                                             console.log('SUCCESS copyObject');
+//                                         }
+//                                     });
+//                                     if (picture_item.orientation.toLowerCase() != "equirectangular") {
+//                                         index++;
+//                                         image1url = picture_item._id + ".standard." + picture_item.filename;
+//                                         picArray.push(image1url);
+//                                         // imageAssets = imageAssets + "<img id=\x22smimage" + index + "\x22 src='" + image1url + "'>";
+//                                         // imageEntities = imageEntities + "<a-image look-at=\x22#player\x22 width='10' segments-height='4' segments-width='2' height='10' position='-2 6 2' rotation='0 180 0' visible='true' src=\x22#smimage" + index + "\x22></a-image>";
+//                                     }
+//                                     callbackz();
+//                                 }
+//                             });
+//                         },
+//                         function (err) {
                            
-                            if (err) {
-                                console.log('A file failed to process');
-                                callback(null);
-                            } else {
-                                console.log('All files have been processed successfully');
-                                callback(null);
-                            }
-                        });
-                } else {
-                    //                      callback(null);
-                    callback(null);
-                }
-            },
+//                             if (err) {
+//                                 console.log('A file failed to process');
+//                                 callback(null);
+//                             } else {
+//                                 console.log('All files have been processed successfully');
+//                                 callback(null);
+//                             }
+//                         });
+//                 } else {
+//                     //                      callback(null);
+//                     callback(null);
+//                 }
+//             },
 
-            function (callback) {
+//             function (callback) {
 
-               if (sceneResponse.sceneUseSkybox && sceneResponse.sceneSkybox != null) {
-//                    if (sceneResponse.sceneUseSkybox) {
-                    var oo_id = null;
-                            if (skyboxID != "") {
-                                oo_id = ObjectID(skyboxID);
-                            } else {
-                                if (sceneResponse.sceneSkybox != null && sceneResponse.sceneSkybox != "")
-                                oo_id = ObjectID(sceneResponse.sceneSkybox);
-                            }
+//                if (sceneResponse.sceneUseSkybox && sceneResponse.sceneSkybox != null) {
+// //                    if (sceneResponse.sceneUseSkybox) {
+//                     var oo_id = null;
+//                             if (skyboxID != "") {
+//                                 oo_id = ObjectID(skyboxID);
+//                             } else {
+//                                 if (sceneResponse.sceneSkybox != null && sceneResponse.sceneSkybox != "")
+//                                 oo_id = ObjectID(sceneResponse.sceneSkybox);
+//                             }
 
-                            if (oo_id) {
+//                             if (oo_id) {
 
-                                db.image_items.findOne({"_id": oo_id}, function (err, picture_item) {
-                                    if (err || !picture_item) {
-                                        console.log("error getting skybox " + sceneResponse.sceneSkybox + err);
-                                        callback(null);
-                                    } else {
+//                                 db.image_items.findOne({"_id": oo_id}, function (err, picture_item) {
+//                                     if (err || !picture_item) {
+//                                         console.log("error getting skybox " + sceneResponse.sceneSkybox + err);
+//                                         callback(null);
+//                                     } else {
 
-                                        s3.copyObject({Bucket: bucketFolder, CopySource: 'servicemedia/users/' + picture_item.userID + "/" + picture_item.filename,
-                                            Key: short_id + "/" + picture_item._id + ".original." + picture_item.filename}, function (err, data) {
-                                            if (err) {
-                                                console.log("ERROR copyObject" + err);
-                                            }
-                                            else {
-                                                console.log('SUCCESS copyObject');
+//                                         (async () => { 
+//                                             try {
+//                                                 const status = await CopyObject(domainBucket, 
+//                                                                                 process.env.S3_ROOT_BUCKET_NAME + 'users/' + picture_item.userID + "/" + picture_item.filename, 
+//                                                                                 short_id + "/" + picture_item._id + ".original." + picture_item.filename);
+//                                                 console.log("copied somethings " + status);
+//                                                 callback(null);
+//                                             } catch (e) {
+//                                                 callback(e);
+//                                             }
+//                                         })();
+//                                         // s3.copyObject({Bucket: bucketFolder, CopySource: 'servicemedia/users/' + picture_item.userID + "/" + picture_item.filename,
+//                                         //     Key: short_id + "/" + picture_item._id + ".original." + picture_item.filename}, function (err, data) {
+//                                         //     if (err) {
+//                                         //         console.log("ERROR copyObject" + err);
+//                                         //     }
+//                                         //     else {
+//                                         //         console.log('SUCCESS copyObject');
 
-                                            }
+//                                         //     }
 
-                                        });
-//                                    skyboxAsset = "<img id=\x22smskybox"\x22 src='" + skyboxUrl + "'>";
-//                                    skyboxEntity = "<a-image look-at=\x22#player\x22 width='10' segments-height='4' segments-width='2' height='10' position='-2 6 2' rotation='0 180 0' visible='true' src=\x22#smimage" + index + "\x22></a-image>";
-                                        skyboxUrl = picture_item._id + ".original." + picture_item.filename;
-                                        callback(null);
-                                    }
-                                });
-                            } else {
-                                callback(null);
-                            }
-               } else {
-                   //                      callback(null);
-                   callback(null);
-               }
-            },
+//                                         // });
+// //                                    skyboxAsset = "<img id=\x22smskybox"\x22 src='" + skyboxUrl + "'>";
+// //                                    skyboxEntity = "<a-image look-at=\x22#player\x22 width='10' segments-height='4' segments-width='2' height='10' position='-2 6 2' rotation='0 180 0' visible='true' src=\x22#smimage" + index + "\x22></a-image>";
+//                                         skyboxUrl = picture_item._id + ".original." + picture_item.filename;
+//                                         callback(null);
+//                                     }
+//                                 });
+//                             } else {
+//                                 callback(null);
+//                             }
+//                } else {
+//                    //                      callback(null);
+//                    callback(null);
+//                }
+//             },
 
-            function (callback) {
-                // var hasPics = false;
-                // if (picArray.Length > 0) {
-                //     hasPics = true;
-                // }
+//             function (callback) {
+//                 // var hasPics = false;
+//                 // if (picArray.Length > 0) {
+//                 //     hasPics = true;
+//                 // }
 
-                if (sceneResponse.sceneIosOK) {
-                    iosOK = "<a href=" + iosInstallUrl + "><div class=\x22apple_yes\x22></div></a>";
-                } else {
-                    iosOK = "<div class=\x22apple_no\x22></div>";
-                }
-                if (sceneResponse.sceneWindowsOK) {
-                    winOK = "<a href=" + windowsInstallUrl + "><div class=\x22windows_yes\x22></div></a>";
-                } else {
-                    winOK = "<div class=\x22windows_no\x22></div>";
-                }
-                if (sceneResponse.sceneAndroidOK) {
-                    androidOK = "<a href=" + androidInstallUrl + "><div class=\x22android_yes\x22></div></a>";
-                } else {
-                    androidOK = "<div class=\x22android_no\x22></div>";
-                }
+//                 if (sceneResponse.sceneIosOK) {
+//                     iosOK = "<a href=" + iosInstallUrl + "><div class=\x22apple_yes\x22></div></a>";
+//                 } else {
+//                     iosOK = "<div class=\x22apple_no\x22></div>";
+//                 }
+//                 if (sceneResponse.sceneWindowsOK) {
+//                     winOK = "<a href=" + windowsInstallUrl + "><div class=\x22windows_yes\x22></div></a>";
+//                 } else {
+//                     winOK = "<div class=\x22windows_no\x22></div>";
+//                 }
+//                 if (sceneResponse.sceneAndroidOK) {
+//                     androidOK = "<a href=" + androidInstallUrl + "><div class=\x22android_yes\x22></div></a>";
+//                 } else {
+//                     androidOK = "<div class=\x22android_no\x22></div>";
+//                 }
 
-                if (sceneResponse.sceneKeynote != null && sceneResponse.sceneKeynote.length > 0){
-                    keynoteText =  "<li class=\x22list-group-item\x22 style=\x22text-align: left; margin-top: 10px; padding: 10px; background-color: rgba(255, 255, 255, 0.5);\x22><p><strong>Keynote:&nbsp;&nbsp;</strong></p><p>" + sceneResponse.sceneKeynote + "</p></li>"
-                }
-                if (sceneResponse.sceneDescription != null && sceneResponse.sceneDescription.length > 0) {
-                    descText = "<li class=\x22list-group-item\x22 style=\x22text-align: left; margin-top: 10px; padding: 10px; background-color: rgba(255, 255, 255, 0.5);\x22><p><strong>Description:&nbsp;&nbsp;</strong></p><p>" + sceneResponse.sceneDescription + "</p></li>"
-                }
-                if (sceneResponse.sceneText != null && sceneResponse.sceneText.length > 0) {
-                    sceneResponse.sceneText = sceneResponse.sceneText.replace(/\n/gi, "<br>");
-                    primaryText =  "<li class=\x22list-group-item\x22 style=\x22text-align: left; margin-top: 10px; padding: 10px; background-color: rgba(255, 255, 255, 0.5);\x22><p><strong>Main Text:&nbsp;&nbsp;</strong></p><p>" + sceneResponse.sceneText + "</p></li>"
-                }
-                var htmltext = "<html xmlns='http://www.w3.org/1999/xhtml' xmlns:fb='http://ogp.me/ns/fb#'>" +
-                    "<!doctype html>"+
-                    "<html lang=\x22en\x22>"+
-                    "<head> " +
-                    "<meta charset=\x22utf-8\x22/>" +
+//                 if (sceneResponse.sceneKeynote != null && sceneResponse.sceneKeynote.length > 0){
+//                     keynoteText =  "<li class=\x22list-group-item\x22 style=\x22text-align: left; margin-top: 10px; padding: 10px; background-color: rgba(255, 255, 255, 0.5);\x22><p><strong>Keynote:&nbsp;&nbsp;</strong></p><p>" + sceneResponse.sceneKeynote + "</p></li>"
+//                 }
+//                 if (sceneResponse.sceneDescription != null && sceneResponse.sceneDescription.length > 0) {
+//                     descText = "<li class=\x22list-group-item\x22 style=\x22text-align: left; margin-top: 10px; padding: 10px; background-color: rgba(255, 255, 255, 0.5);\x22><p><strong>Description:&nbsp;&nbsp;</strong></p><p>" + sceneResponse.sceneDescription + "</p></li>"
+//                 }
+//                 if (sceneResponse.sceneText != null && sceneResponse.sceneText.length > 0) {
+//                     sceneResponse.sceneText = sceneResponse.sceneText.replace(/\n/gi, "<br>");
+//                     primaryText =  "<li class=\x22list-group-item\x22 style=\x22text-align: left; margin-top: 10px; padding: 10px; background-color: rgba(255, 255, 255, 0.5);\x22><p><strong>Main Text:&nbsp;&nbsp;</strong></p><p>" + sceneResponse.sceneText + "</p></li>"
+//                 }
+//                 var htmltext = "<html xmlns='http://www.w3.org/1999/xhtml' xmlns:fb='http://ogp.me/ns/fb#'>" +
+//                     "<!doctype html>"+
+//                     "<html lang=\x22en\x22>"+
+//                     "<head> " +
+//                     "<meta charset=\x22utf-8\x22/>" +
 
     
-                    "<meta property=\x22og:title\x22  name=\x22og:title\x22  content=\x22" + sceneResponse.sceneTitle + "\x22/>" +
-                    "<meta property=\x22og:url\x22 name=\x22og:url\x22 content=\x22http://" + sceneResponse.sceneDomain + "/" + sceneResponse.short_id + "\x22 /> " +
-                    "<meta property=\x22og:type\x22 name=\x22og:type\x22 content=\x22website\x22/> " +
-                    "<meta property=\x22og:image\x22 name=\x22og:image\x22 content=\x22http://" + sceneResponse.sceneDomain + "/" + sceneResponse.short_id + "/" + postcardArray[0] + "\x22 /> " +
-                    "<meta property=\x22og:image:height\x22 name=\x22og:image:height\x22 content=\x221024\x22 /> " +
-                    "<meta property=\x22og:image:width\x22  name=\x22og:image:width\x22 content=\x221024\x22 /> " +
-                    "<meta property=\x22og:description\x22 name=\x22og:description\x22 content=\x22" + sceneResponse.sceneDescription + "\x22 /> " +
-                    "<meta name=\x22viewport\x22 content=\x22width=device-width, initial-scale=1, shrink-to-fit=no\x22></meta>" +
-                    // "<meta name='viewport' content='width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no'/>" +
-                    "<meta name=\x22description\x22 content=\x22" + sceneResponse.sceneDescription + "\x22/>" +
-                    "<meta name=\x22mobile-web-app-capable\x22 content=\x22yes\x22>" +
-                    "<meta name=\x22apple-mobile-web-app-capable\x22 content=\x22yes\x22>" +
-                    "<meta name=\x22apple-mobile-web-app-status-bar-style\x22 content=\x22black-translucent\x22 />" +
-                    // "<meta name=\x22apple-mobile-web-app-status-bar-style' content=\x22black\x22>" +
-                    "<meta name=\x22robots\x22 content=\x22index,follow\x22/>" +
+//                     "<meta property=\x22og:title\x22  name=\x22og:title\x22  content=\x22" + sceneResponse.sceneTitle + "\x22/>" +
+//                     "<meta property=\x22og:url\x22 name=\x22og:url\x22 content=\x22http://" + sceneResponse.sceneDomain + "/" + sceneResponse.short_id + "\x22 /> " +
+//                     "<meta property=\x22og:type\x22 name=\x22og:type\x22 content=\x22website\x22/> " +
+//                     "<meta property=\x22og:image\x22 name=\x22og:image\x22 content=\x22http://" + sceneResponse.sceneDomain + "/" + sceneResponse.short_id + "/" + postcardArray[0] + "\x22 /> " +
+//                     "<meta property=\x22og:image:height\x22 name=\x22og:image:height\x22 content=\x221024\x22 /> " +
+//                     "<meta property=\x22og:image:width\x22  name=\x22og:image:width\x22 content=\x221024\x22 /> " +
+//                     "<meta property=\x22og:description\x22 name=\x22og:description\x22 content=\x22" + sceneResponse.sceneDescription + "\x22 /> " +
+//                     "<meta name=\x22viewport\x22 content=\x22width=device-width, initial-scale=1, shrink-to-fit=no\x22></meta>" +
+//                     // "<meta name='viewport' content='width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no'/>" +
+//                     "<meta name=\x22description\x22 content=\x22" + sceneResponse.sceneDescription + "\x22/>" +
+//                     "<meta name=\x22mobile-web-app-capable\x22 content=\x22yes\x22>" +
+//                     "<meta name=\x22apple-mobile-web-app-capable\x22 content=\x22yes\x22>" +
+//                     "<meta name=\x22apple-mobile-web-app-status-bar-style\x22 content=\x22black-translucent\x22 />" +
+//                     // "<meta name=\x22apple-mobile-web-app-status-bar-style' content=\x22black\x22>" +
+//                     "<meta name=\x22robots\x22 content=\x22index,follow\x22/>" +
 
-                    "<link rel=\x22stylesheet\x22 href=\x22https://servicemedia.net/css/smstyle.css\x22>" +
+//                     "<link rel=\x22stylesheet\x22 href=\x22https://servicemedia.net/css/smstyle.css\x22>" +
 
-                    "<link rel=\x22stylesheet\x22 href=\x22https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css\x22 integrity=\x22sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm\x22 crossorigin=\x22anonymous\x22></link>"+
+//                     "<link rel=\x22stylesheet\x22 href=\x22https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css\x22 integrity=\x22sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm\x22 crossorigin=\x22anonymous\x22></link>"+
 
-                    "<title>" + sceneResponse.sceneTitle + "</title>" +
+//                     "<title>" + sceneResponse.sceneTitle + "</title>" +
 
-                    "</head>" +
+//                     "</head>" +
 
-                    "<body bgcolor='black'>" +
+//                     "<body bgcolor='black'>" +
 
                     
-                    "<script>" +
-                    "window.fbAsyncInit = function() {" +
-                    "FB.init({" +
-                    "appId : \x221678172455793030\x22," +
-                    "xfbml : true," +
-                    "version : 'v2.8'" +
-                    "});" +
-                    "FB.AppEvents.logPageView();" +
-                    "};" +
-                    "(function(d, s, id) {" +
-                    "var js, fjs = d.getElementsByTagName(s)[0];" +
-                    "if (d.getElementById(id)) return;" +
-                    "js = d.createElement(s); js.id = id;" +
-                    "js.src = \x22//connect.facebook.net/en_US/sdk.js\x22;" +
-                    "fjs.parentNode.insertBefore(js, fjs);" +
-                    "}(document, \x22script\x22, \x22facebook-jssdk\x22));</script>" +
+//                     "<script>" +
+//                     "window.fbAsyncInit = function() {" +
+//                     "FB.init({" +
+//                     "appId : \x221678172455793030\x22," +
+//                     "xfbml : true," +
+//                     "version : 'v2.8'" +
+//                     "});" +
+//                     "FB.AppEvents.logPageView();" +
+//                     "};" +
+//                     "(function(d, s, id) {" +
+//                     "var js, fjs = d.getElementsByTagName(s)[0];" +
+//                     "if (d.getElementById(id)) return;" +
+//                     "js = d.createElement(s); js.id = id;" +
+//                     "js.src = \x22//connect.facebook.net/en_US/sdk.js\x22;" +
+//                     "fjs.parentNode.insertBefore(js, fjs);" +
+//                     "}(document, \x22script\x22, \x22facebook-jssdk\x22));</script>" +
                     
-                //    "<nav class=\x22navbar navbar-expand-lg navbar-light bg-light\x22>" +
-                    // "<nav class=\x22navbar navbar-expand-lg navbar-toggleable-md navbar-light bg-light fixed-top\x22>" +
-                    // "<nav class=\x22navbar navbar-expand-lg navbar-light bg-light fixed-top\x22>" +
-                    "<nav class=\x22navbar navbar-expand-lg navbar-dark bg-dark fixed-top\x22>" +
-                    // "<button class=\x22navbar-toggler\x22 type=\x22button\x22 data-toggle=\x22collapse\x22 data-target=\x22#navbarSupportedContent\x22 aria-controls=\x22navbarSupportedContent\x22 aria-expanded=\x22false\x22 aria-label=\x22Toggle navigation\x22>"+
-                    // "<span class=\x22navbar-toggler-icon\x22></span>"+
-                    // "</button>"+
-                    "<a class=\x22navbar-brand\x22 href=\x22http://" + sceneResponse.sceneDomain + "\x22>" + sceneResponse.sceneDomain + "</a>" +
-                    "<button class=\x22navbar-toggler navbar-toggler-right\x22 type=\x22button\x22 data-toggle=\x22collapse\x22 data-target=\x22#navbarCollapse\x22 aria-controls=\x22navbarCollapse\x22 aria-expanded=\x22false\x22 aria-label=\x22Toggle navigation\x22>" +
-                    "<span class=\x22navbar-toggler-icon\x22></span>" +
-                    "</button>" +
-                    "<div class=\x22collapse navbar-collapse\x22 id=\x22navbarCollapse\x22>"+
+//                 //    "<nav class=\x22navbar navbar-expand-lg navbar-light bg-light\x22>" +
+//                     // "<nav class=\x22navbar navbar-expand-lg navbar-toggleable-md navbar-light bg-light fixed-top\x22>" +
+//                     // "<nav class=\x22navbar navbar-expand-lg navbar-light bg-light fixed-top\x22>" +
+//                     "<nav class=\x22navbar navbar-expand-lg navbar-dark bg-dark fixed-top\x22>" +
+//                     // "<button class=\x22navbar-toggler\x22 type=\x22button\x22 data-toggle=\x22collapse\x22 data-target=\x22#navbarSupportedContent\x22 aria-controls=\x22navbarSupportedContent\x22 aria-expanded=\x22false\x22 aria-label=\x22Toggle navigation\x22>"+
+//                     // "<span class=\x22navbar-toggler-icon\x22></span>"+
+//                     // "</button>"+
+//                     "<a class=\x22navbar-brand\x22 href=\x22http://" + sceneResponse.sceneDomain + "\x22>" + sceneResponse.sceneDomain + "</a>" +
+//                     "<button class=\x22navbar-toggler navbar-toggler-right\x22 type=\x22button\x22 data-toggle=\x22collapse\x22 data-target=\x22#navbarCollapse\x22 aria-controls=\x22navbarCollapse\x22 aria-expanded=\x22false\x22 aria-label=\x22Toggle navigation\x22>" +
+//                     "<span class=\x22navbar-toggler-icon\x22></span>" +
+//                     "</button>" +
+//                     "<div class=\x22collapse navbar-collapse\x22 id=\x22navbarCollapse\x22>"+
 
 
-                    // "<div class=\x22collapse navbar-collapse\x22 id=\x22navbarCollapse\x22>" +
+//                     // "<div class=\x22collapse navbar-collapse\x22 id=\x22navbarCollapse\x22>" +
 
-                    "<div class=\x22nav-item active mx-2\x22>" +
-                    "<span class=\x22text-white\x22>  Title : <h4>" + sceneResponse.sceneTitle + "</h4></span>"+
-                    "</div>" +
-                    "<div class=\x22nav-item active mx-2 pull-right\x22>" +
-                    "<span class=\x22text-white\x22>  Short Code : <h4><a href=\x22https://strr.us/s/" + sceneResponse.short_id + "\x22>" + sceneResponse.short_id + "</a></h4></span>"+
-                    "</div>" +
+//                     "<div class=\x22nav-item active mx-2\x22>" +
+//                     "<span class=\x22text-white\x22>  Title : <h4>" + sceneResponse.sceneTitle + "</h4></span>"+
+//                     "</div>" +
+//                     "<div class=\x22nav-item active mx-2 pull-right\x22>" +
+//                     "<span class=\x22text-white\x22>  Short Code : <h4><a href=\x22https://strr.us/s/" + sceneResponse.short_id + "\x22>" + sceneResponse.short_id + "</a></h4></span>"+
+//                     "</div>" +
 
-                    // "<li class=\x22nav-item active pull-right\x22>" +
-                    // "<a class=\x22nav-link\x22 href=\x22http://" + sceneResponse.sceneDomain + "\x22>Home <span class=\x22sr-only\x22>(current)</span></a>" +
-                    // "</li>" +
-                    "<div class=\x22mx-2 pull-right\x22>"+
+//                     // "<li class=\x22nav-item active pull-right\x22>" +
+//                     // "<a class=\x22nav-link\x22 href=\x22http://" + sceneResponse.sceneDomain + "\x22>Home <span class=\x22sr-only\x22>(current)</span></a>" +
+//                     // "</li>" +
+//                     "<div class=\x22mx-2 pull-right\x22>"+
 
 
 
-                    // "<div class=\x22pull-right\x22 data-toggle="tooltip" data-placement="top" title="Scene Available on Windows App" ng-class="{true: 'windows_no', false: 'windows_yes'}[!scene.sceneWindowsOK]">{{!scene.sceneWindowsOK && '' || ''}}</div>" +
-                    // "<div class=\x22pull-right\x22ng-show="scene.sceneAndroidOK" data-toggle="tooltip" data-placement="top" title="Scene Available on Android App" ng-class="{true: 'android_no', false: 'android_yes'}[!scene.sceneAndroidOK]" >{{!scene.sceneAndroidOK && '' || ''}}</div>" +
-                    // "<div class=\x22pull-right\x22ng-show="scene.sceneIosOK" data-toggle="tooltip" data-placement="top" title="Scene Available on IOS App" ng-class="{true: 'apple_no', false: 'apple_yes'}[!scene.sceneIosOK]" >{{!scene.sceneIosOK && '' || ''}}</div></a>" +
+//                     // "<div class=\x22pull-right\x22 data-toggle="tooltip" data-placement="top" title="Scene Available on Windows App" ng-class="{true: 'windows_no', false: 'windows_yes'}[!scene.sceneWindowsOK]">{{!scene.sceneWindowsOK && '' || ''}}</div>" +
+//                     // "<div class=\x22pull-right\x22ng-show="scene.sceneAndroidOK" data-toggle="tooltip" data-placement="top" title="Scene Available on Android App" ng-class="{true: 'android_no', false: 'android_yes'}[!scene.sceneAndroidOK]" >{{!scene.sceneAndroidOK && '' || ''}}</div>" +
+//                     // "<div class=\x22pull-right\x22ng-show="scene.sceneIosOK" data-toggle="tooltip" data-placement="top" title="Scene Available on IOS App" ng-class="{true: 'apple_no', false: 'apple_yes'}[!scene.sceneIosOK]" >{{!scene.sceneIosOK && '' || ''}}</div></a>" +
 
-                    "<ul class=\x22navbar-nav pull-right\x22>" +
-                    "<li class=\x22nav-item active mx-2\x22>" +
+//                     "<ul class=\x22navbar-nav pull-right\x22>" +
+//                     "<li class=\x22nav-item active mx-2\x22>" +
                    
 
-                    "<li>" +
-                    "&nbsp" +
-                    "</li>" +
-                    prevLink +
-                    nextLink +
+//                     "<li>" +
+//                     "&nbsp" +
+//                     "</li>" +
+//                     prevLink +
+//                     nextLink +
 
-                    "<li>" +
-                    "<a class=\x22mx-2 btn btn-primary btn-sm\x22 href=\x22../" + sceneResponse.short_id + "/webxr.html\x22 target=\x22_blank\x22>WebXR</a>" +
-                    "</li>" +
-                    "<li>" +
-                    "<a class=\x22mx-2 btn btn-primary btn-sm\x22 href=\x22/connect/?scene=" + sceneResponse.short_id + "\x22 target=\x22_blank\x22>Livecast</a>" +
-                    "</li>" +
-                    "<li>" +
-                    "<a class=\x22mx-2 pull-right  glyphicon glyphicon-envelope btn btn-primary btn-sm\x22 href=\x22mailto:" + sceneResponse.short_id + "@" + sceneResponse.sceneDomain + "\x22>Message</a>"+
-                    // "<a class=\x22mx-2 pull-right>Send Message : " + sceneResponse.short_id + "@" + sceneResponse.sceneDomain + "</a>"+
-                    "</li>" +
+//                     "<li>" +
+//                     "<a class=\x22mx-2 btn btn-primary btn-sm\x22 href=\x22../" + sceneResponse.short_id + "/webxr.html\x22 target=\x22_blank\x22>WebXR</a>" +
+//                     "</li>" +
+//                     "<li>" +
+//                     "<a class=\x22mx-2 btn btn-primary btn-sm\x22 href=\x22/connect/?scene=" + sceneResponse.short_id + "\x22 target=\x22_blank\x22>Livecast</a>" +
+//                     "</li>" +
+//                     "<li>" +
+//                     "<a class=\x22mx-2 pull-right  glyphicon glyphicon-envelope btn btn-primary btn-sm\x22 href=\x22mailto:" + sceneResponse.short_id + "@" + sceneResponse.sceneDomain + "\x22>Message</a>"+
+//                     // "<a class=\x22mx-2 pull-right>Send Message : " + sceneResponse.short_id + "@" + sceneResponse.sceneDomain + "</a>"+
+//                     "</li>" +
 
-                    "<li>" +
-                    "&nbsp &nbsp &nbsp &nbsp" +
-                    "</li>" +
-                    "<li class=\x22nav-item active\x22>" +
-                    iosOK +
-                    "</li>" +
+//                     "<li>" +
+//                     "&nbsp &nbsp &nbsp &nbsp" +
+//                     "</li>" +
+//                     "<li class=\x22nav-item active\x22>" +
+//                     iosOK +
+//                     "</li>" +
 
-                    "<li class=\x22nav-item active\x22>" +
-                    androidOK +
-                    "</li>" +
-                    "<li class=\x22nav-item active\x22>" +
-                    winOK +
-                    "</li>" +
-                    "<li>" +
-                    "&nbsp &nbsp &nbsp &nbsp" +
-                    "</li>" +
-                    "<li>" +
-                    "<a href=\x22https://servicemedia.net/qrcode/" + sceneResponse.sceneDomain + "/" + sceneResponse.short_id + "\x22 target=\x22_blank\x22><img style=\x22display: block; width: auto; height: 64; max-width: 64;\x22 alt=\x22qrcode\x22 src=\x22" + theUrl + "\x22/></a>" +
-                    "</li>" +
-                    "<li>" +
-                    "&nbsp &nbsp &nbsp &nbsp" +
-                    "</li>" +
-                    "<li>" +
-                    "<audio controls " + loopable + ">" +
-                     "<source src='" + oggurl + "'type='audio/ogg'>" +
-                     "<source src='" + mp3url + "'type='audio/mpeg'>" +
-                     "Your browser does not support the audio element. " +
-                     "</audio>" +
-                    "</li>" +
+//                     "<li class=\x22nav-item active\x22>" +
+//                     androidOK +
+//                     "</li>" +
+//                     "<li class=\x22nav-item active\x22>" +
+//                     winOK +
+//                     "</li>" +
+//                     "<li>" +
+//                     "&nbsp &nbsp &nbsp &nbsp" +
+//                     "</li>" +
+//                     "<li>" +
+//                     "<a href=\x22https://servicemedia.net/qrcode/" + sceneResponse.sceneDomain + "/" + sceneResponse.short_id + "\x22 target=\x22_blank\x22><img style=\x22display: block; width: auto; height: 64; max-width: 64;\x22 alt=\x22qrcode\x22 src=\x22" + theUrl + "\x22/></a>" +
+//                     "</li>" +
+//                     "<li>" +
+//                     "&nbsp &nbsp &nbsp &nbsp" +
+//                     "</li>" +
+//                     "<li>" +
+//                     "<audio controls " + loopable + ">" +
+//                      "<source src='" + oggurl + "'type='audio/ogg'>" +
+//                      "<source src='" + mp3url + "'type='audio/mpeg'>" +
+//                      "Your browser does not support the audio element. " +
+//                      "</audio>" +
+//                     "</li>" +
                     
-                    "<li>" +
-                    "&nbsp" +
-                    "</li>" +
-                    "<li class=\x22nav-item active mx-2\x22>" +
-                    " <div class=\x22fb-share-button\x22" +
-                    " data-href=\x22http://" + sceneResponse.sceneDomain + "/" + sceneResponse.short_id + "\x22" +
-                    " data-layout=\x22button_count\x22>" +
-                    " </div>" +
-                    "</li>" +
-                    "<li class=\x22nav-item active mx-2 pull-right\x22>" +
-                    "<div class=\x22fb-like\x22" +
-                    "data-href=\x22http://" + sceneResponse.sceneDomain + "/" + sceneResponse.short_id + "\x22" +
-                    "data-layout=\x22standard\x22" +
-                    "data-action=\x22like\x22" +
-                    "data-show-faces=\x22true\x22>" +
-                    "</div>" +
-                    "</li>" +
+//                     "<li>" +
+//                     "&nbsp" +
+//                     "</li>" +
+//                     "<li class=\x22nav-item active mx-2\x22>" +
+//                     " <div class=\x22fb-share-button\x22" +
+//                     " data-href=\x22http://" + sceneResponse.sceneDomain + "/" + sceneResponse.short_id + "\x22" +
+//                     " data-layout=\x22button_count\x22>" +
+//                     " </div>" +
+//                     "</li>" +
+//                     "<li class=\x22nav-item active mx-2 pull-right\x22>" +
+//                     "<div class=\x22fb-like\x22" +
+//                     "data-href=\x22http://" + sceneResponse.sceneDomain + "/" + sceneResponse.short_id + "\x22" +
+//                     "data-layout=\x22standard\x22" +
+//                     "data-action=\x22like\x22" +
+//                     "data-show-faces=\x22true\x22>" +
+//                     "</div>" +
+//                     "</li>" +
 
 
-                    "</ul>" +
-                    //  "</div>"+
+//                     "</ul>" +
+//                     //  "</div>"+
 
-                    //  "</div>"+
+//                     //  "</div>"+
 
-                    "</div>"+
-                    "       </nav>" +
+//                     "</div>"+
+//                     "       </nav>" +
 
-                    "<div id=/x22fb-root/x22></div>" +
-//                  "<div style='background-image: url(" + image1url + "); height: 100%; width: 100%; border: 1px solid black;'>" +
-                    "<div class=\x22container-fluid\x22>"+
-                    // "<br><br>" +
-                    "<div class=\x22my-12 row\x22>"+
-                    "<div class=\x22 mx-5  col-sm\x22>"+
-                    "<div class=\x22panel panel-default\x22 style=\x22text-align: center\x22>" +
-                    //  "<div class=\x22panel-heading\x22>Scene Info:</div>" +
-                     "<div class=\x22panel-body\x22 style=\x22text-align: center; margin-top: 50px; padding: 50px;\x22>" +
-                     "<ul class=\x22list-group\x22 style=\x22text-align: left; margin-top: 10px; padding: 10px; background-color: rgba(255, 255, 255, 0.5);\x22>"+
+//                     "<div id=/x22fb-root/x22></div>" +
+// //                  "<div style='background-image: url(" + image1url + "); height: 100%; width: 100%; border: 1px solid black;'>" +
+//                     "<div class=\x22container-fluid\x22>"+
+//                     // "<br><br>" +
+//                     "<div class=\x22my-12 row\x22>"+
+//                     "<div class=\x22 mx-5  col-sm\x22>"+
+//                     "<div class=\x22panel panel-default\x22 style=\x22text-align: center\x22>" +
+//                     //  "<div class=\x22panel-heading\x22>Scene Info:</div>" +
+//                      "<div class=\x22panel-body\x22 style=\x22text-align: center; margin-top: 50px; padding: 50px;\x22>" +
+//                      "<ul class=\x22list-group\x22 style=\x22text-align: left; margin-top: 10px; padding: 10px; background-color: rgba(255, 255, 255, 0.5);\x22>"+
 
-                    keynoteText +
-                    descText +
-                    primaryText +
-                    // "<li><div style=\x22width: 100%; top-margin: 20px; text-align: center;\x22><a href=\x22https://servicemedia.net/qrcode/" + sceneResponse.short_id +"\x22><img width=\x22auto\x22 height=\x22100%\x22 style=\x22display: block;\x22 alt=\x22qrcode\x22 src=\x22" + theUrl + "\x22/></a></div></li>" +
-                    "</ul>" +
-                    "</div>" +
-                    "</div>" +
+//                     keynoteText +
+//                     descText +
+//                     primaryText +
+//                     // "<li><div style=\x22width: 100%; top-margin: 20px; text-align: center;\x22><a href=\x22https://servicemedia.net/qrcode/" + sceneResponse.short_id +"\x22><img width=\x22auto\x22 height=\x22100%\x22 style=\x22display: block;\x22 alt=\x22qrcode\x22 src=\x22" + theUrl + "\x22/></a></div></li>" +
+//                     "</ul>" +
+//                     "</div>" +
+//                     "</div>" +
 
-                    "</div>"+
-                    "<div class=\x22 mx-2  col-sm\x22>"+
+//                     "</div>"+
+//                     "<div class=\x22 mx-2  col-sm\x22>"+
 
-                    "</div>"+
-                    "<div class=\x22 mx-4  col-sm\x22>"+
-                    // "<div style=\x22width: 100%; top-margin: 0px; text-align: center;\x22><a href=\x22https://servicemedia.net/qrcode/" + sceneResponse.short_id +"\x22><imgwidth=\x22auto\x22 height=\x22100%\x22 style=\x22display: block;\x22 alt=\x22qrcode\x22 src=\x22" + theUrl + "\x22/></a></div>" +
-                    // "<div style=\x22width: 100%; top-margin: 10px; text-align: center;\x22><img width=\x22auto\x22 height=\x22100%\x22 style=\x22display: block;\x22 alt=\x22qrcode\x22 src=\x22" + url + "\x22/></div>"
-                    "</div>"+
-                    // "<div class=\x22mx-4  bg-light  col-sm mx-auto\x22>"+
+//                     "</div>"+
+//                     "<div class=\x22 mx-4  col-sm\x22>"+
+//                     // "<div style=\x22width: 100%; top-margin: 0px; text-align: center;\x22><a href=\x22https://servicemedia.net/qrcode/" + sceneResponse.short_id +"\x22><imgwidth=\x22auto\x22 height=\x22100%\x22 style=\x22display: block;\x22 alt=\x22qrcode\x22 src=\x22" + theUrl + "\x22/></a></div>" +
+//                     // "<div style=\x22width: 100%; top-margin: 10px; text-align: center;\x22><img width=\x22auto\x22 height=\x22100%\x22 style=\x22display: block;\x22 alt=\x22qrcode\x22 src=\x22" + url + "\x22/></div>"
+//                     "</div>"+
+//                     // "<div class=\x22mx-4  bg-light  col-sm mx-auto\x22>"+
 
-                    // "<div  style=\x22margin-top: 100px; padding: 100px;\x22 class=\x22my-20 card\x22><h4>" + sceneResponse.sceneDescription + "</h4></div>"+
-                    // "</div>"+
-                    // "<div class=\x22mx-4 bg-light col-sm\x22>"+
-                    // "<div class=\x22card mx-4\x22>" + sceneResponse.sceneTags + "</div>"+
-                    // "</div>"+
+//                     // "<div  style=\x22margin-top: 100px; padding: 100px;\x22 class=\x22my-20 card\x22><h4>" + sceneResponse.sceneDescription + "</h4></div>"+
+//                     // "</div>"+
+//                     // "<div class=\x22mx-4 bg-light col-sm\x22>"+
+//                     // "<div class=\x22card mx-4\x22>" + sceneResponse.sceneTags + "</div>"+
+//                     // "</div>"+
 
-                    "</div>"+
-
-
-                    "</div>" +
-                   "</div>" +
-
-                    // "<script src=\x22https://code.jquery.com/jquery-3.2.1.slim.min.js\x22 integrity=\x22sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN\x22 crossorigin=\x22anonymous\x22></script>" +
-                    // "<script src=\x22https://cdnjs.cloudflare.com/ajax/libs/danielgindi-jquery-backstretch/2.1.15/jquery.backstretch.js\x22></script>" +
-                    "<script src=\x22../dist/jquery-3.1.1.min.js\x22></script>" +
-                    "<script src=\x22../dist/jquery.backstretch.min.js\x22></script>" +
-                    "<script src=\x22https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js\x22 integrity=\x22sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q\x22 crossorigin=\x22anonymous\x22></script>" +
-                    "<script src=\x22https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js\x22 integrity=\x22sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl\x22 crossorigin=\x22anonymous\x22></script>" +
-
-                    "<script>" +
-                // To attach Backstrech as the body's background
-                        // "if (" + hasPics + ") {"+
-                            "$.backstretch(" + JSON.stringify(postcardArray) + ", {duration: 6000, fade: 750});" +
-                        // "} " +
-                        // else if (postcard1.Length > 4) {"+
-                        //     "$.backstretch('" + postcard1 + "');}" +
-
-                    "</script>"+
-                    "</body>" +
-                "</html>";
-                s3.putObject({ Bucket: bucketFolder, Key: short_id + "/" + "index.html", Body: htmltext,  ContentType: 'text/html', ContentEncoding: 'identity' }, function (err, data) {
-                    console.log('uploaded');
-                });
-                callback();
-
-             }
-        ], //waterfall end
-
-        function (err, result) { // #last function, close async
-            res.send("page generated");
-            console.log("waterfall done: " + result);
-        }
-    );
-});
+//                     "</div>"+
 
 
-function getRandomInt(max) {
-    return Math.floor(Math.random() * Math.floor(max));
-  }
+//                     "</div>" +
+//                    "</div>" +
+
+//                     // "<script src=\x22https://code.jquery.com/jquery-3.2.1.slim.min.js\x22 integrity=\x22sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN\x22 crossorigin=\x22anonymous\x22></script>" +
+//                     // "<script src=\x22https://cdnjs.cloudflare.com/ajax/libs/danielgindi-jquery-backstretch/2.1.15/jquery.backstretch.js\x22></script>" +
+//                     "<script src=\x22../dist/jquery-3.1.1.min.js\x22></script>" +
+//                     "<script src=\x22../dist/jquery.backstretch.min.js\x22></script>" +
+//                     "<script src=\x22https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js\x22 integrity=\x22sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q\x22 crossorigin=\x22anonymous\x22></script>" +
+//                     "<script src=\x22https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js\x22 integrity=\x22sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl\x22 crossorigin=\x22anonymous\x22></script>" +
+
+//                     "<script>" +
+//                 // To attach Backstrech as the body's background
+//                         // "if (" + hasPics + ") {"+
+//                             "$.backstretch(" + JSON.stringify(postcardArray) + ", {duration: 6000, fade: 750});" +
+//                         // "} " +
+//                         // else if (postcard1.Length > 4) {"+
+//                         //     "$.backstretch('" + postcard1 + "');}" +
+
+//                     "</script>"+
+//                     "</body>" +
+//                 "</html>";
+//                 s3.putObject({ Bucket: domainBucket, Key: short_id + "/" + "index.html", Body: htmltext,  ContentType: 'text/html', ContentEncoding: 'identity' }, function (err, data) {
+//                     console.log('uploaded');
+//                 });
+//                 callback();
+
+//              }
+//         ], //waterfall end
+
+//         function (err, result) { // #last function, close async
+//             res.send("page generated");
+//             console.log("waterfall done: " + result);
+//         }
+//     );
+// });
+
+
+// function getRandomInt(max) {
+//     return Math.floor(Math.random() * Math.floor(max));
+//   }
   
 app.post('/netradiodetails', function (req, res) {
     let streamurl = req.body.url;
@@ -16412,23 +17123,47 @@ app.get('/scene/:_id/:platform/:version', function (req, res) { //called from ap
 
                     async.each (sceneResponse.sceneWebLinks, function (objID, callbackz) { //nested async-ery!
                         if (ObjectID.isValid(objID)) {
-                        db.weblinks.findOne({'_id': ObjectID(objID)}, function (err, weblink) {
+                            
+                            db.weblinks.findOne({'_id': ObjectID(objID)}, function (err, weblink) {
                             if (err || !weblink) {
-                            console.log("can't find weblink");
-                            callbackz();
-                                } else {
-                                    // let weblink = {};
-                                    var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia.web', Key: objID + "/" + objID + ".thumb.jpg", Expires: 6000});
-                                    var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia.web', Key: objID + "/" + objID + ".half.jpg", Expires: 6000});
-                                    var urlStandard = s3.getSignedUrl('getObject', {Bucket: 'servicemedia.web', Key: objID + "/" + objID + ".standard.jpg", Expires: 6000});
-                                    weblink.urlThumb = urlThumb;
-                                    weblink.urlHalf = urlHalf;
-                                    weblink.urlStandard = urlStandard;
-                                    weblink.link_id = weblink._id;
-                                    // weblink.link_url;
-                                    // console.log("tryna push weblink " + JSON.stringify(weblink));
-                                    sceneWebLinx.push(weblink);
-                                    callbackz();
+                                console.log("can't find weblink");
+                                callbackz();
+                            } else {
+                                    (async () => {
+                                        try {
+                                            const urlThumb = await ReturnPresignedUrl(process.env.S3_WEBSCRAPE_BUCKET_NAME, objID + "/" + objID + ".thumb.jpg", 6000);
+                                            const urlHalf = await ReturnPresignedUrl(process.env.S3_WEBSCRAPE_BUCKET_NAME, objID + "/" + objID + ".half.jpg", 6000);
+                                            const urlStandard = await ReturnPresignedUrl(process.env.S3_WEBSCRAPE_BUCKET_NAME, objID + "/" + objID + ".standard.jpg", 6000);
+                                            weblink.urlThumb = urlThumb;
+                                            weblink.urlHalf = urlHalf;
+                                            weblink.urlStandard = urlStandard;
+                                            weblink.link_id = weblink._id;
+                                            // weblink.link_url;
+                                            // console.log("tryna push weblink " + JSON.stringify(weblink));
+                                            sceneWebLinx.push(weblink);
+                                            callbackz();
+                                        } catch (e) {
+                                            console.log("error caught in webxling " + e);
+                                            // callbackz();
+                                        }
+                                        // var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia.web', Key: objID + "/" + objID + ".thumb.jpg", Expires: 6000});
+                                        // var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia.web', Key: objID + "/" + objID + ".half.jpg", Expires: 6000});
+                                        // var urlStandard = s3.getSignedUrl('getObject', {Bucket: 'servicemedia.web', Key: objID + "/" + objID + ".standard.jpg", Expires: 6000});
+                                       
+                                        
+                                    })();
+                                    // // let weblink = {};
+                                    // var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia.web', Key: objID + "/" + objID + ".thumb.jpg", Expires: 6000});
+                                    // var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia.web', Key: objID + "/" + objID + ".half.jpg", Expires: 6000});
+                                    // var urlStandard = s3.getSignedUrl('getObject', {Bucket: 'servicemedia.web', Key: objID + "/" + objID + ".standard.jpg", Expires: 6000});
+                                    // weblink.urlThumb = urlThumb;
+                                    // weblink.urlHalf = urlHalf;
+                                    // weblink.urlStandard = urlStandard;
+                                    // weblink.link_id = weblink._id;
+                                    // // weblink.link_url;
+                                    // // console.log("tryna push weblink " + JSON.stringify(weblink));
+                                    // sceneWebLinx.push(weblink);
+                                    // callbackz();
                                 }
                             });
                         } else {
@@ -16458,7 +17193,7 @@ app.get('/scene/:_id/:platform/:version', function (req, res) { //called from ap
             function (callback) { 
                 console.log("videoGroups: " + sceneResponse.sceneVideoGroups);
                     if (sceneResponse.sceneVideoGroups != null && sceneResponse.sceneVideoGroups.length > 0) {
-                        vgID = sceneResponse.sceneVideoGroups[0];
+                        let vgID = sceneResponse.sceneVideoGroups[0];
                         let oo_id = ObjectID(vgID);
 
                         db.groups.find({"_id": oo_id}, function (err, groups) {
@@ -16478,10 +17213,13 @@ app.get('/scene/:_id/:platform/:version', function (req, res) { //called from ap
                                         callbackz();
                                     } else {
                                         async.each(videos, function(video, cbimage) { //jack in a signed url for each
+                                           
                                             // video.url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + video.userID + "/video/" + video._id + "/" + video._id + "." + video.filename, Expires: 6000}); //TODO: puthemsina video folder!
-                                            video.url = ReturnPresignedUrlSync(process.env.S3_ROOT_BUCKET_NAME, 'users/' + video.userID + "/video/" + video._id + "/" + video._id + "." + video.filename, 6000);
                                             
-                                            cbimage();
+                                                video.url = ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + video.userID + "/video/" + video._id + "/" + video._id + "." + video.filename, 6000);
+                                                console.log("vidoe url " + video.url);
+                                                cbimage();
+                                            
                                         }, 
                                         function (err) {
                                             if (err) {
@@ -16537,10 +17275,21 @@ app.get('/scene/:_id/:platform/:version', function (req, res) { //called from ap
             function (callback) { //TODO jack in version part of path~ AND USE .ENV values!
 
                 if (sceneResponse.sceneUseEnvironment) {
-                    var urlScene = s3.getSignedUrl('getObject', {Bucket: 'mvmv.us', Key: versionID + '/' + 'scenes_' + platformType + '/' + sceneResponse.sceneEnvironment.name, Expires: 6000});
-                    sceneResponse.sceneEnvironment.sceneBundleUrl = urlScene;
-                    console.log(urlScene);
-                    callback(null);
+                    (async () => {
+                        try {
+                            const urlScene = await ReturnPresignedUrl(process.env.UNITY_BUCKET_NAME,versionID + '/' + 'scenes_' + platformType + '/' + sceneResponse.sceneEnvironment.name,6000);
+                            sceneResponse.sceneEnvironment.sceneBundleUrl = urlScene;
+                            console.log("gotsa unity urlscene: " + urlScene);
+                            callback(null);
+                        } catch (e) {
+                            console.log("error getting scene asset bundle");
+                            callback(null);
+                        }
+                    })();
+                    // var urlScene = s3.getSignedUrl('getObject', {Bucket: 'mvmv.us', Key: versionID + '/' + 'scenes_' + platformType + '/' + sceneResponse.sceneEnvironment.name, Expires: 6000});
+                    // sceneResponse.sceneEnvironment.sceneBundleUrl = urlScene;
+                    // console.log(urlScene);
+                    // callback(null);
                 } else {
                     callback(null);
                 }
@@ -16585,22 +17334,46 @@ app.get('/scene/:_id/:platform/:version', function (req, res) { //called from ap
                     expiration.setMinutes(expiration.getMinutes() + 1000);
                     var baseName = path.basename(item_string_filename, (item_string_filename_ext));
                     //console.log(baseName);
-                    var mp3Name = baseName + '.mp3';
-                    var oggName = baseName + '.ogg';
-                    var pngName = baseName + '.png';
-                    var urlMp3 = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + mp3Name, Expires: 60000});
-                    var urlOgg = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + oggName, Expires: 60000});
-                    var urlPng = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + pngName, Expires: 60000});
-                    audio_items[i].URLmp3 = urlMp3; //jack in teh signed urls into the object array
-                    audio_items[i].URLogg = urlOgg;
-                    audio_items[i].URLpng = urlPng;
-                    if (audio_items[i].tags != null) {
-                        if (audio_items[i].tags.length < 1) {
-                            audio_items[i].tags = [""];
-                        } else {
-                            audio_items[i].tags = [""];
+
+                    // var mp3Name = baseName + '.mp3';
+                    // var oggName = baseName + '.ogg';
+                    // var pngName = baseName + '.png';
+                    // var urlMp3 = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + mp3Name, Expires: 60000});
+                    // var urlOgg = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + oggName, Expires: 60000});
+                    // var urlPng = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + pngName, Expires: 60000});
+                    // audio_items[i].URLmp3 = urlMp3; //jack in teh signed urls into the object array
+                    // audio_items[i].URLogg = urlOgg;
+                    // audio_items[i].URLpng = urlPng;
+                    // if (audio_items[i].tags != null) {
+                    //     if (audio_items[i].tags.length < 1) {
+                    //         audio_items[i].tags = [""];
+                    //     } else {
+                    //         audio_items[i].tags = [""];
+                    //     }
+                    // }
+                    (async () => {
+                        try {
+                            const urlMp3 = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + mp3Name, 6000);
+                            const urlOgg = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + oggName, 6000);
+                            const urlPng = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + pngName, 6000);
+
+        //                            audio_items.URLmp3 = urlMp3; //jack in teh signed urls into the object array
+                            audio_items[i].URLmp3 = urlMp3; //jack in teh signed urls into the object array
+                            audio_items[i].URLogg = urlOgg;
+                            audio_items[i].URLpng = urlPng;
+                            if (audio_items[i].tags != null) {
+                                if (audio_items[i].tags.length < 1) {
+                                    audio_items[i].tags = [""];
+                                } else {
+                                    audio_items[i].tags = [""];
+                                }
+                            }
+
+                        } catch (e) {
+                           
+                            console.log("error in unity audio fetch" + e)
                         }
-                    }
+                    })();
                 }
                 //   console.log('tryna send ' + audio_items);
                 audioResponse = audio_items;
@@ -16623,73 +17396,85 @@ app.get('/scene/:_id/:platform/:version', function (req, res) { //called from ap
             },
 
             function (picture_items, callback) {
+                (async ()=> {
                 for (var i = 0; i < picture_items.length; i++) {
-                    //    console.log("picture_item: ", picture_items[i]);
+                       console.log("picture_item: ", picture_items[i]);
                     var item_string_filename = JSON.stringify(picture_items[i].filename);
                     item_string_filename = item_string_filename.replace(/\"/g, "");
                     var item_string_filename_ext = getExtension(item_string_filename);
                     var expiration = new Date();
                     expiration.setMinutes(expiration.getMinutes() + 1000);
-                    var baseName = path.basename(item_string_filename, (item_string_filename_ext));
-                    //console.log(baseName);
-                    var thumbName = 'thumb.' + baseName + item_string_filename_ext;
-                    var quarterName = 'quarter.' + baseName + item_string_filename_ext;
-                    var halfName = 'half.' + baseName + item_string_filename_ext;
-                    var standardName = 'standard.' + baseName + item_string_filename_ext;
-                    var originalName = baseName + item_string_filename_ext;
 
-                    var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_items[i].userID + "/pictures/" + picture_items[i]._id + "." + thumbName, Expires: 6000}); //just send back thumbnail urls for list
-                    var urlQuarter = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_items[i].userID + "/pictures/" + picture_items[i]._id + "." + quarterName, Expires: 6000});
-                    var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_items[i].userID + "/pictures/" + picture_items[i]._id + "." + halfName, Expires: 6000});
-                    var urlStandard = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_items[i].userID + "/pictures/" + picture_items[i]._id + "." + standardName, Expires: 6000});
-                    var urlTarget = "";
-                    if (picture_items[i].useTarget) {
-                        urlTarget = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_items[i].userID + "/pictures/targets/" + picture_items[i]._id + ".mind", Expires: 6000});
-                    }
-                    
-                    
-                    //var urlPng = knoxClient.signedUrl(audio_item[0]._id + "." + pngName, expiration);
-                    picture_items[i].urlThumb = urlThumb; //jack in teh signed urls into the object array
-                    picture_items[i].urlQuarter = urlQuarter; //jack in teh signed urls into the object array
-                    picture_items[i].urlHalf = urlHalf; //jack in teh signed urls into the object array
-                    picture_items[i].urlStandard = urlStandard; //jack in teh signed urls into the object array
-                    picture_items[i].urlTarget = urlTarget;
-                    if (picture_items[i].orientation != null && picture_items[i].orientation.toLowerCase() == "equirectangular") { //add the big one for skyboxes
-                        let theKey = "users/" + picture_items[i].userID + "/pictures/originals/" + picture_items[i]._id + ".original." + originalName;
-                        // const params = { //need to be async, if at all
-                        //     Bucket: 'servicemedia', 
-                        //     Key: theKey
-                        // };
-                        // s3.headObject(params, function(err, data) { //some old skyboxen aren't saved with _id.original. in filename, check for that
-                        //     if (err) {
-                        //         console.log("tryna rename the key to " +picture_items[i].userID + "/pictures/originals/" + originalName);
-                        //         theKey = "users/" +picture_items[i].userID + "/pictures/originals/" + originalName;
-                        //     } 
-                        // });
-                        var urlOriginal = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: theKey, Expires: 6000});
-                        picture_items[i].urlOriginal = urlOriginal;
-                        let cubeMapAsset = [];
-                        if (sceneResponse.sceneUseDynCubeMap != null && sceneResponse.sceneUseDynCubeMap) {
-                                // let path1 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_items[i].userID+"/cubemaps/"+picture_items[i]._id+"_px.jpg", Expires: 6000});  
-                                // let path2 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_items[i].userID+"/cubemaps/"+picture_items[i]._id+"_nx.jpg", Expires: 6000});  
-                                // let path3 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_items[i].userID+"/cubemaps/"+picture_items[i]._id+"_py.jpg", Expires: 6000});  
-                                // let path4 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_items[i].userID+"/cubemaps/"+picture_items[i]._id+"_ny.jpg", Expires: 6000});  
-                                // let path5 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_items[i].userID+"/cubemaps/"+picture_items[i]._id+"_pz.jpg", Expires: 6000});  
-                                // let path6 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_items[i].userID+"/cubemaps/"+picture_items[i]._id+"_nz.jpg", Expires: 6000});                                    
-                                // cubeMapAsset.push(path1);
-                                // cubeMapAsset.push(path2);
-                                // cubeMapAsset.push(path3);
-                                // cubeMapAsset.push(path4);
-                                // cubeMapAsset.push(path5);
-                                // cubeMapAsset.push(path6);
-                            sceneResponse.cubeMapAsset = cubeMapAsset;
+                  
+                        var baseName = path.basename(item_string_filename, (item_string_filename_ext));
+                        //console.log(baseName);
+                        var thumbName = 'thumb.' + baseName + item_string_filename_ext;
+                        var quarterName = 'quarter.' + baseName + item_string_filename_ext;
+                        var halfName = 'half.' + baseName + item_string_filename_ext;
+                        var standardName = 'standard.' + baseName + item_string_filename_ext;
+                        var originalName = baseName + item_string_filename_ext;
+
+                        const urlThumb = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, "users/" + picture_items[i].userID + "/pictures/" + picture_items[i]._id + "." + thumbName, 6000 );
+                        const urlQuarter = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, "users/" + picture_items[i].userID + "/pictures/" + picture_items[i]._id + "." + quarterName, 6000 );
+                        const urlHalf = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, "users/" + picture_items[i].userID + "/pictures/" + picture_items[i]._id + "." + halfName, 6000 );
+                        const urlStandard = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, "users/" + picture_items[i].userID + "/pictures/" + picture_items[i]._id + "." + standardName, 6000 );
+
+                        // var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_items[i].userID + "/pictures/" + picture_items[i]._id + "." + thumbName, Expires: 6000}); //just send back thumbnail urls for list
+                        // var urlQuarter = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_items[i].userID + "/pictures/" + picture_items[i]._id + "." + quarterName, Expires: 6000});
+                        // var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_items[i].userID + "/pictures/" + picture_items[i]._id + "." + halfName, Expires: 6000});
+                        // var urlStandard = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_items[i].userID + "/pictures/" + picture_items[i]._id + "." + standardName, Expires: 6000});
+                        var urlTarget = "";
+                        if (picture_items[i].useTarget) {
+                            // urlTarget = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_items[i].userID + "/pictures/targets/" + picture_items[i]._id + ".mind", Expires: 6000});
+                            urlTarget = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, "users/" + picture_items[i].userID + "/pictures/targets/" + picture_items[i]._id + ".mind", 6000 );
+                        } 
+                        
+                        
+                        //var urlPng = knoxClient.signedUrl(audio_item[0]._id + "." + pngName, expiration);
+                        picture_items[i].urlThumb = urlThumb; //jack in teh signed urls into the object array
+                        picture_items[i].urlQuarter = urlQuarter; //jack in teh signed urls into the object array
+                        picture_items[i].urlHalf = urlHalf; //jack in teh signed urls into the object array
+                        picture_items[i].urlStandard = urlStandard; //jack in teh signed urls into the object array
+                        picture_items[i].urlTarget = urlTarget;
+                        if (picture_items[i].orientation != null && picture_items[i].orientation.toLowerCase() == "equirectangular") { //add the big one for skyboxes
+                            let theKey = "users/" + picture_items[i].userID + "/pictures/originals/" + picture_items[i]._id + ".original." + originalName;
+                            // const params = { //need to be async, if at all
+                            //     Bucket: 'servicemedia', 
+                            //     Key: theKey
+                            // };
+                            // s3.headObject(params, function(err, data) { //some old skyboxen aren't saved with _id.original. in filename, check for that
+                            //     if (err) {
+                            //         console.log("tryna rename the key to " +picture_items[i].userID + "/pictures/originals/" + originalName);
+                            //         theKey = "users/" +picture_items[i].userID + "/pictures/originals/" + originalName;
+                            //     } 
+                            // });
+                            // var urlOriginal = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: theKey, Expires: 6000});
+                            const urlOriginal = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, theKey, 6000); 
+                            picture_items[i].urlOriginal = urlOriginal;
+                            let cubeMapAsset = [];
+                            if (sceneResponse.sceneUseDynCubeMap != null && sceneResponse.sceneUseDynCubeMap) {
+                                    // let path1 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_items[i].userID+"/cubemaps/"+picture_items[i]._id+"_px.jpg", Expires: 6000});  
+                                    // let path2 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_items[i].userID+"/cubemaps/"+picture_items[i]._id+"_nx.jpg", Expires: 6000});  
+                                    // let path3 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_items[i].userID+"/cubemaps/"+picture_items[i]._id+"_py.jpg", Expires: 6000});  
+                                    // let path4 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_items[i].userID+"/cubemaps/"+picture_items[i]._id+"_ny.jpg", Expires: 6000});  
+                                    // let path5 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_items[i].userID+"/cubemaps/"+picture_items[i]._id+"_pz.jpg", Expires: 6000});  
+                                    // let path6 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_items[i].userID+"/cubemaps/"+picture_items[i]._id+"_nz.jpg", Expires: 6000});                                    
+                                    // cubeMapAsset.push(path1);
+                                    // cubeMapAsset.push(path2);
+                                    // cubeMapAsset.push(path3);
+                                    // cubeMapAsset.push(path4);
+                                    // cubeMapAsset.push(path5);
+                                    // cubeMapAsset.push(path6);
+                                sceneResponse.cubeMapAsset = cubeMapAsset;
+                            }
                         }
-                    }
-                    if (picture_items[i].hasAlphaChannel == null) {picture_items[i].hasAlphaChannel = false}
-                    //pathResponse.path.pictures.push(urlThumb, urlQuarter, urlHalf, urlStandard);
-                    if (picture_items[i].tags == null) {picture_items.tags = [""]}
+                        if (picture_items[i].hasAlphaChannel == null) {picture_items[i].hasAlphaChannel = false}
+                        //pathResponse.path.pictures.push(urlThumb, urlQuarter, urlHalf, urlStandard);
+                        if (picture_items[i].tags == null) {picture_items.tags = [""]}
+                  
                 }
                 pictureResponse = picture_items ;
+            })();
                 callback(null);
             },
 
@@ -16705,21 +17490,27 @@ app.get('/scene/:_id/:platform/:version', function (req, res) { //called from ap
 //                                        callback(null);
                                 callbackz();
                             } else {
-                                var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".thumb." + picture_item.filename, Expires: 6000});
-                                var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".half." + picture_item.filename, Expires: 6000});
-                                var urlStandard = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".standard." + picture_item.filename, Expires: 6000});
+                                (async () => {
+                                    // var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".thumb." + picture_item.filename, Expires: 6000});
+                                    // var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".half." + picture_item.filename, Expires: 6000});
+                                    // var urlStandard = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".standard." + picture_item.filename, Expires: 6000});
 
-                                var postcard = {};
-                                postcard.userID = picture_item.userID;
-                                postcard._id = picture_item._id;
-                                postcard.sceneID = picture_item.postcardForScene;
-                                postcard.urlThumb = urlThumb;
-                                postcard.urlHalf = urlHalf;
-                                postcard.urlStandard = urlStandard;
-                                if (postcards.length < 9)
-                                    postcards.push(postcard);
-//                                        console.log("pushing postcard: " + JSON.stringify(postcard));
-                                callbackz();
+                                    const urlThumb = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + picture_item.userID + "/pictures/" + picture_item._id + ".thumb." + picture_item.filename,6000);
+                                    const urlHalf = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + picture_item.userID + "/pictures/" + picture_item._id + ".half." + picture_item.filename,6000);
+                                    const urlStandard = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + picture_item.userID + "/pictures/" + picture_item._id + ".standard." + picture_item.filename,6000);
+
+                                    var postcard = {};
+                                    postcard.userID = picture_item.userID;
+                                    postcard._id = picture_item._id;
+                                    postcard.sceneID = picture_item.postcardForScene;
+                                    postcard.urlThumb = urlThumb;
+                                    postcard.urlHalf = urlHalf;
+                                    postcard.urlStandard = urlStandard;
+                                    if (postcards.length < 9)
+                                        postcards.push(postcard);
+    //                                        console.log("pushing postcard: " + JSON.stringify(postcard));
+                                    callbackz();
+                                })();
                             }
 
                         });
@@ -16752,7 +17543,7 @@ app.get('/scene/:_id/:platform/:version', function (req, res) { //called from ap
 
             function (callback) {
                 var modelz = [];
-               console.log("sceneModels : " + JSON.stringify(sceneResponse.sceneModels));
+               console.log("sceneModelzzz : " + JSON.stringify(sceneResponse.sceneModels));
                 if (sceneResponse.sceneModels != null) {
                     async.each (sceneResponse.sceneModels, function (objID, callbackz) { //nested async-ery!
                         var oo_id = ObjectID(objID);
@@ -16762,11 +17553,15 @@ app.get('/scene/:_id/:platform/:version', function (req, res) { //called from ap
                                 console.log("error getting model: " + err);
                                 callbackz();
                             } else {
-                                console.log("gotsa model:" + model._id);
-                                let url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + model.userID + "/gltf/" + model.filename, Expires: 6000});
-                                model.url = url;
-                                modelz.push(model);
-                                callbackz();
+                                (async () => {
+                                    console.log("gotsa model:" + model._id);
+                                    // let url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + model.userID + "/gltf/" + model.filename, Expires: 6000});
+
+                                    model.url = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + model.userID + "/gltf/" + model.filename,6000);
+                                    modelz.push(model);
+                                    callbackz();
+                                
+                                })();
                             }
                         });
                     }, function(err) {
@@ -16777,8 +17572,8 @@ app.get('/scene/:_id/:platform/:version', function (req, res) { //called from ap
                             callback(null);
                         } else {
                             console.log('modelz have been added to scene.modelz');
-                            objectResponse = modelz;
-                            sceneResponse.sceneModelz = objectResponse;
+                            // const objectResponse = modelz;
+                            sceneResponse.sceneModelz = modelz;
                             callback(null);
                         }
                     });
@@ -16841,40 +17636,53 @@ app.get('/scene/:_id/:platform/:version', function (req, res) { //called from ap
                                 callbackz();
                             } else {
                                 //
-                                //console.log("8229 tryna find childObjectIDs: " + JSON.stringify(obj_item.childObjectIDs));                                
-                                if (obj_item.audioEmit == null)
-                                    obj_item.audioEmit = false;
-                                if (obj_item.audioScale == null)
-                                    obj_item.audioEmit = false;
-                                obj_item.objectGroup = "none";
-                                if (obj_item.childObjectIDs != null && obj_item.childObjectIDs.length > 0) {
-                                    var childIDs = obj_item.childObjectIDs.map(convertStringToObjectID); //convert child IDs array to objIDs
-                                    db.obj_items.find({_id : {$in : childIDs}}, function(err, obj_items) {
+                                //console.log("8229 tryna find childObjectIDs: " + JSON.stringify(obj_item.childObjectIDs));             
+                                                
+                                    if (obj_item.audioEmit == null) {
+                                        obj_item.audioEmit = false;
+                                    }                                       
+                                    if (obj_item.audioScale == null) {
+                                        obj_item.audioEmit = false;
+                                    }
+                                    
+                                        obj_item.objectGroup = "none";
+                                        if (obj_item.childObjectIDs != null && obj_item.childObjectIDs.length > 0) {
+                                            var childIDs = obj_item.childObjectIDs.map(convertStringToObjectID); //convert child IDs array to objIDs
+                                            db.obj_items.find({_id : {$in : childIDs}}, function(err, obj_items) {
 
-                                        if (err || !obj_items) {
-                                            console.log("error getting childObject items: " + err);
-                                            //res.send("error getting child objects");
-                                            obj_item.objectGroup = "none";
-                                            obj_item.assetUrl = s3.getSignedUrl('getObject', {Bucket: 'mvmv.us', Key: versionID + '/' + 'bundles_' + platformType + '/' + obj_item.assetname, Expires: 6000});
-                                            objex.push(obj_item)
-                                            callbackz();
+                                                if (err || !obj_items) {
+                                                    (async () => {
+                                                        console.log("error getting childObject items: " + err);
+                                                        //res.send("error getting child objects");
+                                                        obj_item.objectGroup = "none";
+                                                        // obj_item.assetUrl = s3.getSignedUrl('getObject', {Bucket: 'mvmv.us', Key: versionID + '/' + 'bundles_' + platformType + '/' + obj_item.assetname, Expires: 6000});
+                                                        obj_item.assetUrl = await ReturnPresignedUrl(process.env.UNITY_BUCKET_NAME, versionID + '/' + 'bundles_' + platformType + '/' + obj_item.assetname, 6000);
+                                                        objex.push(obj_item)
+                                                        callbackz();
+                                                    })();
+                                                } else {
+                                                    (async () => {
+                                                        childObjects = obj_items;
+                                                    // console.log("childObjects: " + JSON.stringify(childObjects));
+                                                        obj_item.childObjects = childObjects;
+                                                        obj_item.objectGroup = "none";
+                                                        obj_item.assetUrl = await ReturnPresignedUrl(process.env.UNITY_BUCKET_NAME, versionID + '/' + 'bundles_' + platformType + '/' + obj_item.assetname, 6000);
+                                                        // obj_item.assetUrl = s3.getSignedUrl('getObject', {Bucket: 'mvmv.us', Key: versionID + '/' + 'bundles_' + platformType + '/' + obj_item.assetname, Expires: 6000});
+                                                        objex.push(obj_item)
+                                                        callbackz();
+                                                    })();
+                                                }
+                                            });
                                         } else {
-                                            childObjects = obj_items;
-                                           // console.log("childObjects: " + JSON.stringify(childObjects));
-                                            obj_item.childObjects = childObjects;
-                                            obj_item.objectGroup = "none";
-                                            obj_item.assetUrl = s3.getSignedUrl('getObject', {Bucket: 'mvmv.us', Key: versionID + '/' + 'bundles_' + platformType + '/' + obj_item.assetname, Expires: 6000});
-                                            objex.push(obj_item)
-                                            callbackz();
+                                            (async () => {
+                                                obj_item.objectGroup = "none";
+                                                // obj_item.assetUrl = s3.getSignedUrl('getObject', {Bucket: 'mvmv.us', Key: versionID + '/' + 'bundles_' + platformType + '/' + obj_item.assetname, Expires: 6000});
+                                                obj_item.assetUrl = await ReturnPresignedUrl(process.env.UNITY_BUCKET_NAME,versionID + '/' + 'bundles_' + platformType + '/' + obj_item.assetname,6000);
+                                                objex.push(obj_item)
+                                                callbackz();
+                                            })();
                                         }
-                                    });
-                                } else {
-                                    obj_item.objectGroup = "none";
-                                    obj_item.assetUrl = s3.getSignedUrl('getObject', {Bucket: 'mvmv.us', Key: versionID + '/' + 'bundles_' + platformType + '/' + obj_item.assetname, Expires: 6000});
-                                    objex.push(obj_item)
-                                    callbackz();
-                                }
-                                //
+                                    
 
                             }
                         });
@@ -16886,8 +17694,8 @@ app.get('/scene/:_id/:platform/:version', function (req, res) { //called from ap
                             callback(null, objex);
                         } else {
                             console.log('objects have been added to scene.objex');
-                            objectResponse = objex;
-                            sceneResponse.sceneObjex = objectResponse;
+                            // objectResponse = objex;
+                            sceneResponse.sceneObjex = objex;
                             callback(null, objex);
                         }
                     });
@@ -17381,7 +18189,7 @@ app.post('/delete_audio/', requiredAuthentication, function (req, res){
                     });
                 } else {
                     var params = {
-                        Bucket: 'servicemedia', // required
+                        Bucket: process.env.S3_ROOT_BUCKET_NAME, // required
                         Delete: { // required
                             Objects: [ // required
                                 {
@@ -17403,19 +18211,29 @@ app.post('/delete_audio/', requiredAuthentication, function (req, res){
                         //MFA: 'STRING_VALUE',
                     };
 
-                    s3.deleteObjects(params, function(err, data) {
-                        if (err) {
-                            console.log(err, err.stack);
-                            res.send(err);
-                            // an error occurred
+                    (async () => {
+                        try {
+                           const status = await DeleteObjects(params.Bucket, params.Delete);
+                           db.audio_items.remove( { "_id" : o_id }, 1 );
+
+                           res.send("files deleted ~" + status);
+                            // db.image_items.remove( { "_id" : o_id }, 1 );  // TODO what if files are gone but db reference remains? 
+                        } catch (e) {
+                           res.send(e);
                         }
-                        else {
-                            console.log(data);
-                            db.audio_items.remove( { "_id" : o_id }, 1 );
-                            res.send("deleted");
-                            // successful response
-                        }
-                    });
+                    })();
+                    // s3.deleteObjects(params, function(err, data) {
+                    //     if (err) {
+                    //         console.log(err, err.stack);
+                    //         res.send(err);
+                    //         // an error occurred
+                    //     }
+                    //     else {
+                    //         console.log(data);
+                            
+                    //         // successful response
+                    //     }
+                    // });
                 }
             })();
         
@@ -17447,17 +18265,30 @@ app.post('/delete_model/', requiredAuthentication, function (req, res){
                 }
             };
 
-            s3.deleteObjects(params, function(err, data) {
-                if (err) {
-                    console.log(err, err.stack);
-                    res.send(err);
-                    // an error occurred
-                }
-                else {
-                    db.models.remove( { "_id" : o_id }, 1 );
-                    res.send("delback");
-                }
-            });
+                (async () => {
+                    try {
+                        let status = await DeleteObjects(process.env.S3_ROOT_BUCKET_NAME, params.Delete);
+                        // if (status == "deleted") {
+                            db.models.remove( { "_id" : o_id }, 1 );
+                            res.send("deleted " + status);
+                        // }
+                        
+                    } catch (e) {
+                        res.send(e);
+                    }
+
+                })();
+            // s3.deleteObjects(params, function(err, data) {
+            //     if (err) {
+            //         console.log(err, err.stack);
+            //         res.send(err);
+            //         // an error occurred
+            //     }
+            //     else {
+            //         db.models.remove( { "_id" : o_id }, 1 );
+            //         res.send("delback");
+            //     }
+            // });
 
         }
     });
@@ -17496,39 +18327,71 @@ app.post('/delete_video/', requiredAuthentication, function (req, res){
                 Bucket: process.env.S3_ROOT_BUCKET_NAME,
                 Prefix: 'users/'+ vid_item.userID + '/video/'+ vid_item._id +'/'
             }
-            s3.listObjects(listparams, function(err, data) {
-                if (err) {
-                    console.log(err);
-                    
+            (async () => {
+                try {
+                    const files = await ListObjects(process.env.S3_ROOT_BUCKET_NAME,'users/'+ vid_item.userID + '/video/'+ vid_item._id +'/');
+                    if (files.Contents.length == 0) {
+                        // console.log("no content found");
+                        db.video_items.remove( { "_id" : o_id }, 1 );
+                        console.log("no content found, video_item record deleted");
+                        res.send("deleted video item from db");
+                    } else {
+                        // let response = files.Contents;
+                        files.Contents.forEach(function(content) {
+                            console.log("deleting vid thing " + content.Key);
+                            delete_params.Delete.Objects.push({Key: content.Key}); //add the hls files
+                            
+                        });
+                        // console.log(JSON.stringify(delete_params));
+                        const status = await DeleteObjects(process.env.S3_ROOT_BUCKET_NAME, delete_params);
+                        db.video_items.remove( { "_id" : o_id }, 1 );
+                        console.log("some video things were deleted " + status);
+                        res.send("deleted " + status);
+                    }
+
+                } catch (e) {
+                    res.send(e);
                 }
-                if (data.Contents.length == 0) {
-                    // console.log("no content found");
-                    db.video_items.remove( { "_id" : o_id }, 1 );
-                    console.log("no content found, video_item record deleted");
-                    res.send("deleted");
-                } else {
-                    response = data.Contents;
-                    data.Contents.forEach(function(content) {
-                        console.log("deleting vid thing " + content.Key);
-                        delete_params.Delete.Objects.push({Key: content.Key}); //add the hls files
+            })();
+            // ListObjects
+           
+
+            // s3.listObjects(listparams, function(err, data) {
+            //     if (err) {
+            //         console.log(err);
+                    
+            //     }
+            //     if (data.Contents.length == 0) {
+            //         // console.log("no content found");
+            //         db.video_items.remove( { "_id" : o_id }, 1 );
+            //         console.log("no content found, video_item record deleted");
+            //         res.send("deleted");
+            //     } else {
+            //         response = data.Contents;
+            //         data.Contents.forEach(function(content) {
+            //             console.log("deleting vid thing " + content.Key);
+            //             delete_params.Delete.Objects.push({Key: content.Key}); //add the hls files
                         
-                    });
-                    console.log(JSON.stringify(delete_params));
-                    s3.deleteObjects(delete_params, function(err, data) {
-                        if (err) {
-                            console.log(err, err.stack);
-                            res.send(err);
-                            // an error occurred
-                        }
-                        else {
-                            db.video_items.remove( { "_id" : o_id }, 1 );
-                            console.log("some video things were deleted");
-                            res.send("deleted");
-                        }
-                    });
+            //         });
+            //         console.log(JSON.stringify(delete_params));
+
+            //         // DeleteObjects
+
+            //         s3.deleteObjects(delete_params, function(err, data) {
+            //             if (err) {
+            //                 console.log(err, err.stack);
+            //                 res.send(err);
+            //                 // an error occurred
+            //             }
+            //             else {
+            //                 db.video_items.remove( { "_id" : o_id }, 1 );
+            //                 console.log("some video things were deleted");
+            //                 res.send("deleted");
+            //             }
+            //         });
                     
-                }
-            });
+            //     }
+            // });
 
             // s3.deleteObjects(params, function(err, data) {
             //     if (err) {
@@ -17600,7 +18463,7 @@ app.post('/delete_picture/', requiredAuthentication, function (req, res){ //TODO
                 
                 // s3.headObject
                 var params = {
-                    Bucket: 'servicemedia',// required
+                    Bucket: process.env.S3_ROOT_BUCKET_NAME,// required
                     Delete: { // required
                         Objects: [ // required
                             {
@@ -17646,16 +18509,31 @@ app.post('/delete_picture/', requiredAuthentication, function (req, res){ //TODO
                     //MFA: 'STRING_VALUE',
                 };
                 console.log("tryna delete picture with params " + JSON.stringify(params));
-                s3.deleteObjects(params, function(err, data) {
-                    if (err) {
-                        console.log(err, err.stack);
-                        res.send(err);
-                    } else {
-                        console.log("pics delete response " + JSON.stringify(data));
-                        db.image_items.remove( { "_id" : o_id }, 1 );  // TODO what if files are gone but db reference remains? 
-                        res.send("deleted");
+
+                (async () => {
+                    try {
+                        let status = await DeleteObjects(process.env.S3_ROOT_BUCKET_NAME, params.Delete);
+                        // if (status.Deleted.length) {
+                            db.image_items.remove( { "_id" : o_id }, 1 );
+                            res.send("deleted " + status);
+                        // } else {
+                            // res.send("delete fail!");
+                        
+                        // db.image_items.remove( { "_id" : o_id }, 1 );  // TODO what if files are gone but db reference remains? 
+                    } catch (e) {
+                        res.send(e);
                     }
-                });
+                })();
+                // s3.deleteObjects(params, function(err, data) {
+                //     if (err) {
+                //         console.log(err, err.stack);
+                //         res.send(err);
+                //     } else {
+                //         console.log("pics delete response " + JSON.stringify(data));
+                //         db.image_items.remove( { "_id" : o_id }, 1 );  // TODO what if files are gone but db reference remains? 
+                //         res.send("deleted");
+                //     }
+                // });
             }
         }
     });
@@ -17881,3 +18759,5 @@ function cleanbase64 (string) {
     return '&#' + c.charCodeAt(0) + ';';
     }))
 };
+
+// export default app;

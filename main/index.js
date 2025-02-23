@@ -5,7 +5,25 @@
     // 2. bigSwitch does "routing" and calls "controller" functions
     // 3. controller functions fetch json and generate html
     // 4. dom elements are selected and updated with new stuff as needed
+    // import Uppy from '../main/vendor/uppy/core';
+    // import Dashboard from '../main/vendor/uppy/dashboard';
+    
+    // import '../main/vendor/uppy/core/dist/style.min.css';
+    // import '../main/vendor/uppy/dashboard/dist/style.min.css';
+    
 
+    import {
+        Uppy,
+        Dashboard,
+        Webcam,
+        AwsS3
+      } from 'https://releases.transloadit.com/uppy/v4.13.2/uppy.min.mjs'
+    // new Uppy().use(Dashboard, { inline: true, target: '#drag-drop-area' });
+
+    window.selectItem = selectItem;
+    window.deleteItem = deleteItem;
+    window.getStoreItem = getStoreItem;
+    window.previewGLTF = previewGLTF;
 
     var cookie = Cookies.get();
     var type = getParameterByName("type", window.location.href); //these params used for routing in bigSwitch
@@ -18,8 +36,10 @@
     var userid = "";
     var username = "";
     var auth = "";
+    let domains = "";
     var apps = {};
     amirite();
+    
     function amirite () {
         if (cookie != null && cookie._id != null) {
         console.log("gotsa cookie: " + cookie._id );
@@ -1090,7 +1110,7 @@
             "</div>";
             }  else if (ext == "glb") {
                 glbIndex++;
-                glbObj = arr[i];
+                const glbObj = arr[i];
                 html = html + 
                 "<div class=\x22card\x22 style=\x22width:320px;\x22>" +
                     "<div class=\x22card-header\x22>"+
@@ -1108,7 +1128,7 @@
                 "</div>";
             }  else if (ext == "usdz") {
                 usdzIndex++;
-                usdzObj = arr[i];
+                // const usdzObj = arr[i];
                 html = html + 
                 "<div class=\x22card\x22 style=\x22width:320px;\x22>" +
                     "<div class=\x22card-header\x22>"+
@@ -1127,7 +1147,7 @@
                 "</div>";
             }  else if (ext == "reality") {
                 usdzIndex++;
-                usdzObj = arr[i];
+                // usdzObj = arr[i];
                 html = html + 
                 "<div class=\x22card\x22 style=\x22width:320px;\x22>" +
                     "<div class=\x22card-header\x22>"+
@@ -2796,7 +2816,7 @@
                 var selectHeader = "";
                 var arr = response.data;
                 if (mode == "select") {
-                    selectFor = parent;
+                    //selectFor = parent;
                     selectHeader = "<th>Select</th>";
                     $("#pageTitle").html("Select Location for " + parent + " " + itemid);
                 }
@@ -3020,7 +3040,7 @@
             }
             var tableFoot =  "</tbody>" +
             "</table>";
-            timeKeysHtml = tableHead + tableBody + tableFoot;
+            const timeKeysHtml = tableHead + tableBody + tableFoot;
             return timeKeysHtml;
         } else {
             return "No Events";
@@ -3569,22 +3589,22 @@
                 var arr = response.data;
                 
                 if (mode == "select") {
-                    selectFor = parent;
+                    //selectFor = parent;
                     selectHeader = "<th>Select</th>";
                     $("#pageTitle").html("Select Audio for " + parent + " " + itemid);
                 }
                 if (mode == "paudio") {
-                    selectFor = parent;
+                    //selectFor = parent;
                     selectHeader = "<th>Select</th>";
                     $("#pageTitle").html("Select Primary Audio for " + parent + " " + itemid);
                 }
                 if (mode == "aaudio") {
-                    selectFor = parent;
+                    //selectFor = parent;
                     selectHeader = "<th>Select</th>";
                     $("#pageTitle").html("Select Ambient Audio for " + parent + " " + itemid);
                 }
                 if (mode == "taudio") {
-                    selectFor = parent;
+                    //selectFor = parent;
                     selectHeader = "<th>Select</th>";
                     $("#pageTitle").html("Select Trigger Audio for " + parent + " " + itemid);
                 }
@@ -3755,7 +3775,7 @@
             var arr = response.data;
          
             if (mode == "select") {
-                selectFor = parent;
+                //selectFor = parent;
                 selectHeader = "<th>Select</th>";
                 $("#pageTitle").html("Select Action for " + parent + " " + itemid);
             }
@@ -3942,8 +3962,8 @@
             appid: appid,
             }
         }
-        tagsHtml = "";
-        tags = [];
+        let tagsHtml = "";
+        let tags = [];
         axios.get('/action/' + item_id, config)
         .then(function (response) {
         let user = response.data.userID;
@@ -4494,8 +4514,8 @@
             appid: appid,
             }
         }
-        tagsHtml = "";
-        tags = [];
+        let tagsHtml = "";
+        let tags = [];
         axios.get('/usertext/' + item_id, config)
         .then(function (response) {
         let user = response.data.userID;
@@ -5213,7 +5233,7 @@
             var arr = response.data;
          
             if (mode == "select") {
-                selectFor = parent;
+                //selectFor = parent;
                 selectHeader = "<th>Select</th>";
                 $("#pageTitle").html("Select Text for " + parent + " " + itemid);
             }
@@ -5307,8 +5327,8 @@
         appid: appid,
         }
         }
-        tagsHtml = "";
-        tags = [];
+        let tagsHtml = "";
+        let tags = [];
         axios.get('/userpic/' + item_id, config)
         .then(function (response) {
         let ouser = response.data.userID;
@@ -5645,13 +5665,7 @@
                         // c.height = 512;
                         let image = dataURItoBlob(c.toDataURL("image/jpeg")); //convert canvas to base64, then to blob.. sigh...
 
-                        // const buffer = Buffer.from(c.toDataURL("image/png").replace(/^data:image\/\w+;base64,/, ""),'base64');
-                        // image.src = buffer;
-                        // image = c.toBlob(function(blob){}, 'image/jpg', 0.95); 
-                        // cubemap = cubemap + "<img id=\x22refl\x22 src=\x22"+c+"\x22>";
-                        // document.body.appendChild(image);
-                        // image = blob;
-                        // console.log(image.src);
+
                         let data = {};
                         data.mapNumber = mapNumber;
                         axios.post('/cubemap_puturl/' + userid + "/" + response.data._id, data)
@@ -6061,7 +6075,7 @@
                 var arr = response.data;
              
                 if (mode == "select") {
-                    selectFor = parent;
+                    //selectFor = parent;
                     selectHeader = "<th>Select</th>";
                     $("#pageTitle").html("Select Picture for " + parent + " " + itemid);
                 }
@@ -6107,8 +6121,14 @@
                     if (arr[i].isPublic != null) {
                         isPublic = arr[i].isPublic;
                     }
-                    var detailsPicLink = "<a href=\x22#page-top\x22 onclick=\x22showPicture('" + arr[i]._id + "')\x22><img class=\x22rounded\x22 src=\x22" + arr[i].URLthumb + "\x22></a>"
-                    var detailsLink = "<a href=\x22#page-top\x22 onclick=\x22showPicture('" + arr[i]._id + "')\x22>" + title + "</a>";
+                    // var detailsPicLink = "<a href=\x22#page-top\x22 onclick=\x22showPicture('" + arr[i]._id + "')\x22><img class=\x22rounded\x22 src=\x22" + arr[i].URLthumb + "\x22></a>"
+                    // var detailsLink = "<a href=\x22#page-top\x22 onclick=\x22showPicture('" + arr[i]._id + "')\x22>" + title + "</a>";
+                    // var detailsPicLink = "<a href=\x22#page-top\x22 onclick=\x22showPicture('" + arr[i]._id + "')\x22><img class=\x22rounded\x22 src=\x22" + arr[i].URLthumb + "\x22></a>"
+                    // var detailsLink = "<a href=\x22#page-top\x22 onclick=\x22showPicture('" + arr[i]._id + "')\x22>" + title + "</a>";
+
+                    var detailsPicLink = "<a href=\x22index.html?type=picture&iid=" + arr[i]._id + "\x22><img class=\x22rounded\x22 src=\x22" + arr[i].URLthumb + "\x22></a>";
+                    var detailsLink = "<a href=\x22index.html?type=picture&iid=" + arr[i]._id + "\x22>" + title + "</a>";
+
                     tableBody = tableBody +
                     "<tr>" +
                         selectButton +
@@ -6164,9 +6184,9 @@
         axios.get('/get_model/' + item_id, config)
             .then(function (response) {
             $("#cards").show();
-            tagsHtml = "";
-            tags = [];
-            preview = {};
+            let tagsHtml = "";
+            let tags = [];
+            let preview = {};
             preview.name = response.data.filename;
             preview.url = response.data.url;
             let cid =  (response.data.cid != undefined && response.data.cid != 'undefined') ? response.data.cid  : ""; 
@@ -6174,7 +6194,7 @@
             if (cid != "") {
                 ipfsLink = " | <a href=\x22https://ipfs.io/ipfs/"+cid+"\x22>IPFS CID: "+cid+"</a>";
             }
-            // console.log(response);
+            console.log(response);
             var card = "<div class=\x22col-lg-12\x22>" +
                 "<div class=\x22card shadow mb-4\x22>" +
                     "<div class=\x22card-header py-3 d-flex flex-row align-items-center justify-content-between\x22>" +
@@ -6460,7 +6480,7 @@
             var arr = response.data;
             let hideIndex = 2;
             if (mode == "select") {
-                selectFor = parent;
+                //selectFor = parent;
                 selectHeader = "<th>Select</th>";
                 $("#pageTitle").html("Select Model for " + parent + " " + itemid);
                 hideIndex = 3;
@@ -7128,7 +7148,7 @@
             var selectHeader = "";
             var arr = response.data;
             if (mode == "select") {
-                selectFor = parent;
+                //selectFor = parent;
                 selectHeader = "<th>Select</th>";
                 $("#pageTitle").html("Select Video for " + parent + " " + itemid);
             }
@@ -7280,17 +7300,17 @@
         arr[i].itemType + "," +
         arr[i].itemSubType + "," +
         arr[i].itemPrice + "," +
-        arr[i].useGameCurrency + "," +
-        arr[i].jsonAttributes.color + "," +
-        arr[i].jsonAttributes.newMeshName + "," +
-        arr[i].jsonAttributes.materialName + "," +
-        arr[i].jsonAttributes.newTextureName + "," +
-        arr[i].jsonAttributes.meshInProject + "," +
-        arr[i].jsonAttributes.inGame + "," +
-        arr[i].jsonAttributes.uiClass + "," +
-        arr[i].jsonAttributes.overrides + "," +
-        arr[i].jsonAttributes.inStore + "," +
-        arr[i].jsonAttributes.rarity + "\n";
+        arr[i].useGameCurrency;
+        // arr[i].jsonAttributes.color + "," +
+        // arr[i].jsonAttributes.newMeshName + "," +
+        // arr[i].jsonAttributes.materialName + "," +
+        // arr[i].jsonAttributes.newTextureName + "," +
+        // arr[i].jsonAttributes.meshInProject + "," +
+        // arr[i].jsonAttributes.inGame + "," +
+        // arr[i].jsonAttributes.uiClass + "," +
+        // arr[i].jsonAttributes.overrides + "," +
+        // arr[i].jsonAttributes.inStore + "," +
+        // arr[i].jsonAttributes.rarity + "\n";
     }
     let header ="dbID,Name,DisplayName,Archetype,Type,Subtype,Price,UseGameCurrency,Color,newMeshName,materialName,newTextureName,meshInProject,inGame,uiClass,overrides,inStore,rarity\n";
     return header + csv
@@ -7590,18 +7610,18 @@
                     let itemDisplayName = document.getElementById("siDisplayName").value;
                     let itemAltName = document.getElementById("siAltName").value;
                     let itemType = document.getElementById("storeItemTypeSelect").value;
-                    let itemSubType = document.getElementById("storeItemSubTypeSelect").value;
+                    // let itemSubType = document.getElementById("storeItemSubTypeSelect").value;
                     let itemPrice = document.getElementById("siPrice").value;
-                    let itemAttributes1 = document.getElementById("storeItemAttributesSelect1").value;
-                    let itemAttributes2 = document.getElementById("storeItemAttributesSelect2").value;
+                    // let itemAttributes1 = document.getElementById("storeItemAttributesSelect1").value;
+                    // let itemAttributes2 = document.getElementById("storeItemAttributesSelect2").value;
                     let itemStatus = document.getElementById("storeItemStatus").value;
                     let itemDescription = document.getElementById("siDesc").value;
                     let maxPerUser = document.getElementById("siMaxPerUser").value;
                     let maxTotal = document.getElementById("siMaxTotal").value;
                     let useGameCurrency = $("#useGameCurrency").prop("checked");
-                    let displayAssetURL = document.getElementById("displayAssetURL").value;
+                    // let displayAssetURL = document.getElementById("displayAssetURL").value;
                     let itemAttributesArray = [];
-                    itemAttributesArray.push(itemAttributes1, itemAttributes2);
+                    // itemAttributesArray.push(itemAttributes1, itemAttributes2);
                     console.log(itemName);
                     let data = {
                         appID : appid,
@@ -7610,10 +7630,10 @@
                         itemAltName : itemAltName,
                         itemStatus : itemStatus,
                         itemType: itemType,
-                        itemSubType: itemSubType,
+                        // itemSubType: itemSubType,
                         itemPrice : itemPrice,
                         useGameCurrency : useGameCurrency,
-                        itemAttributes : itemAttributesArray,
+                        // itemAttributes : itemAttributesArray,
                         itemAssetIDs : [],
                         itemDescription: itemDescription,
                         maxPerUser : maxPerUser,
@@ -7647,104 +7667,106 @@
                 });
             });            
     }
+
     function getStoreItems() {
-    appid = getParameterByName("appid", window.location.href);
-    let path = '/get_storeitems/' + appid;
-    let config = { headers: {
-            appid: appid,
+        appid = getParameterByName("appid", window.location.href);
+        let path = '/get_storeitems/' + appid;
+        let config = { headers: {
+                appid: appid,
+            }
         }
-    }
-    $("#pageTitle").html("Store Items for " + appName(appid));
-    if (appid == null) {
-        path = '/get_storeitems_all/'
-        config = {};
-        $("#pageTitle").html("All Store Items");
-    }
-
-
-    var selectFor = "none";
-    console.log("getting storeitems for " + appid);
-    axios.get(path, config)
-    .then(function (response) {
-        // console.log(JSON.stringify(response));
-        var jsonResponse = response.data;
-        // console.log(ReturnCSV(response.data.storeitems));
-        var arr = jsonResponse.storeitems;
-        var selectHeader = "<th>Select</th>";
-        var selectButton = "<th>Select</th>";
-
-        var tableHead = "<table id=\x22dataTable1\x22 class=\x22display table table-striped table-bordered\x22 style=\x22width:100%\x22>" +
-            "<thead>"+
-            "<tr>"+
-            "<th></th>"+
-            "<th>Name</th>"+
-            "<th>AltName</th>"+
-            "<th>Type</th>"+
-            "<th>SubType</th>"+
-            "<th>Price</th>"+
-            "<th>Status</th>"+
-            "<th>Last Update</th>"+
-        "</tr>"+
-        "</thead>"+
-        "<tbody>";
-        var tableBody = "";
-        let storePic = "";
-        let storeItemPics = [];
-        let storeItem = {};
-        for(var i = 0; i < arr.length; i++) {
-            let ts = 0;
-            if (arr[i].createdTimestamp != undefined && arr[i].createdTimestamp != null) {
-                ts = arr[i].createdTimestamp;
-            }
-            if (arr[i].lastUpdateTimestamp != undefined && arr[i].lastUpdateTimestamp != null) {
-                ts = arr[i].lastUpdateTimestamp;
-            }
-             storePic = "";
-            storeItem = arr[i];
-            if (storeItem.storeItemPictures != null && storeItem.storeItemPictures != undefined && storeItem.storeItemPictures.length > 0) {
-                storePic = storeItem.storeItemPictures[0].urlThumb;
-            }
-            var editButton = "<button type=\x22button\x22 class=\x22btn btn-link\x22 onclick=\x22getStoreItem('" + arr[i]._id + "')\x22>" + arr[i].itemName + "</button>";
-            tableBody = tableBody +
-            "<tr>" +
-            "<td><img class=\x22rounded image-thumbnail\x22 src=\x22 " + storePic + "\x22></td>" +    
-            "<td>" + editButton + "<div>_id:" + storeItem._id +"</div></td>" +
-            "<td>" + arr[i].itemAltName + "</td>" +
-            "<td>" + arr[i].itemType + "</td>" +
-            "<td>" + arr[i].itemSubType + "</td>" +
-            "<td>" + "$ " + (arr[i].itemPrice * .01).toFixed(2)+ "</td>" +
-            "<td>" + arr[i].itemStatus + "</td>" +
-            "<td>" + convertTimestamp(ts) + "</td>" +
-            "</tr>";
+        $("#pageTitle").html("Store Items for " + appName(appid));
+        if (appid == null) {
+            path = '/get_storeitems_all/'
+            config = {};
+            $("#pageTitle").html("All Store Items");
         }
-        var tableFoot =  "</tbody>" +
-            "<tfoot>" +
-            "<tr>" +
-            "<th></th>"+
-            "<th>Name</th>"+
-            "<th>AltName</th>"+
-            "<th>Type</th>"+
-            "<th>SubType</th>"+
-            "<th>Price</th>"+
-            "<th>Status</th>"+
-            "<th>Last Update</th>"+
-            "</tr>" +
-        "</tfoot>" +
-        "</table>";
-        $("#table1Data").html(tableHead + tableBody + tableFoot);
-        let newButton = "<button class=\x22btn btn-info  float-right\x22 onclick=\x22getStoreItem('new')\x22>Create New Store Item</button>";
-        $("#newButton").html(newButton);
-        $("#newButton").show();
-        var data = "text/json;charset=utf-8," + encodeURIComponent(ReturnCSV(response.data.storeitems));
-        $('<a class=\x22btn btn-xs btn-primary\x22 href="data:' + data + '" download="storeItems.csv">download CSV</a>').appendTo('#downloadContainer');
-        $('#dataTable1').DataTable(
-            {"order": [[ 7, "desc" ]]}
-        );
-    })
-    .catch(function (error) {
-        console.log(error);
-    });
+
+        // let selectFor = "none";
+        // window.selectFor = selectFor;
+        console.log("getting storeitems for " + appid);
+        axios.get(path, config)
+        .then(function (response) {
+            // console.log(JSON.stringify(response));
+            var jsonResponse = response.data;
+            // console.log(ReturnCSV(response.data.storeitems));
+            var arr = jsonResponse.storeitems;
+            var selectHeader = "<th>Select</th>";
+            var selectButton = "<th>Select</th>";
+
+            var tableHead = "<table id=\x22dataTable1\x22 class=\x22display table table-striped table-bordered\x22 style=\x22width:100%\x22>" +
+                "<thead>"+
+                "<tr>"+
+                "<th></th>"+
+                "<th>Name</th>"+
+                "<th>AltName</th>"+
+                "<th>Type</th>"+
+                "<th>SubType</th>"+
+                "<th>Price</th>"+
+                "<th>Status</th>"+
+                "<th>Last Update</th>"+
+            "</tr>"+
+            "</thead>"+
+            "<tbody>";
+            var tableBody = "";
+            let storePic = "";
+            let storeItemPics = [];
+            let storeItem = {};
+            for(var i = 0; i < arr.length; i++) {
+                let ts = 0;
+                if (arr[i].createdTimestamp != undefined && arr[i].createdTimestamp != null) {
+                    ts = arr[i].createdTimestamp;
+                }
+                if (arr[i].lastUpdateTimestamp != undefined && arr[i].lastUpdateTimestamp != null) {
+                    ts = arr[i].lastUpdateTimestamp;
+                }
+                storePic = "";
+                storeItem = arr[i];
+                if (storeItem.storeItemPictures != null && storeItem.storeItemPictures != undefined && storeItem.storeItemPictures.length > 0) {
+                    storePic = storeItem.storeItemPictures[0].urlThumb;
+                }
+                var editButton = "<button type=\x22button\x22 class=\x22btn btn-link\x22 onclick=\x22getStoreItem('" + arr[i]._id + "')\x22>" + arr[i].itemName + "</button>";
+                tableBody = tableBody +
+                "<tr>" +
+                "<td><img class=\x22rounded image-thumbnail\x22 src=\x22 " + storePic + "\x22></td>" +    
+                "<td>" + editButton + "<div>_id:" + storeItem._id +"</div></td>" +
+                "<td>" + arr[i].itemAltName + "</td>" +
+                "<td>" + arr[i].itemType + "</td>" +
+                "<td>" + arr[i].itemSubType + "</td>" +
+                "<td>" + "$ " + (arr[i].itemPrice * .01).toFixed(2)+ "</td>" +
+                "<td>" + arr[i].itemStatus + "</td>" +
+                "<td>" + convertTimestamp(ts) + "</td>" +
+                "</tr>";
+            }
+            var tableFoot =  "</tbody>" +
+                "<tfoot>" +
+                "<tr>" +
+                "<th></th>"+
+                "<th>Name</th>"+
+                "<th>AltName</th>"+
+                "<th>Type</th>"+
+                "<th>SubType</th>"+
+                "<th>Price</th>"+
+                "<th>Status</th>"+
+                "<th>Last Update</th>"+
+                "</tr>" +
+            "</tfoot>" +
+            "</table>";
+            $("#table1Data").html(tableHead + tableBody + tableFoot);
+            let newButton = "<button class=\x22btn btn-info  float-right\x22 onclick=\x22getStoreItem('new')\x22>Create New Store Item</button>";
+            $("#newButton").html(newButton);
+            $("#newButton").show();
+            var data = "text/json;charset=utf-8," + encodeURIComponent(ReturnCSV(response.data.storeitems));
+            $('<a class=\x22btn btn-xs btn-primary\x22 href="data:' + data + '" download="storeItems.csv">download CSV</a>').appendTo('#downloadContainer');
+            $('#dataTable1').DataTable(
+                {"order": [[ 7, "desc" ]]}
+            );
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
     }
+
     function getAppPurchases() {
         let config = { headers: {
                 appid: appid,
@@ -8369,11 +8391,11 @@ function showGroup() {
         console.log("groupData: " + JSON.stringify(response.data));
         if (response.data.type.toLowerCase().includes("picture")) {
             grouptype = pictype;
-            responseArr = response.data.image_items;
-            refArr = [];
-            arr = [];
-            idArr = response.data.items;
-            groupArr = response.data.groupdata;
+            let responseArr = response.data.image_items;
+            let refArr = [];
+            let arr = [];
+            let idArr = response.data.items;
+            let groupArr = response.data.groupdata;
             if (groupArr != null) { //if there's a groupdata array
                 console.log("gotsa pic group data array");
                 groupArr = groupArr.sort(function(a, b){ //sort groupdata by index #
@@ -8433,11 +8455,11 @@ function showGroup() {
         }
         if (response.data.type.toLowerCase() == "location") {
             grouptype = loctype;
-            responseArr = response.data.locations;
-            refArr = [];
-            arr = [];
-            idArr = response.data.items;
-            groupArr = response.data.groupData;
+            let responseArr = response.data.locations;
+            let refArr = [];
+            let arr = [];
+            let idArr = response.data.items;
+            let groupArr = response.data.groupData;
             if (groupArr != null) { //if there's a groupdata array
                 groupArr = groupArr.sort(function(a, b){ //sort groupdata by index #
                     return a.itemIndex > b.itemIndex;
@@ -8505,11 +8527,11 @@ function showGroup() {
         }
         if (response.data.type.toLowerCase() == "audio") {
             grouptype = audiotype;
-            responseArr = response.data.audio_items;
-            refArr = [];
-            arr = [];
-            idArr = response.data.items;
-            groupArr = response.data.groupData;
+            let responseArr = response.data.audio_items;
+            let refArr = [];
+            let arr = [];
+            let idArr = response.data.items;
+            let groupArr = response.data.groupData;
             if (groupArr != null) { //if there's a groupdata array
                 groupArr = groupArr.sort(function(a, b){ //sort groupdata by index #
                     return a.itemIndex > b.itemIndex;
@@ -8571,11 +8593,11 @@ function showGroup() {
         }
         if (response.data.type.toLowerCase() == "video") {
             grouptype = vidtype;
-            responseArr = response.data.video_items;
-            refArr = [];
-            arr = [];
-            idArr = response.data.items;
-            groupArr = response.data.groupData;
+            let responseArr = response.data.video_items;
+            let refArr = [];
+            let arr = [];
+            let idArr = response.data.items;
+            let groupArr = response.data.groupData;
             if (groupArr != null) { //if there's a groupdata array
                 groupArr = groupArr.sort(function(a, b){ //sort groupdata by index #
                     return a.itemIndex > b.itemIndex;
@@ -8641,11 +8663,11 @@ function showGroup() {
         }
         if (response.data.type.toLowerCase() == "objects") {
             grouptype = objtype;
-            responseArr = response.data.obj_items;
-            refArr = [];
-            arr = [];
-            idArr = response.data.items;
-            groupArr = response.data.groupData;
+            let responseArr = response.data.obj_items;
+            let refArr = [];
+            let arr = [];
+            let idArr = response.data.items;
+            let groupArr = response.data.groupData;
             if (groupArr != null) { //if there's a groupdata array
                 groupArr = groupArr.sort(function(a, b){ //sort groupdata by index #
                     return a.itemIndex > b.itemIndex;
@@ -8702,11 +8724,11 @@ function showGroup() {
         }
         if (response.data.type.toLowerCase() == "scenes") {
             grouptype = scenetype;
-            responseArr = response.data.scene_items;
-            refArr = [];
-            arr = [];
-            idArr = response.data.items;
-            groupArr = response.data.groupData;
+            let responseArr = response.data.scene_items;
+            let refArr = [];
+            let arr = [];
+            let idArr = response.data.items;
+            let groupArr = response.data.groupData;
             if (groupArr != null) { //if there's a groupdata array
                 groupArr = groupArr.sort(function(a, b){ //sort groupdata by index #
                     return a.itemIndex > b.itemIndex;
@@ -10072,18 +10094,18 @@ function getAllPeople() {
             "<option>yellowRoseOfTexas</option>";
         return midi;
     }
-    function returnGLTFs() {
-        console.log("tryna fetch gltfs");
-        axios.get('/gltf/' + userid)
-        .then(function (response) {
-            // console.log(JSON.stringify(response.data.gltfItems));
-            return response.data.gltfItems;
-        }) //end of main fetch
-        .catch(function (error) {
-        console.log(error);
-            return error;
-        });
-    }
+    // function returnGLTFs() {
+    //     console.log("tryna fetch gltfs");
+    //     axios.get('/gltf/' + userid)
+    //     .then(function (response) {
+    //         // console.log(JSON.stringify(response.data.gltfItems));
+    //         return response.data.gltfItems;
+    //     }) //end of main fetch
+    //     .catch(function (error) {
+    //     console.log(error);
+    //         return error;
+    //     });
+    // }
     function returnObjectTypes(selectedType) {
         let types = "";
         const typesArray = [
@@ -10613,7 +10635,7 @@ function getAllPeople() {
         // }
         if (actionIDs != null && actionIDs.length > 0) {
             for (let i = 0; i < actionIDs.length; i++) {
-                for (a = 0; a < actions.length; a++) {
+                for (let a = 0; a < actions.length; a++) {
                     // console.log("actions " + a + " " + JSON.stringify(actions[a]));
                     if (actionIDs[i] == actions[a]._id) {
                         objAction = objAction + "<div class=\x22btn btn-success btn-sm "+actions[a]._id+"\x22><a style=\x22color:white;\x22 target=\x22_blank\x22 role=\x22button\x22" +
@@ -10631,7 +10653,7 @@ function getAllPeople() {
 
 
         $("#pageTitle").html("Object Details");
-        extraButtons = "<a href=\x22#\x22 id=\x22deleteButton\x22 class=\x22btn btn-danger btn-sm float-left\x22 onclick=\x22deleteItem('object','" + response.data._id + "')\x22>Delete Object</a>" +
+        const extraButtons = "<a href=\x22#\x22 id=\x22deleteButton\x22 class=\x22btn btn-danger btn-sm float-left\x22 onclick=\x22deleteItem('object','" + response.data._id + "')\x22>Delete Object</a>" +
         "<a class=\x22btn btn-primary btn-sm float-right\x22 href=\x22index.html?type=pictures&mode=select&parent=object&iid=" + response.data._id + "\x22>Add Object Pic</a>";
         let card = "<div class=\x22col-lg-12\x22>" +
             "<div class=\x22card shadow mb-4\x22>" +
@@ -12156,7 +12178,7 @@ function getAllPeople() {
             var arr = response.data;
             var hideIndex = 3;
             if (mode == "select") {
-                selectFor = parent;
+                //selectFor = parent;
                 selectHeader = "<th>Select</th>";
                 $("#pageTitle").html("Select Object for " + parent + " " + itemid);
             }
@@ -13116,57 +13138,57 @@ function getAllPeople() {
                     if (triggerAudioGroupButtons.length > 0) {
                         triggerAudio.URLpng = "ref/groups_selected.png";
                     }
-                    sceneButtons = "<label for=\x22scenePicButtons\x22>Link to Scenes</label><div id=\x22sceneSceneButtons\x22 style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\x22 role=\x22group\x22 aria-label=\x22button group\x22>" +
+                    const sceneButtons = "<label for=\x22scenePicButtons\x22>Link to Scenes</label><div id=\x22sceneSceneButtons\x22 style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\x22 role=\x22group\x22 aria-label=\x22button group\x22>" +
                     "<a class=\x22btn btn-primary\x22 href=\x22index.html?type=newscene\x22><i class=\x22fas fa-file-upload\x22></i> New </a>" +
                     "<a class=\x22btn btn-info\x22 href=\x22index.html?type=scenes&mode=select&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Select </a>" +
                     "<a class=\x22btn btn-success\x22 href=\x22index.html?type=groups&mode=scenegroup&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Group </a>" +
                     "<button class=\x22btn btn-danger clearSceneScenes\x22><i class=\x22fas fa-broom\x22></i> Clear </button></div>";
-                    picButtons = "<label for=\x22scenePicButtons\x22>Scene Pictures </label><div id=\x22scenePicButtons\x22 style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\x22 role=\x22group\x22 aria-label=\x22button group\x22>" +
+                    const picButtons = "<label for=\x22scenePicButtons\x22>Scene Pictures </label><div id=\x22scenePicButtons\x22 style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\x22 role=\x22group\x22 aria-label=\x22button group\x22>" +
                     "<a class=\x22btn btn-primary\x22 href=\x22index.html?type=bulkup\x22><i class=\x22fas fa-file-upload\x22></i> Upload </a>" +
                     "<a class=\x22btn btn-info\x22 href=\x22index.html?type=pictures&mode=select&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Select </a>" +
                     "<a class=\x22btn btn-success\x22 href=\x22index.html?type=groups&mode=picgroup&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Group </a>" +
                     "<button class=\x22btn btn-danger clearScenePictures\x22><i class=\x22fas fa-broom\x22></i> Clear </button></div>";
-                    postcardButtons = "<label for=\x22scenePostcardButtons\x22>Postcards </label><div id=\x22scenePostcardButtons\x22 style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\x22 role=\x22group\x22 aria-label=\x22button group\x22>" +
+                    const postcardButtons = "<label for=\x22scenePostcardButtons\x22>Postcards </label><div id=\x22scenePostcardButtons\x22 style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\x22 role=\x22group\x22 aria-label=\x22button group\x22>" +
                     "<a class=\x22btn btn-primary\x22 href=\x22index.html?type=bulkup\x22><i class=\x22fas fa-file-upload\x22></i> Upload </a>" +
                     "<a class=\x22btn btn-info\x22 href=\x22index.html?type=pictures&mode=postselect&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Select </a>" +
                     "<button class=\x22btn btn-danger clearScenePostcards\x22><i class=\x22fas fa-broom\x22></i> Clear </button></div>";
-                    vidButtons = "<label for=\x22scenePicButtons\x22>Scene Videos </label><div style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\x22 role=\x22group\x22 aria-label=\x22button group\x22>" +
+                    const vidButtons = "<label for=\x22scenePicButtons\x22>Scene Videos </label><div style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\x22 role=\x22group\x22 aria-label=\x22button group\x22>" +
                     "<a class=\x22btn btn-primary\x22 href=\x22index.html?type=bulkup\x22><i class=\x22fas fa-file-upload\x22></i> Upload </a>" +
                     "<a class=\x22btn btn-info\x22 href=\x22index.html?type=video&mode=select&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Select </a>" +
                     "<a class=\x22btn btn-success\x22 href=\x22index.html?type=groups&mode=vidgroup&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Group </a>" +
                     "<button class=\x22btn btn-danger clearSceneVids\x22><i class=\x22fas fa-broom\x22></i> Clear </button></div>";
-                    primaryAudioButtons = " <div style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\x22 role=\x22group\x22 aria-label=\x22button group\x22>" +
+                    const primaryAudioButtons = " <div style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\x22 role=\x22group\x22 aria-label=\x22button group\x22>" +
                     "<a class=\x22btn btn-primary btn-sm\x22 href=\x22index.html?type=bulkup\x22><i class=\x22fas fa-file-upload\x22></i> Upload </a>" +
                     "<a class=\x22btn btn-info btn-sm\x22 href=\x22index.html?type=audio&mode=paudio&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Select </a>" +
                     "<a class=\x22btn btn-success btn-sm\x22 href=\x22index.html?type=groups&mode=paudiogroup&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Group </a>" +
                     "<button class=\x22btn btn-danger btn-sm clearScenePrimaryAudio\x22><i class=\x22fas fa-broom\x22></i> Clear </button></div>";
-                    ambientAudioButtons = " <div style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\x22 role=\x22group\x22 aria-label=\x22button group\x22>" +
+                    const ambientAudioButtons = " <div style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\x22 role=\x22group\x22 aria-label=\x22button group\x22>" +
                     "<a class=\x22btn btn-primary btn-sm\x22 href=\x22index.html?type=bulkup\x22><i class=\x22fas fa-file-upload\x22></i> Upload </a>" +
                     "<a class=\x22btn btn-info btn-sm\x22 href=\x22index.html?type=audio&mode=aaudio&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Select </a>" +
                     "<a class=\x22btn btn-success btn-sm\x22 href=\x22index.html?type=groups&mode=aaudiogroup&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Group </a>" +
                     "<button class=\x22btn btn-danger btn-sm clearSceneAmbientAudio\x22><i class=\x22fas fa-broom\x22></i> Clear </button></div>";
-                    triggerAudioButtons = " <div style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\x22 role=\x22group\x22 aria-label=\x22button group\x22>" +
+                    const triggerAudioButtons = " <div style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\x22 role=\x22group\x22 aria-label=\x22button group\x22>" +
                     "<a class=\x22btn btn-primary btn-sm\x22 href=\x22index.html?type=bulkup\x22><i class=\x22fas fa-file-upload\x22></i> Upload </a>" +
                     "<a class=\x22btn btn-info btn-sm\x22 href=\x22index.html?type=audio&mode=taudio&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Select </a>" +
                     "<a class=\x22btn btn-success btn-sm\x22 href=\x22index.html?type=groups&mode=taudiogroup&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Group </a>" +
                     "<button class=\x22btn btn-danger btn-sm clearSceneTriggerAudio\x22><i class=\x22fas fa-broom\x22></i> Clear </button></div>";
-                    modelButtons = " <div style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\x22 role=\x22group\x22 aria-label=\x22button group\x22>" +
+                    const modelButtons = " <div style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\x22 role=\x22group\x22 aria-label=\x22button group\x22>" +
                     "<a class=\x22btn btn-primary\x22 href=\x22index.html?type=models\x22><i class=\x22fas fa-file-upload\x22></i> New </a>" +
                     "<a class=\x22btn btn-info\x22 href=\x22index.html?type=models&mode=select&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Select </a>" +
                     "<a class=\x22btn btn-success\x22 href=\x22index.html?type=groups&mode=modelgroup&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Group </a>" +
                     "<button class=\x22btn btn-danger\x22 onclick=\x22ClearScenePostcards()\x22><i class=\x22fas fa-broom\x22></i> Clear </button></div>";
-                    objButtons = " <div style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\x22 role=\x22group\x22 aria-label=\x22button group\x22>" +
+                    const objButtons = " <div style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\x22 role=\x22group\x22 aria-label=\x22button group\x22>" +
                     "<a class=\x22btn btn-primary\x22 href=\x22index.html?type=objex\x22><i class=\x22fas fa-file-upload\x22></i> New </a>" +
                     "<a class=\x22btn btn-info\x22 href=\x22index.html?type=objex&mode=select&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Select </a>" +
                     "<a class=\x22btn btn-success\x22 href=\x22index.html?type=groups&mode=objgroup&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Group </a>" +
                     "<button class=\x22btn btn-danger\x22 onclick=\x22ClearSceneObjects()\x22><i class=\x22fas fa-broom\x22></i> Clear </button></div>";
-                    locationButtons = " <div style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\x22 role=\x22group\x22 aria-label=\x22button group\x22>" +
+                    const locationButtons = " <div style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\x22 role=\x22group\x22 aria-label=\x22button group\x22>" +
                     // "<a class=\x22btn btn-primary\x22 href=\x22index.html?type=locations\x22><i class=\x22fas fa-file-upload\x22></i> New </a>" +
                     "<a class=\x22btn btn-primary newSceneLocation\x22 href=\x22#\x22><i class=\x22fas fa-file-upload\x22></i> New </a>" +
                     "<a class=\x22btn btn-info\x22 href=\x22index.html?type=locations&mode=select&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Select </a>" +
                     "<a class=\x22btn btn-success\x22 href=\x22index.html?type=groups&mode=locgroup&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Group </a>" +
                     "<button class=\x22btn btn-danger\x22 onclick=\x22ClearSceneLocations()\x22><i class=\x22fas fa-broom\x22></i> Clear </button></div>";
-                    textButtons = " <div style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\x22 role=\x22group\x22 aria-label=\x22button group\x22>" +
+                    const textButtons = " <div style=\x22margin: 0px 10px;\x22  class=\x22btn-group float-right\x22 role=\x22group\x22 aria-label=\x22button group\x22>" +
                     "<a class=\x22btn btn-primary\x22 href=\x22index.html?type=texts\x22><i class=\x22fas fa-file-upload\x22></i> New </a>" +
                     "<a class=\x22btn btn-info\x22 href=\x22index.html?type=texts&mode=select&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Select </a>" +
                     "<a class=\x22btn btn-success\x22 href=\x22index.html?type=groups&mode=textgroup&parent=scene&iid="+response.data._id+"\x22><i class=\x22fas fa-hand-pointer\x22></i> Group </a>" +
@@ -15687,7 +15709,7 @@ function getAllPeople() {
                     $(document).on('click','.clearSceneVids',function(e) {
                         e.preventDefault();  
                         console.log("tryna clearSceneVids");
-                        sceneVideoItems = [];
+                        // sceneVideoItems = [];
                         sceneYouTubeIDs = [];
                         sceneVideos = [];
                         sceneVideoGroups = [];
@@ -17524,7 +17546,7 @@ function getAllPeople() {
         var arr = response.data;
         var hideIndex = 3;
         if (mode == "select") {
-            selectFor = parent;
+            //selectFor = parent;
             selectHeader = "<th>Select</th>";
             $("#pageTitle").html("Select Object for " + parent + " " + itemid);
         }
@@ -18238,7 +18260,10 @@ function getAllPeople() {
     }
         //upload and staging stuff
     var selected = [];
-    var uppy = Uppy.Core({
+
+
+    // new Uppy().use(Dashboard, { inline: true, target: '#drag-drop-area' });
+    var uppy = new Uppy({
             onBeforeFileAdded: (currentFile, files) => {
                 const fileNameM = currentFile.name.replace(/\s+/g, '');
                 const fileNameMo = fileNameM.replace(/,/g, '');
@@ -18258,11 +18283,11 @@ function getAllPeople() {
                 return modifiedFile
                 }
             })
-            .use(Uppy.Dashboard, {
+            .use(Dashboard, {
                 inline: true,
                 target: '#drag-drop-area',
             })
-            .use(Uppy.Webcam, {
+            .use(Webcam, {
                 target: Uppy.Dashboard,
                 modes: [
                     'video-audio',
@@ -18273,7 +18298,7 @@ function getAllPeople() {
                 mirror: true,
                 facingMode: 'environment',
             })
-            .use(Uppy.AwsS3, {
+            .use(AwsS3, {
             getUploadParameters (file) {
                 console.log('tryna fetch /stagingputurl/' + cookie._id);
             return fetch('/stagingputurl/' + cookie._id, {
@@ -18311,6 +18336,7 @@ function getAllPeople() {
         console.log('Upload complete! We’ve uploaded these files:', result.successful);
             window.location.href = "./index.html?type=staging";
         });
+
         $(document).on("click",".delete",function(){ //because the button is dynamic, must do it via .on
             console.log("delete clicked");
             // alert(this.id);
@@ -18354,10 +18380,10 @@ function getAllPeople() {
             });
         });
         $(document).on("click","#process_selected",function(){             
-            processMe = {};
-            pArr = [];
+            let processMe = {};
+            let pArr = [];
             for( var i = 0; i < selected.length; i++){
-                d = {};
+                let d = {};
                 d.key = selected[i].replace(/,\s+/g, '').toLowerCase();
                 d.uid = cookie._id;
             
@@ -18407,10 +18433,10 @@ function getAllPeople() {
             });
         });
         $(document).on("click","#delete_selected",function(){ 
-            deleteMe = {};
-            dlArr = [];
+            let deleteMe = {};
+            let dlArr = [];
             for( var i = 0; i < selected.length; i++){
-                d = {};
+                let d = {};
                 d.key = selected[i];
                 d.uid = cookie._id;
                 dlArr.push(d);
