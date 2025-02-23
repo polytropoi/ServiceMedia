@@ -748,16 +748,16 @@ landing_router.get('/:_id', function (req, res) {
                 // TODO - backstretch include var!
                 // "<script src=\x22/main/js/jquery.backstretch.min.js\x22></script>"; 
                 if (avatarName == undefined || avatarName == null || avatarName == "guest") { //cook up a guest name if not logged in
-                    array1 = [];
-                    array2 = [];
-                    array3 = [];
-                    index1 = -1;
-                    index2 = -1;
-                    index3 = -1;
-                    name1 = "";
-                    name2 = "";
-                    name3 = "";
-                    min = 0;
+                    let array1 = [];
+                    let array2 = [];
+                    let array3 = [];
+                    let index1 = -1;
+                    let index2 = -1;
+                    let index3 = -1;
+                    let name1 = "";
+                    let name2 = "";
+                    let name3 = "";
+                    let min = 0;
                     db.lexicons.findOne({name: "nameArrays"}, function (err, items) {
                     if (err || !items) {
                         console.log("error getting scene 5: " + err);
@@ -922,9 +922,9 @@ landing_router.get('/:_id', function (req, res) {
                                 if (sceneResponse.sceneLocations[i].model != undefined && sceneResponse.sceneLocations[i].model != "none" && sceneResponse.sceneLocations[i].model.length > 0) { //new way of attaching gltf to location w/out object
                                     // console.log("pushinbg model locaition " + sceneResponse.sceneLocations[i]);
                                     sceneModelLocations.push(sceneResponse.sceneLocations[i]);
-                                    if (sceneResponse.sceneLocations[i].eventData != null && sceneResponse.sceneLocations[i].eventData.length > 4) {
-                                        animationComponent = "<script src=\x22https://unpkg.com/aframe-animation-component@5.1.2/dist/aframe-animation-component.min.js\x22></script>"; //unused !NEEDS FIXING - this component could be added more than once
-                                    }
+                                    // if (sceneResponse.sceneLocations[i].eventData != null && sceneResponse.sceneLocations[i].eventData.length > 4) {
+                                    //     animationComponent = "<script src=\x22https://unpkg.com/aframe-animation-component@5.1.2/dist/aframe-animation-component.min.js\x22></script>"; //unused !NEEDS FIXING - this component could be added more than once
+                                    // }
                                 }
                                 if (sceneResponse.sceneLocations[i].markerType != undefined && sceneResponse.sceneLocations[i].type.toLowerCase() != 'geographic') { //cloudmarkers, special type allows local mods
                                     if (sceneResponse.sceneLocations[i].markerType.toLowerCase() == "placeholder" 
@@ -1758,7 +1758,7 @@ landing_router.get('/:_id', function (req, res) {
                                             } else {      
                                                 // console.log("founda matching model: " + JSON.stringify(asset));
                                                 if (asset.item_type == "glb") {
-                                                    assetUserID = asset.userID;
+                                                    const assetUserID = asset.userID;
                                                     // var sourcePath =   "servicemedia/users/" + assetUserID + "/gltf/" + locMdl.gltf; //this should be "model" or "filename"
                                                     (async () => {
                                                         // let modelURL = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + assetUserID + "/gltf/" + asset.filename, Expires: 6000});
@@ -2877,7 +2877,7 @@ landing_router.get('/:_id', function (req, res) {
                 function (callback) {
                     console.log("videoGroups: " + sceneResponse.sceneVideoGroups);
                     if (sceneResponse.sceneVideoGroups != null && sceneResponse.sceneVideoGroups.length > 0) {
-                        vgID = sceneResponse.sceneVideoGroups[0];
+                        const vgID = sceneResponse.sceneVideoGroups[0];
                         let oo_id = ObjectID(vgID);
 
                         db.groups.find({"_id": oo_id}, function (err, groups) {
@@ -2897,10 +2897,12 @@ landing_router.get('/:_id', function (req, res) {
                                         callbackz();
                                     } else {
                                         async.each(videos, function(video, cbimage) { //jack in a signed url for each
-                                            // video.url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + video.userID + "/video/" + video._id + "/" + video._id + "." + video.filename, Expires: 6000}); //TODO: puthemsina video folder!
-                                            video.url = ReturnPresignedUrlSync(process.env.S3_ROOT_BUCKET_NAME, 'users/' + video.userID + "/video/" + video._id + "/" + video._id + "." + video.filename, 6000);
-                                            
-                                            cbimage();
+                                            (async () => {
+                                                // video.url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + video.userID + "/video/" + video._id + "/" + video._id + "." + video.filename, Expires: 6000}); //TODO: puthemsina video folder!
+                                                video.url = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + video.userID + "/video/" + video._id + "/" + video._id + "." + video.filename, 6000);
+                                                
+                                                cbimage();
+                                            })();
                                         }, 
                                         function (err) {
                                             if (err) {
