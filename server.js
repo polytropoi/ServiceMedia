@@ -14619,47 +14619,52 @@ app.get('/available_domain_scenes/:domain',  function (req, res) { //public scen
                                                 cb(); //no postcards, next...
                                             }
                                         } else {
-                                            var item_string_filename = JSON.stringify(picture_item.filename);
-                                            item_string_filename = item_string_filename.replace(/\"/g, "");
-                                            var item_string_filename_ext = getExtension(item_string_filename);
-                                            var expiration = new Date();
-                                            expiration.setMinutes(expiration.getMinutes() + 30);
-                                            var baseName = path.basename(item_string_filename, (item_string_filename_ext));
-                                            // var thumbName = 'thumb.' + baseName + item_string_filename_ext;  //unused for now
-                                            // var standardName = 'standard.' + baseName + item_string_filename_ext;
-                                            var halfName = 'half.' + baseName + item_string_filename_ext;
-                                            var quarterName = 'quarter.' + baseName + item_string_filename_ext;
-                                            var originalName = 'original.' + baseName + item_string_filename_ext;
-                                            var urlOrig = "";
-                                            if (req.params.domain == "xrswim.com") { //return orig ones for xrswim..
-                                                urlOrig = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/originals/" + picture_item._id + "." + originalName, Expires: 6000});
-                                                // s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + origName, Expires: 6000}); //just send back thumbnail urls for list
-                                            }
-                                            var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + halfName, Expires: 6000}); //just send back thumbnail urls for list
-                                            var urlQuarter = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + quarterName, Expires: 6000}); //just send back thumbnail urls for list
-                                            availableScene = {
-                                                sceneTitle: scene.sceneTitle,
-                                                sceneKey: scene.short_id,
-                                                sceneType: scene.sceneType,
-                                                sceneWebType: scene.sceneWebType,
-                                                sceneAltURL: scene.sceneAltURL,
-                                                sceneLastUpdate: scene.sceneLastUpdate,
-                                                sceneDescription: scene.sceneDescription,
-                                                sceneKeynote: scene.sceneKeynote,
-                                                sceneCategory: scene.sceneCategory,
-                                                sceneSource: scene.sceneSource,
-                                                sceneTags: scene.sceneTags,
-                                                sceneWebGLOK: scene.sceneWebGLOK,
-                                                sceneAndroidOK: scene.sceneAndroidOK,
-                                                sceneIosOK: scene.sceneIosOK,
-                                                sceneWindowsOK: scene.sceneWindowsOK,
-                                                sceneStatus: scene.sceneShareWithPublic ? "public" : "private",
-                                                sceneOwner: scene.userName,
-                                                scenePostcardQuarter: urlQuarter,
-                                                scenePostcardHalf: urlHalf,
-                                                scenePostcardOriginal: urlOrig
-                                            };
-                                            callback(null, availableScene);
+                                            (async () => {
+                                                var item_string_filename = JSON.stringify(picture_item.filename);
+                                                item_string_filename = item_string_filename.replace(/\"/g, "");
+                                                var item_string_filename_ext = getExtension(item_string_filename);
+                                                var expiration = new Date();
+                                                expiration.setMinutes(expiration.getMinutes() + 30);
+                                                var baseName = path.basename(item_string_filename, (item_string_filename_ext));
+                                                // var thumbName = 'thumb.' + baseName + item_string_filename_ext;  //unused for now
+                                                // var standardName = 'standard.' + baseName + item_string_filename_ext;
+                                                var halfName = 'half.' + baseName + item_string_filename_ext;
+                                                var quarterName = 'quarter.' + baseName + item_string_filename_ext;
+                                                var originalName = 'original.' + baseName + item_string_filename_ext;
+                                                const urlOrig = "";
+                                                // if (req.params.domain == "xrswim.com") { //return orig ones for xrswim..
+                                                //     // urlOrig = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/originals/" + picture_item._id + "." + originalName, Expires: 6000});
+                                                //     url
+                                                //     // s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + origName, Expires: 6000}); //just send back thumbnail urls for list
+                                                // }
+                                                // var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + halfName, Expires: 6000}); //just send back thumbnail urls for list
+                                                // var urlQuarter = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + quarterName, Expires: 6000}); //just send back thumbnail urls for list
+                                                const urlHalf = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + halfName, 6000);
+                                                const urlQuarter = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, "users/" + picture_item.userID + "/pictures/" + picture_item._id + "." + halfName, 6000);
+                                                availableScene = {
+                                                    sceneTitle: scene.sceneTitle,
+                                                    sceneKey: scene.short_id,
+                                                    sceneType: scene.sceneType,
+                                                    sceneWebType: scene.sceneWebType,
+                                                    sceneAltURL: scene.sceneAltURL,
+                                                    sceneLastUpdate: scene.sceneLastUpdate,
+                                                    sceneDescription: scene.sceneDescription,
+                                                    sceneKeynote: scene.sceneKeynote,
+                                                    sceneCategory: scene.sceneCategory,
+                                                    sceneSource: scene.sceneSource,
+                                                    sceneTags: scene.sceneTags,
+                                                    sceneWebGLOK: scene.sceneWebGLOK,
+                                                    sceneAndroidOK: scene.sceneAndroidOK,
+                                                    sceneIosOK: scene.sceneIosOK,
+                                                    sceneWindowsOK: scene.sceneWindowsOK,
+                                                    sceneStatus: scene.sceneShareWithPublic ? "public" : "private",
+                                                    sceneOwner: scene.userName,
+                                                    scenePostcardQuarter: urlQuarter,
+                                                    scenePostcardHalf: urlHalf,
+                                                    scenePostcardOriginal: urlOrig
+                                                };
+                                                callback(null, availableScene);
+                                            })();
                                         }
                                     });
                                 } else {
@@ -14699,20 +14704,23 @@ app.get('/available_domain_scenes/:domain',  function (req, res) { //public scen
                                             console.log("error getting audio items: " + err);
                                             callback(null,err);
                                         } else {
-                                            var item_string_filename = JSON.stringify(audio_item.filename);
-                                            // console.log("audio filename: " + item_string_filename);
-                                            item_string_filename = item_string_filename.replace(/\"/g, "");
-                                            var item_string_filename_ext = getExtension(item_string_filename);
-                                            var expiration = new Date();
-                                            expiration.setMinutes(expiration.getMinutes() + 1000);
-                                            var baseName = path.basename(item_string_filename, (item_string_filename_ext));
-                                            //console.log(baseName);
-                                            var mp3Name = baseName + '.mp3';
-                                            var primaryAudioUrl = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_item.userID + "/audio/" + audio_item._id + "." + mp3Name, Expires: 60000});
-                                            avScene.primaryAudioUrl = primaryAudioUrl;
-                                            // console.log("tryna push " + primaryAudioUrl + " to scene number " + availableScenesResponse.availableScenes.length);
-                                            availableScenesResponse.availableScenes.push(avScene);
-                                            callback(null, 'done');
+                                            (async () => {
+                                                var item_string_filename = JSON.stringify(audio_item.filename);
+                                                // console.log("audio filename: " + item_string_filename);
+                                                item_string_filename = item_string_filename.replace(/\"/g, "");
+                                                var item_string_filename_ext = getExtension(item_string_filename);
+                                                var expiration = new Date();
+                                                expiration.setMinutes(expiration.getMinutes() + 1000);
+                                                var baseName = path.basename(item_string_filename, (item_string_filename_ext));
+                                                //console.log(baseName);
+                                                var mp3Name = baseName + '.mp3';
+                                                // var primaryAudioUrl = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + audio_item.userID + "/audio/" + audio_item._id + "." + mp3Name, Expires: 60000});
+                                                const primaryAudioUrl = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + audio_item.userID + "/audio/" + audio_item._id + "." + mp3Name,6000);
+                                                avScene.primaryAudioUrl = primaryAudioUrl;
+                                                // console.log("tryna push " + primaryAudioUrl + " to scene number " + availableScenesResponse.availableScenes.length);
+                                                availableScenesResponse.availableScenes.push(avScene);
+                                                callback(null, 'done');
+                                            })();
                                         }
                                     });
                                 } else {

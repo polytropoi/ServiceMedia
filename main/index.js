@@ -24,6 +24,7 @@
     window.deleteItem = deleteItem;
     window.getStoreItem = getStoreItem;
     window.previewGLTF = previewGLTF;
+    window.logout = logout;
 
     var cookie = Cookies.get();
     var type = getParameterByName("type", window.location.href); //these params used for routing in bigSwitch
