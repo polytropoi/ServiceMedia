@@ -13031,7 +13031,7 @@ function getAllPeople() {
 
             //primary audio
             if (scenePrimaryAudioGroups != null && scenePrimaryAudioGroups.length > 0) {
-                for (i = 0; i < scenePrimaryAudioGroups.length; i++) {
+                for (let i = 0; i < scenePrimaryAudioGroups.length; i++) {
                     primaryAudioGroupButtons = primaryAudioGroupButtons +                                         
                     "<a href=\x22index.html?type=group&iid="+ scenePrimaryAudioGroups[i] +"\x22 class=\x22badge badge-pill badge-dark float-left\x22>" + scenePrimaryAudioGroups[i] + "</a>";
                 }
@@ -13046,7 +13046,7 @@ function getAllPeople() {
             }
                 //ambient audio
             if (response.data.sceneAmbientAudioGroups != null && sceneAmbientAudioGroups.length > 0) {
-                for (i = 0; i < sceneAmbientAudioGroups.length; i++) {
+                for (let i = 0; i < sceneAmbientAudioGroups.length; i++) {
                     ambientAudioGroupButtons = ambientAudioGroupButtons +                                         
                     "<a href=\x22index.html?type=group&iid="+ sceneAmbientAudioGroups[i] +"\x22 class=\x22badge badge-pill badge-dark float-left\x22>" + sceneAmbientAudioGroups[i] + "</a>";
                 }
@@ -13061,7 +13061,7 @@ function getAllPeople() {
             }
             //trigger audio
             if (response.data.sceneTriggerAudioGroups != null && sceneTriggerAudioGroups.length > 0) {
-                for (i = 0; i < response.data.sceneTriggerAudioGroups.length; i++) {
+                for (let i = 0; i < response.data.sceneTriggerAudioGroups.length; i++) {
                     triggerAudioGroupButtons = triggerAudioGroupButtons +                                         
                     "<a href=\x22index.html?type=group&iid="+ sceneTriggerAudioGroups[i] +"\x22 class=\x22badge badge-pill badge-dark float-left\x22>" + sceneTriggerAudioGroups[i] + "</a>";
                 }

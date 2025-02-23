@@ -3443,7 +3443,7 @@ app.post('/dropnope/', requiredAuthentication, function (req, res) {
                     if (i_item.objectID == obj._id) {
                         iCount++;
                         console.log("gotsa invnetory match with the obj " + iCount);
-                        // if (i == (inventory.inventoryItems.length - 1)) { //loop is over, carry on... 
+                        
                             if (iCount >= obj.maxPerScene) {
                                 // console.log("max per scene reached!");
                                 callbackz('maxxed');
@@ -3472,21 +3472,7 @@ app.post('/dropnope/', requiredAuthentication, function (req, res) {
                     }
                 });
 
-                // for (let i = 0; i < inventory.inventoryItems.length; i++) { //count scene inventory items like this obj
-                //     if (inventory.inventoryItems[i].objectID == obj._id) {
-                //         iCount++;
-                //         console.log("gotsa invnetory match with the obj " + iCount);
-                //         if (i == (inventory.inventoryItems.length - 1)) { //loop is over, carry on... 
-                //             if (iCount > obj.maxPerScene) {
-                //                 console.log("max per scene reached!");
-                //                 callback("max");
-                                
-                //             } else {
-                //                 callback(null);
-                //             }
-                //         }
-                //     }
-                // } 
+               
             } else {
                 callback(null);
             }
@@ -13883,19 +13869,21 @@ app.get('/uscene/:user_id/:scene_id',  requiredAuthentication, uscene, function 
 
                     (async () => {
                         try {
-                            const urlMp3 = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + mp3Name, 6000);
-                            const urlOgg = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + oggName, 6000);
-                            const urlPng = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + pngName, 6000);
+                            if (audio_items[i]) {
+                                const urlMp3 = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + mp3Name, 6000);
+                                const urlOgg = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + oggName, 6000);
+                                const urlPng = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + pngName, 6000);
 
-        //                            audio_items.URLmp3 = urlMp3; //jack in teh signed urls into the object array
-                            audio_items[i].URLmp3 = urlMp3; //jack in teh signed urls into the object array
-                            audio_items[i].URLogg = urlOgg;
-                            audio_items[i].URLpng = urlPng;
-                            if (audio_items[i].tags != null) {
-                                if (audio_items[i].tags.length < 1) {
-                                    audio_items[i].tags = [""];
-                                } else {
-                                    audio_items[i].tags = [""];
+            //                            audio_items.URLmp3 = urlMp3; //jack in teh signed urls into the object array
+                                audio_items[i].URLmp3 = urlMp3; //jack in teh signed urls into the object array
+                                audio_items[i].URLogg = urlOgg;
+                                audio_items[i].URLpng = urlPng;
+                                if (audio_items[i].tags != null) {
+                                    if (audio_items[i].tags.length < 1) {
+                                        audio_items[i].tags = [""];
+                                    } else {
+                                        audio_items[i].tags = [""];
+                                    }
                                 }
                             }
   
@@ -13903,7 +13891,8 @@ app.get('/uscene/:user_id/:scene_id',  requiredAuthentication, uscene, function 
                         } catch (e) {
                            
                             // callback(null);
-                            console.log("error in audioResponse " + e);
+                            console.log("error in audioResponse " + e + audio_items[i]);
+                            
                         }
                     })();
 
