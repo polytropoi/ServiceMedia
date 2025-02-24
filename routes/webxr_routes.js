@@ -839,7 +839,7 @@ webxr_router.get('/:_id', function (req, res) {
                     let name1 = "";
                     let name2 = "";
                     let name3 = "";
-                    min = 0;
+                    const min = 0;
                     db.lexicons.findOne({name: "nameArrays"}, function (err, items) {
                     if (err || !items) {
                         console.log("error getting scene 5: " + err);
