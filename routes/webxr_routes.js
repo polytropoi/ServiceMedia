@@ -538,7 +538,7 @@ webxr_router.get('/:_id', function (req, res) {
     let enviromentScript = ""; //for aframe env component
     
 
-    let aframeScript = "<script src=\x22https://aframe.io/releases/1.6.0/aframe.min.js\x22></script>";
+    let aframeScript = "<script src=\x22https://aframe.io/releases/1.7.0/aframe.min.js\x22></script>";
     let threejsVersion = "164";
     let surfaceScatterScript = "";
     let locationData = "";
@@ -767,13 +767,13 @@ webxr_router.get('/:_id', function (req, res) {
                         if (sceneData.sceneTags[i].includes("synth")) {
                             synthScripts = "<script src=\x22../main/src/synth/Tone.js\x22></script><script src=\x22../main/js/synth.js\x22></script>";
                         }
-                        if (sceneData.sceneTags[i].toLowerCase().includes("aframe 1.2")) {
-                            aframeScript = "<script src=\x22https://aframe.io/releases/1.2.0/aframe.min.js\x22></script>";
+                        if (sceneData.sceneTags[i].toLowerCase().includes("aframe 1.6")) {
+                            aframeScript = "<script src=\x22https://aframe.io/releases/1.6.0/aframe.min.js\x22></script>";
                         }
                         if (sceneData.sceneTags[i].toLowerCase().includes("aframe master")) {
                             // aframeScript = "<script src=\x22https://cdn.jsdelivr.net/gh/aframevr/aframe@744e2b869e281f840cff7d9cb02e95750ce90920/dist/aframe-master.min.js\x22></script>"; //ref 20220715// nope!
-                            aframeScript = "<script src=\x22https://cdn.jsdelivr.net/gh/aframevr/aframe@f4a80d235cdbf9bee3bffca684c0f12985de145b/dist/aframe-master.min.js\x22></script>"; //ref 20231103 (integrated hands!)
-                            threejsVersion = "170";
+                            aframeScript = "<script src=\x22https://cdn.jsdelivr.net/gh/aframevr/aframe@388a47f384feccad2b0d38985f67c441222388e2/dist/aframe-master.min.js\x22></script>"; //ref 20231103 (integrated hands!)
+                            threejsVersion = "173";
                         }
                         if (sceneData.sceneTags[i].toLowerCase().includes("aframe ada")) {
                             aframeScript = "<script src=\x22https://a-cursor-test.glitch.me/aframe-master.js\x22></script>"; //mod by @adarosecannon

@@ -1064,7 +1064,7 @@
             numSpawned = this.count
           }
 
-          if (hasSource || isUsingModel) {
+          if ((hasSource || isUsingModel) && particlePosition.updateRange) {
             particlePosition.updateRange.offset = startIndex
             particlePosition.updateRange.count = numSpawned
             particlePosition.needsUpdate = true
@@ -1076,11 +1076,11 @@
             particleQuaternion.needsUpdate = true
           }
 
-          // if (changeIDs) {
+          if (particleVertexID.updateRange) {
             particleVertexID.updateRange.offset = startIndex
             particleVertexID.updateRange.count = numSpawned
             particleVertexID.needsUpdate = true
-          // }
+          }
 
           // this will cause a glitch in the appearance as we reset the IDs to prevent them from overflowing
           this.nextID = this.nextID % RANDOM_REPEAT_COUNT
