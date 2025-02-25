@@ -15891,7 +15891,7 @@ function getAllPeople() {
                             confirm: function () {
                                 // console.log("data: " + JSON.stringify(data));   
 
-                                data = {};
+                                let data = {};
                                 data.sceneShareWithPeople = sceneShareWithPeople;
                                 data.sceneShareWithMessage = sceneShareWithMessage;
                                 data.sceneTitle = sceneTitle;

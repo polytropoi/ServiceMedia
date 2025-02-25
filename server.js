@@ -169,6 +169,7 @@ var store = new MongoDBStore({ //store session cookies in a separate db with dif
     // aws.config = new aws.Config({accessKeyId: process.env.AWSKEY, secretAccessKey: process.env.AWSSECRET, region: process.env.AWSREGION});
     // export let ses = new aws.SES({apiVersion : '2010-12-01'});
     import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+
     import {
         S3Client, 
         S3ServiceException, 
@@ -178,10 +179,19 @@ var store = new MongoDBStore({ //store session cookies in a separate db with dif
         ListObjectsV2Command,
         PutObjectCommand,
         DeleteObjectCommand,
-        DeleteObjectsCommand
-      } from "@aws-sdk/client-s3";
+        DeleteObjectsCommand,
+    } from "@aws-sdk/client-s3";
+    
+    import {SESClient,SendEmailCommand} from "@aws-sdk/client-ses"
     // export let s3 = new aws.S3();
     export const s3 = new S3Client({
+        region: 'us-east-1',
+        credentials: {
+            accessKeyId: process.env.AWSKEY,
+            secretAccessKey: process.env.AWSSECRET
+        }
+    });
+    export const ses = new SESClient({
         region: 'us-east-1',
         credentials: {
             accessKeyId: process.env.AWSKEY,
@@ -1374,7 +1384,56 @@ export async function CopyObject(targetBucket, copySource, key) {
         // });
     }
 } 
-
+export async function SendEmail(toAddress, fromAddress, htmlbody, subject) {
+    console.log("tryna send email " + toAddress + fromAddress);
+    const command = new SendEmailCommand({
+        Destination: {
+          /* required */
+          CcAddresses: [
+            /* more items */
+          ],
+        //   ToAddresses: toAddresses, //must be an array
+          ToAddresses: [
+            toAddress,
+            /* more To-email addresses */
+          ],
+        },
+        Message: {
+          /* required */
+          Body: {
+            /* required */
+            Html: {
+              Charset: "UTF-8",
+              Data: htmlbody,
+            }
+            // Text: {
+            //   Charset: "UTF-8",
+            //   Data: textbody,
+            // },
+          },
+          Subject: {
+            Charset: "UTF-8",
+            Data: subject,
+          },
+        },
+        Source: fromAddress,
+        ReplyToAddresses: [
+           
+          /* more items */
+        ],
+      });
+      try {
+        return await ses.send(command);
+      } catch (caught) {
+        console.log("caught email error " + caught);
+        if (caught instanceof Error && caught.name === "MessageRejected") {
+          /** @type { import('@aws-sdk/client-ses').MessageRejected} */
+          const messageRejectedError = caught;
+          return messageRejectedError;
+        }
+        throw caught;
+      }
+}
 
 //ROUTES BELOW
 ////////////////////////////////////////////////////////////////
@@ -2219,45 +2278,45 @@ app.get('/traffic/:domain', requiredAuthentication, admin, function (req, res) {
 
 });
 
-app.post('/ios_inapp_purchase/', function(req, res){
-    console.log("tryna save ios inapp purchase type " + JSON.stringify(req.body.productID));
-    var item = req.body;
-    item.datePosted = Date.now();
-    item.isValidated = "no";
-    item.sourcePlatform = "iOS";
-    // item.userID = "";
-    var htmlbody = "incoming IAP: " + JSON.stringify(item);
-        ses.sendEmail( {
-            Source: "admin@servicemedia.net",
-            Destination: { ToAddresses: [adminEmail]},
-            Message: {
-                Subject: {
-                    Data: "Incoming IAP"
-                },
-                Body: {
-                    Html: {
-                        Data: htmlbody
-                    }
-                }
-            }
-        }
-        , function(err, data) {
-            if(err) throw err
-            console.log('Email sent:');
-            console.log(data);
+// app.post('/ios_inapp_purchase/', function(req, res){
+//     console.log("tryna save ios inapp purchase type " + JSON.stringify(req.body.productID));
+//     var item = req.body;
+//     item.datePosted = Date.now();
+//     item.isValidated = "no";
+//     item.sourcePlatform = "iOS";
+//     // item.userID = "";
+//     var htmlbody = "incoming IAP: " + JSON.stringify(item);
+//         ses.sendEmail( {
+//             Source: "admin@servicemedia.net",
+//             Destination: { ToAddresses: [adminEmail]},
+//             Message: {
+//                 Subject: {
+//                     Data: "Incoming IAP"
+//                 },
+//                 Body: {
+//                     Html: {
+//                         Data: htmlbody
+//                     }
+//                 }
+//             }
+//         }
+//         , function(err, data) {
+//             if(err) throw err
+//             console.log('Email sent:');
+//             console.log(data);
            
-        });
-    db.iap.save(item, function (err, saved) {
-        if ( err || !saved ) {
-            console.log('iap not saved..');
-            res.send("error " + err);
-        } else {
-            var item_id = saved._id.toString();
-            console.log('new iap, id: ' + item_id);
-            res.send(item_id);
-        }
-    });
-});
+//         });
+//     db.iap.save(item, function (err, saved) {
+//         if ( err || !saved ) {
+//             console.log('iap not saved..');
+//             res.send("error " + err);
+//         } else {
+//             var item_id = saved._id.toString();
+//             console.log('new iap, id: ' + item_id);
+//             res.send(item_id);
+//         }
+//     });
+// });
 
 app.get('/validate/:auth_id', function (req, res) {
     console.log("tryna validate...");
@@ -2385,26 +2444,42 @@ app.post('/stripe_collect_data', function (req,res) {
                                     "You may then log into the app, using your email as username, and with the password <strong>" + userPass + "</strong> which you may change at any time." +
                                     " You may also change your username, but your account will remain tied to this email address.<br><br>" +
                                     "Payment ID: " + item_id;
-                                    ses.sendEmail({
-                                        Source: from,
-                                        Destination: { ToAddresses: [req.body.stripeEmail], CcAddresses: [], BccAddresses: [adminEmail] },
-                                        Message: {
-                                            Subject: {
-                                                Data: 'New ' + topName + ' Subscription!'
-                                            },
-                                            Body: {
-                                                Html: {
-                                                    Data: htmlbody
-                                                }
-                                            }
+
+                                    (async () => {
+
+                                        try {
+                                            // const status1 = await SendEmail(to, from, htmlbody, subject);
+                                            const status2 = await SendEmail(req.body.stripeEmail, process.env.ADMIN_EMAIL, htmlbody, 'New ' + topName + ' Subscription!');
+                                            console.log("new sub mail " + status2);
+                                            // res.redirect("/#/");
+                                            // callback(null);
+                                        } catch (e) {
+                                            console.log("payment update mailfail " + e);
+                                            // callback(e);
+                                            // res.send(e);
                                         }
-                                    }
-                                    , function(err, data) {
-                                        if(err) throw err
-                                        console.log('Email sent:');
-                                        console.log(data);
-                                        //res.redirect("http://elnoise.com/#/login");
-                                    });
+                                    
+                                    })();
+                                    // ses.sendEmail({
+                                    //     Source: from,
+                                    //     Destination: { ToAddresses: [req.body.stripeEmail], CcAddresses: [], BccAddresses: [adminEmail] },
+                                    //     Message: {
+                                    //         Subject: {
+                                    //             Data: 'New ' + topName + ' Subscription!'
+                                    //         },
+                                    //         Body: {
+                                    //             Html: {
+                                    //                 Data: htmlbody
+                                    //             }
+                                    //         }
+                                    //     }
+                                    // }
+                                    // , function(err, data) {
+                                    //     if(err) throw err
+                                    //     console.log('Email sent:');
+                                    //     console.log(data);
+                                    //     //res.redirect("http://elnoise.com/#/login");
+                                    // });
                                 }
                                     res.redirect("/#/newthanks");
                                 });
@@ -2431,26 +2506,42 @@ app.post('/stripe_collect_data', function (req,res) {
                         "If you need to reset your password, go to " + rootHost + "/#/reset/<br>" + 
                         "If you have any questions or problems, you may reply to this email, or contact polytropoi@gmail.com. <br>Best regards,<br>Jim Cherry<br><br>" +
                         "Payment ID: " + item_id;
-                        ses.sendEmail({
-                            Source: "admin@servicemedia.net",
-                            Destination: { ToAddresses: [req.body.stripeEmail], CcAddresses: [], BccAddresses: [adminEmail] },
-                            Message: {
-                                Subject: {
-                                    Data: topName + ' Payment Received - Thanks!'
-                                },
-                                Body: {
-                                    Html: {
-                                        Data: htmlbody
-                                    }
-                                }
+
+                        (async () => {
+
+                            try {
+                                // const status1 = await SendEmail(to, from, htmlbody, subject);
+                                const status2 = await SendEmail(req.body.stripeEmail, process.env.ADMIN_EMAIL, htmlbody, topName + ' Payment Received - Thanks!');
+                                console.log("new sub mail " + status2);
+                                // res.redirect("/#/");
+                                // callback(null);
+                            } catch (e) {
+                                console.log("payment update mailfail " + e);
+                                // callback(e);
+                                // res.send(e);
                             }
-                        }
-                        , function(err, data) {
-                            if(err) throw err
-                            console.log('Email sent:');
-                            console.log(data);
-                            //res.redirect("http://elnoise.com/#/login");
-                        });
+                           
+                        })();
+                        // ses.sendEmail({
+                        //     Source: "admin@servicemedia.net",
+                        //     Destination: { ToAddresses: [req.body.stripeEmail], CcAddresses: [], BccAddresses: [adminEmail] },
+                        //     Message: {
+                        //         Subject: {
+                        //             Data: topName + ' Payment Received - Thanks!'
+                        //         },
+                        //         Body: {
+                        //             Html: {
+                        //                 Data: htmlbody
+                        //             }
+                        //         }
+                        //     }
+                        // }
+                        // , function(err, data) {
+                        //     if(err) throw err
+                        //     console.log('Email sent:');
+                        //     console.log(data);
+                        //     //res.redirect("http://elnoise.com/#/login");
+                        // });
                     }
                 }
                 });
@@ -2477,138 +2568,169 @@ app.post('/stripe_collect_data', function (req,res) {
 //    });
 });
 
-app.post('/check_sub_email/', requiredAuthentication, function(req, res){ //convert IAP subscriber to actual user
-    console.log(req.body);
-    // res.send("you sent " + req.body);
-    db.users.find( {email: req.body.email}, function (err, users) {
-        if (err || !users || users.length < 1) { //if no users already exist for this email
-            db.iap.findOne({receipt: req.body.receipt}, function (err, recpt) { //is receipt "valid" i.e. stored in iap table?
-                if (err || !recpt) {
-                    res.send("invalid receipt");
-                } else { 
-                    db.users.find({receipt : req.body.receipt}, function (err, receepts) { //has receipt already been used for an existing user?
-                        if (err || receepts.length > 0) {
-                            var htmlbody = req.body.email + " tryna reuse same receipt : " + JSON.stringify(req.body.receipt);
-                            ses.sendEmail( {
-                                Source: "admin@servicemedia.net",
-                                Destination: { ToAddresses: [adminEmail]},
-                                Message: {
-                                    Subject: {
-                                        Data: "receipt reuse from " + req.body.email
-                                    },
-                                    Body: {
-                                        Html: {
-                                            Data: htmlbody
-                                        }
-                                    }
-                                }
-                            }
-                            , function(err, data) {
-                                if(err) throw err
-                                console.log('Email sent:');
-                                console.log(data);
+// app.post('/check_sub_email/', requiredAuthentication, function(req, res){ //convert IAP subscriber to actual user //ugh, no
+//     console.log(req.body);
+//     // res.send("you sent " + req.body);
+//     db.users.find( {email: req.body.email}, function (err, users) {
+//         if (err || !users || users.length < 1) { //if no users already exist for this email
+//             db.iap.findOne({receipt: req.body.receipt}, function (err, recpt) { //is receipt "valid" i.e. stored in iap table?
+//                 if (err || !recpt) {
+//                     res.send("invalid receipt");
+//                 } else { 
+//                     db.users.find({receipt : req.body.receipt}, function (err, receepts) { //has receipt already been used for an existing user?
+//                         if (err || receepts.length > 0) {
+//                             var htmlbody = req.body.email + " tryna reuse same receipt : " + JSON.stringify(req.body.receipt);
+//                             // ses.sendEmail( {
+//                             //     Source: "admin@servicemedia.net",
+//                             //     Destination: { ToAddresses: [adminEmail]},
+//                             //     Message: {
+//                             //         Subject: {
+//                             //             Data: "receipt reuse from " + req.body.email
+//                             //         },
+//                             //         Body: {
+//                             //             Html: {
+//                             //                 Data: htmlbody
+//                             //             }
+//                             //         }
+//                             //     }
+//                             // }
+//                             // , function(err, data) {
+//                             //     if(err) throw err
+//                             //     console.log('Email sent:');
+//                             //     console.log(data);
                                
-                            });
-                            res.send("Error: this subscription has already been used by another user.  Please contact admin@servicemedia.net");
+//                             // });
 
-                        } else {
-                            console.log('fixing to make a new user from iap subscriber!'); //do it!
-                            var from = "admin@servicemedia.net";
-                            var timestamp = Math.round(Date.now() / 1000);
-                            var ip = req.headers['x-forwarded-for'] ||
-                                req.connection.remoteAddress ||
-                                req.socket.remoteAddress ||
-                                req.connection.socket.remoteAddress;
-                            var userPass = shortid.generate();
-                            bcrypt.genSalt(10, function(err, salt) {
-                                bcrypt.hash(userPass, salt, null, function(err, hash) {
-                                    var cleanhash = validator.blacklist(hash, ['/','.','$']); //make it URL safe
-                                    db.users.save({
-                                        type : 'iap_subscriber',
-                                        status : 'unvalidated',
-                                        userName : req.body.email,
-                                        email : req.body.email,
-                                        createDate : timestamp,
-                                        validationHash : cleanhash,
-                                        createIP : ip,
-                                        paymentStatus: "ok",
-                                        receipt: req.body.receipt,
-                                        iapID: recpt._id,
-                                        // odomain : req.body.domain, //original domain
-                                        // oappid : req.headers.appid.toString().replace(":", ""), //original app id
-                                        password : hash
-                                    },
-                                    function (err, newUser){
-                                        if ( err || !newUser ){
-                                            console.log("db error, new user not saved", err);
-                                            res.send("error creating user : " + err);
-                                        } else {
-                                            console.log("new user saved to db");
-                                            var user_id = newUser._id.toString();
-                                            console.log("userID: " + user_id);
+//                             (async () => {
 
-                                            htmlbody = "Welcome to " + topName + ", " + req.body.email + "!  <a href=\""+ rootHost + "/validate/" + cleanhash + "\">To get started, click this link to validate account</a> <br><br>"+
-                                            "You may then log into the app, using your email as username, and with the password <strong>" + userPass + "</strong> which you may change at any time.<br>" +
-                                            "You may also change your username, but your account will remain tied to this email address.<br><br>" +
-                                            "in-app-purchase ID: " + recpt._id;  
-                                            ses.sendEmail({
-                                                    Source: from,
-                                                    Destination: { ToAddresses: [req.body.email], CcAddresses: [], BccAddresses: [adminEmail] },
-                                                    Message: {
-                                                        Subject: {
-                                                            Data: 'New ' + topName + ' Subscription!'
-                                                        },
-                                                        Body: {
-                                                            Html: {
-                                                                Data: htmlbody
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                                , function(err, data) {
-                                                    if(err) throw err
-                                                    console.log('Email sent:');
-                                                    console.log(data);
-                                                    //res.redirect("http://elnoise.com/#/login");
-                                                });
-                                        
-                                            res.send("Thanks! A validation email has been sent to the address you provided; you must click on the validation link to activate your account.");
-                                            // res.redirect("/#/newthanks");
-                                            var htmlbody = req.body.email + " iap subscriber converting to user with receipt : " + JSON.stringify(req.body.receipt);
-                                            ses.sendEmail( {
-                                                Source: "admin@servicemedia.net",
-                                                Destination: { ToAddresses: [adminEmail]},
-                                                Message: {
-                                                    Subject: {
-                                                        Data: "new iap user " + req.body.email
-                                                    },
-                                                    Body: {
-                                                        Html: {
-                                                            Data: htmlbody
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                            , function(err, data) {
-                                                if(err) throw err
-                                                console.log('Email sent:');
-                                                console.log(data);
+//                                 try {
+//                                     // const status1 = await SendEmail(to, from, htmlbody, subject);
+//                                     const status2 = await SendEmail(process.env.ADMIN_EMAIL, process.env.ADMIN_EMAIL, htmlbody, "receipt reuse from " + req.body.email);
+//                                     console.log("sub ckeck fail " + status2);
+//                                     // res.redirect("/#/");
+//                                     // callback(null);
+//                                 } catch (e) {
+//                                     console.log("sub chck mailfail " + e);
+//                                     // callback(e);
+//                                     // res.send(e);
+//                                 }
+                               
+//                             })();
+//                             res.send("Error: this subscription has already been used by another user.  Please contact admin@servicemedia.net");
+
+//                         } else {
+//                             console.log('fixing to make a new user from iap subscriber!'); //do it!
+//                             var from = "admin@servicemedia.net";
+//                             var timestamp = Math.round(Date.now() / 1000);
+//                             var ip = req.headers['x-forwarded-for'] ||
+//                                 req.connection.remoteAddress ||
+//                                 req.socket.remoteAddress ||
+//                                 req.connection.socket.remoteAddress;
+//                             var userPass = shortid.generate();
+//                             bcrypt.genSalt(10, function(err, salt) {
+//                                 bcrypt.hash(userPass, salt, null, function(err, hash) {
+//                                     var cleanhash = validator.blacklist(hash, ['/','.','$']); //make it URL safe
+//                                     db.users.save({
+//                                         type : 'iap_subscriber',
+//                                         status : 'unvalidated',
+//                                         userName : req.body.email,
+//                                         email : req.body.email,
+//                                         createDate : timestamp,
+//                                         validationHash : cleanhash,
+//                                         createIP : ip,
+//                                         paymentStatus: "ok",
+//                                         receipt: req.body.receipt,
+//                                         iapID: recpt._id,
+//                                         // odomain : req.body.domain, //original domain
+//                                         // oappid : req.headers.appid.toString().replace(":", ""), //original app id
+//                                         password : hash
+//                                     },
+//                                     function (err, newUser){
+//                                         if ( err || !newUser ){
+//                                             console.log("db error, new user not saved", err);
+//                                             res.send("error creating user : " + err);
+//                                         } else {
+//                                             console.log("new user saved to db");
+//                                             var user_id = newUser._id.toString();
+//                                             console.log("userID: " + user_id);
+
+//                                             htmlbody = "Welcome to " + topName + ", " + req.body.email + "!  <a href=\""+ rootHost + "/validate/" + cleanhash + "\">To get started, click this link to validate account</a> <br><br>"+
+//                                             "You may then log into the app, using your email as username, and with the password <strong>" + userPass + "</strong> which you may change at any time.<br>" +
+//                                             "You may also change your username, but your account will remain tied to this email address.<br><br>" +
+//                                             "in-app-purchase ID: " + recpt._id;  
+//                                             // ses.sendEmail({
+//                                             //         Source: from,
+//                                             //         Destination: { ToAddresses: [req.body.email], CcAddresses: [], BccAddresses: [adminEmail] },
+//                                             //         Message: {
+//                                             //             Subject: {
+//                                             //                 Data: 'New ' + topName + ' Subscription!'
+//                                             //             },
+//                                             //             Body: {
+//                                             //                 Html: {
+//                                             //                     Data: htmlbody
+//                                             //                 }
+//                                             //             }
+//                                             //         }
+//                                             //     }
+//                                             //     , function(err, data) {
+//                                             //         if(err) throw err
+//                                             //         console.log('Email sent:');
+//                                             //         console.log(data);
+//                                             //         //res.redirect("http://elnoise.com/#/login");
+//                                             //     });
+//                                             (async () => {
+
+//                                                 try {
+//                                                     // const status1 = await SendEmail(to, from, htmlbody, subject);
+//                                                     const status2 = await SendEmail(req.body.email, process.env.ADMIN_EMAIL, htmlbody, "receipt reuse from " + 'New ' + topName + ' Subscription!');
+//                                                     console.log("new sub mail " + status2);
+//                                                     // res.redirect("/#/");
+//                                                     // callback(null);
+//                                                 } catch (e) {
+//                                                     console.log("new sub req mailfail " + e);
+//                                                     // callback(e);
+//                                                     // res.send(e);
+//                                                 }
+                                               
+//                                             })();
+//                                             res.send("Thanks! A validation email has been sent to the address you provided; you must click on the validation link to activate your account.");
+//                                             // res.redirect("/#/newthanks");
+//                                             var htmlbody = req.body.email + " iap subscriber converting to user with receipt : " + JSON.stringify(req.body.receipt);
                                             
-                                            });
-                                        }
-                                    });
-                                });
-                            });
-                        }
-                    });
-                }
-            });
-        } else {
+//                                             ses.sendEmail( {
+//                                                 Source: "admin@servicemedia.net",
+//                                                 Destination: { ToAddresses: [adminEmail]},
+//                                                 Message: {
+//                                                     Subject: {
+//                                                         Data: "new iap user " + req.body.email
+//                                                     },
+//                                                     Body: {
+//                                                         Html: {
+//                                                             Data: htmlbody
+//                                                         }
+//                                                     }
+//                                                 }
+//                                             }
+//                                             , function(err, data) {
+//                                                 if(err) throw err
+//                                                 console.log('Email sent:');
+//                                                 console.log(data);
+                                            
+//                                             });
+//                                         }
+//                                     });
+//                                 });
+//                             });
+//                         }
+//                     });
+//                 }
+//             });
+//         } else {
 
-            res.send("Sorry, that email is already in use.\n\nTo recover a lost password, use the Reset button on the previous page");
-        }
-    });
-});
+//             res.send("Sorry, that email is already in use.\n\nTo recover a lost password, use the Reset button on the previous page");
+//         }
+//     });
+// });
 
 app.get('/makedomainadmin/:domain/:_id',  checkAppID, requiredAuthentication, admin, function (req, res) {
     console.log(" makedomainadmin req" + req)
@@ -6875,27 +6997,42 @@ app.post('/invitation_req/', function (req,res) {
                                             "<br> Owner: " + theScene.userName +
                                             "<br><br><strong><a href='"+ requestProtocol + "://" + req.headers.host + "/qrcode/" + req.body.short_id + "'>Click here to scan QR Code for this scene</a></strong>" +
                                             "<br> For more scenes like this, or to get the latest app, visit <a href='https://servicemedia.net'>ServiceMedia.net!</a> ";
-                                        ses.sendEmail( {
-                                                Source: from,
-                                                Destination: { ToAddresses: to, BccAddresses: bcc},
-                                                Message: {
-                                                    Subject: {
-                                                        Data: subject
-                                                    },
-                                                    Body: {
-                                                        Html: {
-                                                            Data: htmlbody
-                                                        }
-                                                    }
+                                            (async () => {
+
+                                                try {
+                                                    const status1 = await SendEmail(to, from, htmlbody, subject);
+                                                    const status2 = await SendEmail(process.env.ADMIN_EMAIL, process.env.ADMIN_EMAIL, htmlbody, subject);
+                                                    console.log("invite_req mails " + status1 + " " + status2);
+                                                    // res.redirect("/#/");
+                                                    callback(null);
+                                                } catch (e) {
+                                                    console.log("invite_req mail errlr " + e);
+                                                    callback(e);
+                                                    // res.send(e);
                                                 }
-                                            }
-                                            , function(err, data) {
-                                                if(err)  callback(err);
-                                                console.log('Email sent:');
-                                                console.log(data);
-                                            });
-                                        // callbackzz();
-                                        callback(null);
+                                               
+                                            })();
+                                        // ses.sendEmail( {
+                                        //         Source: from,
+                                        //         Destination: { ToAddresses: to, BccAddresses: bcc},
+                                        //         Message: {
+                                        //             Subject: {
+                                        //                 Data: subject
+                                        //             },
+                                        //             Body: {
+                                        //                 Html: {
+                                        //                     Data: htmlbody
+                                        //                 }
+                                        //             }
+                                        //         }
+                                        //     }
+                                        //     , function(err, data) {
+                                        //         if(err)  callback(err);
+                                        //         console.log('Email sent:');
+                                        //         console.log(data);
+                                        //     });
+                                        // // callbackzz();
+                                        // callback(null);
                                     } else {
                                         //TODO check user's auth?
                                         // if (timestamp < user.resetTimestamp + 3600) { //expires in 1 hour!
@@ -6962,33 +7099,47 @@ app.post('/invitation_req/', function (req,res) {
                                                     "Click here to authenticate your access!</a></button><br>" +
                                                     "<br> <img src=" + urlHalf + "> " +
                                                     "<br> For more info, or to become a subscriber, visit <a href='https://servicemedia.net'>ServiceMedia.net!</a> ";
-                                            ses.sendEmail( {
-                                                    Source: from,
-                                                    Destination: { ToAddresses: to, BccAddresses: bcc },
-                                                    Message: {
-                                                        Subject: {
-                                                            Data: subject
-                                                        },
-                                                        Body: {
-                                                            Html: {
-                                                                Data: htmlbody
-                                                            }
+
+                                                    (async () => {
+
+                                                        try {
+                                                            const status1 = await SendEmail(to, from, htmlbody, subject);
+                                                            const status2 = await SendEmail(process.env.ADMIN_EMAIL, process.env.ADMIN_EMAIL, htmlbody, subject);
+                                                            console.log("invite_req mails " + status1 + " " + status2);
+                                                            // res.redirect("/#/");
+                                                            callback(null);
+                                                        } catch (e) {
+                                                            console.log("infivite req mail errlr " + e);
+                                                            callback(e);
+                                                            // res.send(e);
                                                         }
-                                                    }
-                                                }
-                                                , function(err, data) {
-                                                    if(err) callback(err);
-                                                    console.log('Email sent:');
-                                                    console.log(data);
+                                                       
+                                                    })();
+
+                                            //     ses.sendEmail( {
+                                            //         Source: from,
+                                            //         Destination: { ToAddresses: to, BccAddresses: bcc },
+                                            //         Message: {
+                                            //             Subject: {
+                                            //                 Data: subject
+                                            //             },
+                                            //             Body: {
+                                            //                 Html: {
+                                            //                     Data: htmlbody
+                                            //                 }
+                                            //             }
+                                            //         }
+                                            //     }
+                                            //     , function(err, data) {
+                                            //         if(err) callback(err);
+                                            //         console.log('Email sent:');
+                                            //         console.log(data);
                                                     
-                                                });
+                                            //     });
                                             });
                                         });
-                                        
-                                    }
-                                    callback(null);
+                                    }                                
                                 }
-                            // }
                         ],
                         function (err, result) { // #last function, close async
                             if (err) {
@@ -7089,209 +7240,236 @@ app.post('/resetpw', function (req, res) {
                             "Click here to reset your password (link expires in 1 hour): </br>" +
                             rootHost + "/main/resetter.html?hzch=" + cleanhash;
                         // console.log(domainAdminEmail + " tryna send html body" + htmlbody);
-                    ses.sendEmail( {
-                            Source: from,
-                            Destination: { ToAddresses: to, CcAddresses: [], BccAddresses: bcc},
-                            Message: {
-                                Subject: {
-                                    Data: subject
-                                },
-                                Body: {
-                                    Html: {
-                                        Data: htmlbody
-                                    }
-                                }
+
+                        (async () => {
+
+                            try {
+                                const status1 = await SendEmail(req.body.email, process.env.ADMIN_EMAIL, htmlbody, subject);
+                                const status2 = await SendEmail(process.env.ADMIN_EMAIL, process.env.ADMIN_EMAIL, htmlbody, subject);
+                                console.log("resetpw mails " + status1 + " " + status2);
+                                res.redirect("/#/");
+                            } catch (e) {
+                                console.log("pw reset mail errlr " + e);
+                                
+                                res.send(e);
                             }
-                        }
-                        , function(err, data) {
-                            if(err) {
-                                res.send(err);
-                            } else {
-                                res.send('email sent');
-                            }
-                            // console.log('Email sent:');
-                            // console.log(data);
-                            
-                            // res.redirect("/#/");
-                        });
-                    });
-                });
-            }
-        });
-    } else {
-        res.send("invalid email address");
-    }
-});
-
-app.post('/send_invitations', requiredAuthentication, checkAppID, function (req, res) { //nope
-
-    console.log('send request from: ' + req.body.email);
-    // ws.send("authorized");
-    var subject = topName + "  Invitation"
-    var from = adminEmail
-    var to = [req.body.email];
-    var bcc = [ "polytropoi@gmail.com"];
-    //var reset = "";
-    var timestamp = Math.round(Date.now() / 1000);
-
-    if (validator.isEmail(req.body.email) == true) {
-
-        // db.users.findOne({"email": req.body.email}, function (err, user) {
-        //     if (err || !user) {
-        //         console.log("error getting user: " + err);
-        //         res.send("email address not found");
-        //     } else {
-
-                bcrypt.genSalt(3, function(err, salt) { //level3 easy, not a password itself
-                    bcrypt.hash(timestamp.toString(), salt, null, function(err, hash) {
-                        // reset = hash;
-                        var cleanhash = validator.blacklist(hash, ['/','.','$']); //make it URL safe
-                        db.invitations.save( { _id: user._id }, { $set: { invitationHash: cleanhash, invitationTimestamp: timestamp}});
-                        var htmlbody = "<h3>" + topName + " Invitation from " + from + "</h3><hr><br>" +
-                            "Click here authenticate your access (link expires in 1 hour): </br>" +
-                            rootHost + "/invitation/" + cleanhash;
-
-                    ses.sendEmail( {
-                            Source: from,
-                            Destination: { ToAddresses: to, BccAddresses: bcc},
-                            Message: {
-                                Subject: {
-                                    Data: subject
-                                },
-                                Body: {
-                                    Html: {
-                                        Data: htmlbody
-                                    }
-                                }
-                            }
-                        }
-                        , function(err, data) {
-                            if(err) throw err
-                            console.log('Email sent:');
-                            console.log(data);
-
-                            res.redirect(rootHost);
-                        });
-                    });
-                });
-        //     }
-        // });
-    } else {
-        res.send("invalid email address");
-    }
-});
-
-
-app.post('/send_invitez/', requiredAuthentication, function (req, res) { //nope
-    console.log("tryna send invite: " + JSON.stringify(req.body)); 
-    res.send("sent");
-});
-
-// app.post('/invite_scene/:_id', checkAppID, requiredAuthentication, function (req, res) {
-//     console.log("share node: " + req.body._id + " wmail: " + req.body.sceneShareWith);
-
-app.post('/send_invite/', requiredAuthentication, function (req, res) { //nope
-    console.log("tryna send invite : " + JSON.stringify(req.body));
-    let addressArray = req.body.sceneShareWithPeople.split(",");
-    async.each (addressArray, function (emailAddress, callbackz) { //loop tru w/ async
-       
-        var subject = "Invitation to Immersive Scene : " + req.body.sceneTitle;
-        var from = adminEmail;
-        var to = [emailAddress.trim()];
-        // var to = ['polytropoi@gmail.com'];
-        var bcc = [adminEmail];
-        //var reset = "";
-        var timestamp = Math.round(Date.now() / 1000);
-        var message = "";
-        var servicemedia_link = rootHost + "/webxr/" + req.body.short_id;
-        // var wgl_link = "https://servicemedia.net/webxr/" + req.body.short_id;
-        var mob_link = "http://strr.us/?scene=" + req.body.short_id;
-        if (req.body.sceneShareWithMessage === "" || req.body.sceneShareWithMessage == null) {
-            message = " has invited you to join them in the metaverse!";
-        } else {
-            message = " has shared this Postcard from the Metaverse with you including the message: " +
-                "<hr><br> " + req.body.sceneShareWithMessage +  "<br>"
-        }
-        var urlHalf = "";
-
-        if (validator.isEmail(emailAddress.trim()) == true) {
-            bcrypt.genSalt(3, function(err, salt) { //level3 easy, not a password itself
-                bcrypt.hash(timestamp.toString(), salt, null, function(err, hash) {
-                    // reset = hash;
-                var cleanhash = validator.blacklist(hash, ['/','.','$']); //make it URL safe
-                var htmlbody = req.session.user.userName + message + "</h3><hr><br>" +
-                    "<br> Scene Title: " + req.body.sceneTitle +
-                    "<br> Scene Key: " + req.body.short_id +
-                    "<br> Scene Type: " + req.body.sceneType +
-                    "<br> Scene Description: " + req.body.sceneDescription +
-                    "<br><br> <img src=" + urlHalf + "> " +
-                    "<br> <a href= " + servicemedia_link + "> Click here for more postcards and content from this scene. </a> <br>If you already have the " + topName + " iOS app, you may load the scene directly with the <a href= " + mob_link + ">Mobile App Link</a>" +
-                    "<br><br>Click here authenticate your access (link expires in 1 hour): </br>" +
-                    req.headers.host + "/invitation_check/" + cleanhash+
-        //            "r><br> <a href= " + mob_link + "> Mobile App link </a> " +
-                    "<br>You may also enter the scene title or keycode on the " + topName + " app landing page" +
-
-                    "<br> For more scenes like this, or to get the latest app, visit <a href='https://servicemedia.net'>ServiceMedia.net!</a> ";
-                // console.log("htmlbody is " + htmlbody);
+                           
+                        })();
+                    
+                            //     ses.sendEmail( {
+                            //             Source: from,
+                            //             Destination: { ToAddresses: to, CcAddresses: [], BccAddresses: bcc},
+                            //             Message: {
+                            //                 Subject: {
+                            //                     Data: subject
+                            //                 },
+                            //                 Body: {
+                            //                     Html: {
+                            //                         Data: htmlbody
+                            //                     }
+                            //                 }
+                            //             }
+                            //         }
+                            //         , function(err, data) {
+                            //             if(err) {
+                            //                 res.send(err);
+                            //             } else {
+                            //                 res.send('email sent');
+                            //             }
+                            //             // console.log('Email sent:');
+                            //             // console.log(data);
                                         
-                // Create sendEmail params 
-                var params = {
-                    Destination: { /* required */
-                    CcAddresses: [],
-                    ToAddresses: to,
-                    },
-                    Message: { /* required */
-                    Body: { /* required */
-                        Html: {
-                        Charset: "UTF-8",
-                        Data: htmlbody
-                        },
-                        Text: {
-                        Charset: "UTF-8",
-                        Data: htmlbody
-                        }
-                    },
-                    Subject: {
-                        Charset: 'UTF-8',
-                        Data: subject
-                    }
-                    },
-                    Source: from, /* required */
-                    ReplyToAddresses: [from],
-                };
-                // Create the promise and SES service object
-                var sendPromise = new aws.SES({apiVersion: '2010-12-01'}).sendEmail(params).promise();
-
-                // Handle promise's fulfilled/rejected states
-                sendPromise.then(
-                    function(data) {
-                            console.log("sent to " + data.MessageId);
-                            callbackz();
-                        }).catch(
-                            function(err) {
-                            console.error(err, err.stack);
-                            callbackz("error sending to email address " + emailAddress + " " + err);
-                        });
+                            //             // res.redirect("/#/");
+                            //         });
                     });
-                }); //bcrypt end
-            } else {
-                callbackz("invalid email address " + emailAddress);
-                // res.send();s
-            }
-        
-        }, function(error) {
-        
-            if (error) {
-                console.log('A file failed to process');
-            
-                res.send("there was an error! " + error);
-            } else {
-                console.log('All files have been processed successfully');
-                res.send("sent!");
-
+                });
             }
         });
+    } else {
+        res.send("invalid email address");
+    }
 });
+
+// app.post('/send_invitations', requiredAuthentication, checkAppID, function (req, res) { //nope
+
+//     console.log('send request from: ' + req.body.email);
+//     // ws.send("authorized");
+//     var subject = topName + "  Invitation"
+//     var from = adminEmail
+//     var to = [req.body.email];
+//     var bcc = [ "polytropoi@gmail.com"];
+//     //var reset = "";
+//     var timestamp = Math.round(Date.now() / 1000);
+
+//     if (validator.isEmail(req.body.email) == true) {
+
+//         // db.users.findOne({"email": req.body.email}, function (err, user) {
+//         //     if (err || !user) {
+//         //         console.log("error getting user: " + err);
+//         //         res.send("email address not found");
+//         //     } else {
+
+//                 bcrypt.genSalt(3, function(err, salt) { //level3 easy, not a password itself
+//                     bcrypt.hash(timestamp.toString(), salt, null, function(err, hash) {
+//                         // reset = hash;
+//                         var cleanhash = validator.blacklist(hash, ['/','.','$']); //make it URL safe
+//                         db.invitations.save( { _id: user._id }, { $set: { invitationHash: cleanhash, invitationTimestamp: timestamp}});
+//                         var htmlbody = "<h3>" + topName + " Invitation from " + from + "</h3><hr><br>" +
+//                             "Click here authenticate your access (link expires in 1 hour): </br>" +
+//                             rootHost + "/invitation/" + cleanhash;
+
+//                             (async () => {
+//                                 try {
+//                                     const status = await SendEmail(req.body.email, process.env.ADMIN_EMAIL, htmlbody, subject);
+//                                     console.log("email sent " + status);
+//                                     res.redirect(rootHost);
+//                                 } catch (e) {
+//                                     console.log("email sendd error " + e);
+//                                     throw (e);
+//                                 } 
+                                
+//                             })();
+//                     ses.sendEmail( {
+//                             Source: from,
+//                             Destination: { ToAddresses: to, BccAddresses: bcc},
+//                             Message: {
+//                                 Subject: {
+//                                     Data: subject
+//                                 },
+//                                 Body: {
+//                                     Html: {
+//                                         Data: htmlbody
+//                                     }
+//                                 }
+//                             }
+//                         }
+//                         , function(err, data) {
+//                             if(err) throw err
+//                             console.log('Email sent:');
+//                             console.log(data);
+
+//                             res.redirect(rootHost);
+//                         });
+//                     });
+//                 });
+//         //     }
+//         // });
+//     } else {
+//         res.send("invalid email address");
+//     }
+// });
+
+
+// app.post('/send_invitez/', requiredAuthentication, function (req, res) { //nope
+//     console.log("tryna send invite: " + JSON.stringify(req.body)); 
+//     res.send("sent");
+// });
+
+// // app.post('/invite_scene/:_id', checkAppID, requiredAuthentication, function (req, res) {
+// //     console.log("share node: " + req.body._id + " wmail: " + req.body.sceneShareWith);
+
+// app.post('/send_invite/', requiredAuthentication, function (req, res) { //nope
+//     console.log("tryna send invite : " + JSON.stringify(req.body));
+//     let addressArray = req.body.sceneShareWithPeople.split(",");
+//     async.each (addressArray, function (emailAddress, callbackz) { //loop tru w/ async
+       
+//         var subject = "Invitation to Immersive Scene : " + req.body.sceneTitle;
+//         var from = adminEmail;
+//         var to = [emailAddress.trim()];
+//         // var to = ['polytropoi@gmail.com'];
+//         var bcc = [adminEmail];
+//         //var reset = "";
+//         var timestamp = Math.round(Date.now() / 1000);
+//         var message = "";
+//         var servicemedia_link = rootHost + "/webxr/" + req.body.short_id;
+//         // var wgl_link = "https://servicemedia.net/webxr/" + req.body.short_id;
+//         var mob_link = "http://strr.us/?scene=" + req.body.short_id;
+//         if (req.body.sceneShareWithMessage === "" || req.body.sceneShareWithMessage == null) {
+//             message = " has invited you to join them in the metaverse!";
+//         } else {
+//             message = " has shared this Postcard from the Metaverse with you including the message: " +
+//                 "<hr><br> " + req.body.sceneShareWithMessage +  "<br>"
+//         }
+//         var urlHalf = "";
+
+//         if (validator.isEmail(emailAddress.trim()) == true) {
+//             bcrypt.genSalt(3, function(err, salt) { //level3 easy, not a password itself
+//                 bcrypt.hash(timestamp.toString(), salt, null, function(err, hash) {
+//                     // reset = hash;
+//                 var cleanhash = validator.blacklist(hash, ['/','.','$']); //make it URL safe
+//                 var htmlbody = req.session.user.userName + message + "</h3><hr><br>" +
+//                     "<br> Scene Title: " + req.body.sceneTitle +
+//                     "<br> Scene Key: " + req.body.short_id +
+//                     "<br> Scene Type: " + req.body.sceneType +
+//                     "<br> Scene Description: " + req.body.sceneDescription +
+//                     "<br><br> <img src=" + urlHalf + "> " +
+//                     "<br> <a href= " + servicemedia_link + "> Click here for more postcards and content from this scene. </a> <br>If you already have the " + topName + " iOS app, you may load the scene directly with the <a href= " + mob_link + ">Mobile App Link</a>" +
+//                     "<br><br>Click here authenticate your access (link expires in 1 hour): </br>" +
+//                     req.headers.host + "/invitation_check/" + cleanhash+
+//         //            "r><br> <a href= " + mob_link + "> Mobile App link </a> " +
+//                     "<br>You may also enter the scene title or keycode on the " + topName + " app landing page" +
+
+//                     "<br> For more scenes like this, or to get the latest app, visit <a href='https://servicemedia.net'>ServiceMedia.net!</a> ";
+//                 // console.log("htmlbody is " + htmlbody);
+                                        
+//                 // Create sendEmail params 
+//                 var params = {
+//                     Destination: { /* required */
+//                     CcAddresses: [],
+//                     ToAddresses: to,
+//                     },
+//                     Message: { /* required */
+//                     Body: { /* required */
+//                         Html: {
+//                         Charset: "UTF-8",
+//                         Data: htmlbody
+//                         },
+//                         Text: {
+//                         Charset: "UTF-8",
+//                         Data: htmlbody
+//                         }
+//                     },
+//                     Subject: {
+//                         Charset: 'UTF-8',
+//                         Data: subject
+//                     }
+//                     },
+//                     Source: from, /* required */
+//                     ReplyToAddresses: [from],
+//                 };
+//                 // Create the promise and SES service object
+//                 var sendPromise = new aws.SES({apiVersion: '2010-12-01'}).sendEmail(params).promise();
+
+//                 // Handle promise's fulfilled/rejected states
+//                 sendPromise.then(
+//                     function(data) {
+//                             console.log("sent to " + data.MessageId);
+//                             callbackz();
+//                         }).catch(
+//                             function(err) {
+//                             console.error(err, err.stack);
+//                             callbackz("error sending to email address " + emailAddress + " " + err);
+//                         });
+//                     });
+//                 }); //bcrypt end
+//             } else {
+//                 callbackz("invalid email address " + emailAddress);
+//                 // res.send();s
+//             }
+        
+//         }, function(error) {
+        
+//             if (error) {
+//                 console.log('A file failed to process');
+            
+//                 res.send("there was an error! " + error);
+//             } else {
+//                 console.log('All files have been processed successfully');
+//                 res.send("sent!");
+
+//             }
+//         });
+// });
 
 app.post('/ext_auth_req/:domain', function (req, res) {
     console.log("tryna get ext_auth_req!" + req.body.email);
@@ -7663,7 +7841,8 @@ app.post('/share_scene/', function (req, res) { //yep! //make it public?
                                                 callback(null, urlHalf, eData, scene);
 
                                             } catch (e) {
-                                                callback(e);
+                                                // callback(e);
+                                                throw(e);
                                             }
                                         })();
                                     }
@@ -7738,6 +7917,7 @@ app.post('/share_scene/', function (req, res) { //yep! //make it public?
                     var restrictToLocationMessage = eventData.restrictToLocation ? "<br>Access is restricted to the event location<br>" : "";
                     var isNotPublicMessage = "";
                     var app_link = "servicemedia://scene?" + req.body.short_id;
+                 
                     // if (req.body.isPublic) {
                     //     message = "An invitation to this private Immersive Scene was requested for you!";
                     // } else {
@@ -7838,9 +8018,15 @@ app.post('/share_scene/', function (req, res) { //yep! //make it public?
                                         console.log('new invitiation id: ' + saved._id.toString());
                                     }
                                 });
+                                
+                                let landingButtons = "<br><a href='"+ requestProtocol + "://" + req.headers.host + "/landing/invite.html?iv=" + cleanhash + "' target='_blank'>" +
+                                "<button style='font-family: Arial, Helvetica, sans-serif;  font-size: 18px; background-color: blue; color: white; border-radius: 8px; margin: 10px; padding: 10px;'>" +
+                                "Click here to access this scene!</a></button><br>";
+
                                 if (req.body.publicRequest) {
                                         message = "An invitation to this private Immersive Scene was requested for you!";
-                                    } else {
+
+                                } else {
                                         if (theScene.sceneShareWithMessage === "" || theScene.sceneShareWithMessage == null || theScene.sceneShareWithMessage.length < 2) {
                                             message = req.session.user.userName + " has shared an Immersive Scene!";
                                             // "<h3>Scene Invitation from " + from + "</h3><hr><br>"
@@ -7848,6 +8034,9 @@ app.post('/share_scene/', function (req, res) { //yep! //make it public?
                                             message = req.session.user.userName + " has shared an Immersive Scene with this message: "+
                                                 "<hr><strong>" + req.body.sceneShareWithMessage +  "</strong><br><hr>";
                                         }
+                                        landingButtons = "<br><a href='"+ requestProtocol + "://" + req.headers.host + "/landing/"+theScene.short_id+"?iv=" + cleanhash + "' target='_blank'>" +
+                                        "<button style='font-family: Arial, Helvetica, sans-serif;  font-size: 18px; background-color: blue; color: white; border-radius: 8px; margin: 10px; padding: 10px;'>" +
+                                        "Scene Landing Page</a></button><br>";
                                 }
                                 message += restrictToEventMessage + restrictToLocationMessage;
                                 if (theScene.sceneEventStart != undefined && theScene.sceneEventStart != null && theScene.sceneEventStart != "") {
@@ -7867,9 +8056,12 @@ app.post('/share_scene/', function (req, res) { //yep! //make it public?
                                 var htmlbody = message +
 
                                     isNotPublicMessage +
-                                    "<br><a href='"+ requestProtocol + "://" + req.headers.host + "/landing/invite.html?iv=" + cleanhash + "' target='_blank'>" +
-                                    "<button style='font-family: Arial, Helvetica, sans-serif;  font-size: 18px; background-color: blue; color: white; border-radius: 8px; margin: 10px; padding: 10px;'>" +
-                                    "Click here to access this scene!</a></button><br>" +
+
+                                    // "<br><a href='"+ requestProtocol + "://" + req.headers.host + "/landing/invite.html?iv=" + cleanhash + "' target='_blank'>" +
+                                    // "<button style='font-family: Arial, Helvetica, sans-serif;  font-size: 18px; background-color: blue; color: white; border-radius: 8px; margin: 10px; padding: 10px;'>" +
+                                    // "Click here to access this scene!</a></button><br>" +
+                                    landingButtons +
+
                                     "<br> <img src=" + urlHalf + "> " +
                                     "<br> Scene Title: " + theScene.sceneTitle +
                                     "<br> Short ID: " + theScene.short_id +
@@ -7879,26 +8071,45 @@ app.post('/share_scene/', function (req, res) { //yep! //make it public?
                                     "<br> For more info, or to become a subscriber, visit <a href='https://servicemedia.net'>ServiceMedia.net!</a><br><br> "+
                                     "<br> To stop messages like this, <a href='"+ requestProtocol + "://" + req.headers.host + "/landing/opt_out.html?iv=" + cleanhash + "' target='_blank'>click here</a><br><br> ";
 
-                            ses.sendEmail( {
-                                    Source: from,
-                                    Destination: { ToAddresses: to, BccAddresses: bcc},
-                                    Message: {
-                                        Subject: {
-                                            Data: subject
-                                        },
-                                        Body: {
-                                            Html: {
-                                                Data: htmlbody
+
+                                    const params = { Source: process.env.ADMIN_EMAIL,
+                                        Destination: { ToAddresses: to, BccAddresses: bcc},
+                                        Message: {
+                                            Subject: {
+                                                Data: subject
+                                            },
+                                            Body: {
+                                                Html: {
+                                                    Data: htmlbody
+                                                }
                                             }
                                         }
-                                    }
-                                }
-                                , function(err, data) {
-                                    if(err) throw err
-                                    console.log('Email sent:');
-                                    console.log(data);
-                                    
-                                });
+                                    };
+
+                                    (async () => {
+                                    const status = await SendEmail(params.Destination.ToAddresses, params.Source, htmlbody, subject);
+
+                                    })();
+                                // ses.sendEmail( {
+                                //         Source: from,
+                                //         Destination: { ToAddresses: to, BccAddresses: bcc},
+                                //         Message: {
+                                //             Subject: {
+                                //                 Data: subject
+                                //             },
+                                //             Body: {
+                                //                 Html: {
+                                //                     Data: htmlbody
+                                //                 }
+                                //             }
+                                //         }
+                                //     }
+                                //     , function(err, data) {
+                                //         if(err) throw err
+                                //         console.log('Email sent:');
+                                //         console.log(data);
+                                        
+                                //     });
                             });
                         });
                         callbackzz();
@@ -8033,26 +8244,32 @@ app.post('/newuser', requiredAuthentication, admin, function (req, res) {
                                             //send validation email
 
                                             htmlbody = "Welcome, " + req.body.userName + "! <a href=\"" + rootHost + "/validate/" + cleanhash + "\"> Click here to validate your new account</a>"
-                                            ses.sendEmail({
-                                                    Source: from,
-                                                    Destination: { ToAddresses: [req.body.userEmail, adminEmail] },
-                                                    Message: {
-                                                        Subject: {
-                                                            Data: topName + ' New User' //TODO Get app name somehow
-                                                        },
-                                                        Body: {
-                                                            Html: {
-                                                                Data: htmlbody
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            , function(err, data) {
-                                                if(err) throw err
-                                                console.log('Email sent:');
-                                                console.log(data);
-                                                //res.redirect("http://elnoise.com/#/login");
-                                            });
+
+                                            (async () => {
+                                                const status1 = await SendEmail(req.body.userEmail,process.env,ADMIN_EMAIL,htmlbody,topName + ' New User');
+                                                const status2 = await SendEmail(process.env.ADMIN_EMAIL,process.env,ADMIN_EMAIL,htmlbody,topName + ' New User EVENT');
+                                                console.log("new user email statuses " + status1 + " " + status2);
+                                            })();
+                                            // ses.sendEmail({
+                                            //         Source: from,
+                                            //         Destination: { ToAddresses: [req.body.userEmail, adminEmail] },
+                                            //         Message: {
+                                            //             Subject: {
+                                            //                 Data: topName + ' New User' //TODO Get app name somehow
+                                            //             },
+                                            //             Body: {
+                                            //                 Html: {
+                                            //                     Data: htmlbody
+                                            //                 }
+                                            //             }
+                                            //         }
+                                            //     }
+                                            // , function(err, data) {
+                                            //     if(err) throw err
+                                            //     console.log('Email sent:');
+                                            //     console.log(data);
+                                            //     //res.redirect("http://elnoise.com/#/login");
+                                            // });
                                         }
                                     });
                             });
@@ -11912,26 +12129,35 @@ app.post('/testpurchase', checkAppID, requiredAuthentication, function (req, res
                                             console.log('new purchase id: ' + item_id);
                                             db.storeitems.update( { "_id": storeitemID },{ $inc: { totalSold: obody.quantity }});
                                             var htmlbody = "Thanks for your Purchase: " + JSON.stringify(saved);
-                                            ses.sendEmail( {
-                                                Source: adminEmail,
-                                                Destination: { ToAddresses: [userEmail]},
-                                                Message: {
-                                                    Subject: {
-                                                        Data: "Your Purchase"
-                                                    },
-                                                    Body: {
-                                                        Html: {
-                                                            Data: htmlbody
-                                                        }
-                                                    }
+                                            (async () => {
+                                                try {
+                                                    const status = await SendEmail(userEmail, adminEmail, htmlbody, "Your Purchase");
+                                                    const status2 = await SendEmail(userEmail, adminEmail, htmlbody, "Your Purchase ADMIN");
+                                                } catch (e) {
+                                                     console.log("error sending! " + e);
                                                 }
-                                            }
-                                            , function(err, data) {
-                                                if(err) throw err
-                                                console.log('Email sent:');
-                                                console.log(data);
+
+                                            })(); 
+                                            // ses.sendEmail( {
+                                            //     Source: adminEmail,
+                                            //     Destination: { ToAddresses: [userEmail]},
+                                            //     Message: {
+                                            //         Subject: {
+                                            //             Data: "Your Purchase"
+                                            //         },
+                                            //         Body: {
+                                            //             Html: {
+                                            //                 Data: htmlbody
+                                            //             }
+                                            //         }
+                                            //     }
+                                            // }
+                                            // , function(err, data) {
+                                            //     if(err) throw err
+                                            //     console.log('Email sent:');
+                                            //     console.log(data);
                                                
-                                            });
+                                            // });
                                             res.send("purchase id: " + item_id + " charged " + saved.price);
                                         }
                                     });
