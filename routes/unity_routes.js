@@ -150,9 +150,9 @@ unity_router.get('/scene/:_id/:platform/:version', function (req, res) { //need 
                             } else {
                                     (async () => {
                                         try {
-                                            const urlThumb = await ReturnPresignedUrl(process.env.S3_WEBSCRAPE_BUCKET_NAME, objID + "/" + objID + ".thumb.jpg", 6000);
-                                            const urlHalf = await ReturnPresignedUrl(process.env.S3_WEBSCRAPE_BUCKET_NAME, objID + "/" + objID + ".half.jpg", 6000);
-                                            const urlStandard = await ReturnPresignedUrl(process.env.S3_WEBSCRAPE_BUCKET_NAME, objID + "/" + objID + ".standard.jpg", 6000);
+                                            const urlThumb = await ReturnPresignedUrl(process.env.WEBSCRAPE_BUCKET_NAME, objID + "/" + objID + ".thumb.jpg", 6000);
+                                            const urlHalf = await ReturnPresignedUrl(process.env.WEBSCRAPE_BUCKET_NAME, objID + "/" + objID + ".half.jpg", 6000);
+                                            const urlStandard = await ReturnPresignedUrl(process.env.WEBSCRAPE_BUCKET_NAME, objID + "/" + objID + ".standard.jpg", 6000);
                                             weblink.urlThumb = urlThumb;
                                             weblink.urlHalf = urlHalf;
                                             weblink.urlStandard = urlStandard;
@@ -235,7 +235,7 @@ unity_router.get('/scene/:_id/:platform/:version', function (req, res) { //need 
                                            
                                             // video.url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + video.userID + "/video/" + video._id + "/" + video._id + "." + video.filename, Expires: 6000}); //TODO: puthemsina video folder!
                                             
-                                                video.url = ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, 'users/' + video.userID + "/video/" + video._id + "/" + video._id + "." + video.filename, 6000);
+                                                video.url = ReturnPresignedUrl(process.env.ROOT_BUCKET_NAME, 'users/' + video.userID + "/video/" + video._id + "/" + video._id + "." + video.filename, 6000);
                                                 console.log("vidoe url " + video.url);
                                                 cbimage();
                                             
@@ -372,9 +372,9 @@ unity_router.get('/scene/:_id/:platform/:version', function (req, res) { //need 
                     // }
                     (async () => {
                         try {
-                            const urlMp3 = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + mp3Name, 6000);
-                            const urlOgg = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + oggName, 6000);
-                            const urlPng = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + pngName, 6000);
+                            const urlMp3 = await ReturnPresignedUrl(process.env.ROOT_BUCKET_NAME,"users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + mp3Name, 6000);
+                            const urlOgg = await ReturnPresignedUrl(process.env.ROOT_BUCKET_NAME,"users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + oggName, 6000);
+                            const urlPng = await ReturnPresignedUrl(process.env.ROOT_BUCKET_NAME,"users/" + audio_items[i].userID + "/audio/" + audio_items[i]._id + "." + pngName, 6000);
 
         //                            audio_items.URLmp3 = urlMp3; //jack in teh signed urls into the object array
                             audio_items[i].URLmp3 = urlMp3; //jack in teh signed urls into the object array
@@ -433,10 +433,10 @@ unity_router.get('/scene/:_id/:platform/:version', function (req, res) { //need 
                         var standardName = 'standard.' + baseName + item_string_filename_ext;
                         var originalName = baseName + item_string_filename_ext;
 
-                        const urlThumb = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, "users/" + picture_items[i].userID + "/pictures/" + picture_items[i]._id + "." + thumbName, 6000 );
-                        const urlQuarter = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, "users/" + picture_items[i].userID + "/pictures/" + picture_items[i]._id + "." + quarterName, 6000 );
-                        const urlHalf = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, "users/" + picture_items[i].userID + "/pictures/" + picture_items[i]._id + "." + halfName, 6000 );
-                        const urlStandard = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, "users/" + picture_items[i].userID + "/pictures/" + picture_items[i]._id + "." + standardName, 6000 );
+                        const urlThumb = await ReturnPresignedUrl(process.env.ROOT_BUCKET_NAME, "users/" + picture_items[i].userID + "/pictures/" + picture_items[i]._id + "." + thumbName, 6000 );
+                        const urlQuarter = await ReturnPresignedUrl(process.env.ROOT_BUCKET_NAME, "users/" + picture_items[i].userID + "/pictures/" + picture_items[i]._id + "." + quarterName, 6000 );
+                        const urlHalf = await ReturnPresignedUrl(process.env.ROOT_BUCKET_NAME, "users/" + picture_items[i].userID + "/pictures/" + picture_items[i]._id + "." + halfName, 6000 );
+                        const urlStandard = await ReturnPresignedUrl(process.env.ROOT_BUCKET_NAME, "users/" + picture_items[i].userID + "/pictures/" + picture_items[i]._id + "." + standardName, 6000 );
 
                         // var urlThumb = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_items[i].userID + "/pictures/" + picture_items[i]._id + "." + thumbName, Expires: 6000}); //just send back thumbnail urls for list
                         // var urlQuarter = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_items[i].userID + "/pictures/" + picture_items[i]._id + "." + quarterName, Expires: 6000});
@@ -445,7 +445,7 @@ unity_router.get('/scene/:_id/:platform/:version', function (req, res) { //need 
                         var urlTarget = "";
                         if (picture_items[i].useTarget) {
                             // urlTarget = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_items[i].userID + "/pictures/targets/" + picture_items[i]._id + ".mind", Expires: 6000});
-                            urlTarget = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, "users/" + picture_items[i].userID + "/pictures/targets/" + picture_items[i]._id + ".mind", 6000 );
+                            urlTarget = await ReturnPresignedUrl(process.env.ROOT_BUCKET_NAME, "users/" + picture_items[i].userID + "/pictures/targets/" + picture_items[i]._id + ".mind", 6000 );
                         } 
                         
                         
@@ -468,16 +468,16 @@ unity_router.get('/scene/:_id/:platform/:version', function (req, res) { //need 
                             //     } 
                             // });
                             // var urlOriginal = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: theKey, Expires: 6000});
-                            const urlOriginal = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME, theKey, 6000); 
+                            const urlOriginal = await ReturnPresignedUrl(process.env.ROOT_BUCKET_NAME, theKey, 6000); 
                             picture_items[i].urlOriginal = urlOriginal;
                             let cubeMapAsset = [];
                             if (sceneResponse.sceneUseDynCubeMap != null && sceneResponse.sceneUseDynCubeMap) {
-                                    // let path1 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_items[i].userID+"/cubemaps/"+picture_items[i]._id+"_px.jpg", Expires: 6000});  
-                                    // let path2 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_items[i].userID+"/cubemaps/"+picture_items[i]._id+"_nx.jpg", Expires: 6000});  
-                                    // let path3 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_items[i].userID+"/cubemaps/"+picture_items[i]._id+"_py.jpg", Expires: 6000});  
-                                    // let path4 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_items[i].userID+"/cubemaps/"+picture_items[i]._id+"_ny.jpg", Expires: 6000});  
-                                    // let path5 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_items[i].userID+"/cubemaps/"+picture_items[i]._id+"_pz.jpg", Expires: 6000});  
-                                    // let path6 = s3.getSignedUrl('getObject', {Bucket: process.env.S3_ROOT_BUCKET_NAME, Key: "users/"+picture_items[i].userID+"/cubemaps/"+picture_items[i]._id+"_nz.jpg", Expires: 6000});                                    
+                                    // let path1 = s3.getSignedUrl('getObject', {Bucket: process.env.ROOT_BUCKET_NAME, Key: "users/"+picture_items[i].userID+"/cubemaps/"+picture_items[i]._id+"_px.jpg", Expires: 6000});  
+                                    // let path2 = s3.getSignedUrl('getObject', {Bucket: process.env.ROOT_BUCKET_NAME, Key: "users/"+picture_items[i].userID+"/cubemaps/"+picture_items[i]._id+"_nx.jpg", Expires: 6000});  
+                                    // let path3 = s3.getSignedUrl('getObject', {Bucket: process.env.ROOT_BUCKET_NAME, Key: "users/"+picture_items[i].userID+"/cubemaps/"+picture_items[i]._id+"_py.jpg", Expires: 6000});  
+                                    // let path4 = s3.getSignedUrl('getObject', {Bucket: process.env.ROOT_BUCKET_NAME, Key: "users/"+picture_items[i].userID+"/cubemaps/"+picture_items[i]._id+"_ny.jpg", Expires: 6000});  
+                                    // let path5 = s3.getSignedUrl('getObject', {Bucket: process.env.ROOT_BUCKET_NAME, Key: "users/"+picture_items[i].userID+"/cubemaps/"+picture_items[i]._id+"_pz.jpg", Expires: 6000});  
+                                    // let path6 = s3.getSignedUrl('getObject', {Bucket: process.env.ROOT_BUCKET_NAME, Key: "users/"+picture_items[i].userID+"/cubemaps/"+picture_items[i]._id+"_nz.jpg", Expires: 6000});                                    
                                     // cubeMapAsset.push(path1);
                                     // cubeMapAsset.push(path2);
                                     // cubeMapAsset.push(path3);
@@ -514,9 +514,9 @@ unity_router.get('/scene/:_id/:platform/:version', function (req, res) { //need 
                                     // var urlHalf = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".half." + picture_item.filename, Expires: 6000});
                                     // var urlStandard = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: "users/" + picture_item.userID + "/pictures/" + picture_item._id + ".standard." + picture_item.filename, Expires: 6000});
 
-                                    const urlThumb = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + picture_item.userID + "/pictures/" + picture_item._id + ".thumb." + picture_item.filename,6000);
-                                    const urlHalf = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + picture_item.userID + "/pictures/" + picture_item._id + ".half." + picture_item.filename,6000);
-                                    const urlStandard = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + picture_item.userID + "/pictures/" + picture_item._id + ".standard." + picture_item.filename,6000);
+                                    const urlThumb = await ReturnPresignedUrl(process.env.ROOT_BUCKET_NAME,"users/" + picture_item.userID + "/pictures/" + picture_item._id + ".thumb." + picture_item.filename,6000);
+                                    const urlHalf = await ReturnPresignedUrl(process.env.ROOT_BUCKET_NAME,"users/" + picture_item.userID + "/pictures/" + picture_item._id + ".half." + picture_item.filename,6000);
+                                    const urlStandard = await ReturnPresignedUrl(process.env.ROOT_BUCKET_NAME,"users/" + picture_item.userID + "/pictures/" + picture_item._id + ".standard." + picture_item.filename,6000);
 
                                     var postcard = {};
                                     postcard.userID = picture_item.userID;
@@ -576,7 +576,7 @@ unity_router.get('/scene/:_id/:platform/:version', function (req, res) { //need 
                                     console.log("gotsa model:" + model._id);
                                     // let url = s3.getSignedUrl('getObject', {Bucket: 'servicemedia', Key: 'users/' + model.userID + "/gltf/" + model.filename, Expires: 6000});
 
-                                    model.url = await ReturnPresignedUrl(process.env.S3_ROOT_BUCKET_NAME,"users/" + model.userID + "/gltf/" + model.filename,6000);
+                                    model.url = await ReturnPresignedUrl(process.env.ROOT_BUCKET_NAME,"users/" + model.userID + "/gltf/" + model.filename,6000);
                                     modelz.push(model);
                                     callbackz();
                                 

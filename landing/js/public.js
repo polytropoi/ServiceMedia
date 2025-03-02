@@ -50,7 +50,7 @@ function generateSuccessHTMLOutput(response) {
           "<div class=\x22card shadow-sm\x22>"+
             // "<svg class=\x22bd-placeholder-img card-img-top\x22 width=\x22100%\x22 height=\x22225\x22 xmlns=\x22http://www.w3.org/2000/svg\x22 role=\x22img\x22 aria-label=\x22Placeholder: Thumbnail\x22 "+
             // "preserveAspectRatio=\x22xMidYMid slice\x22 focusable=\x22false\x22><title>Placeholder</title><rect width=\x22100%\x22 height=\x22100%\x22 fill=\x22#55595c\x22/><text x=\x2250%\x22 y=\x2250%\x22 fill=\x22#eceeef\x22 dy=\x22.3em\x22>Thumbnail</text></svg>"+
-            '<a href=\x22https://smxr.net/landing/'+ shuffledArray[i].sceneKey + '\x22 target=\x22_blank\x22>' +
+            '<a href=\x22/landing/'+ shuffledArray[i].sceneKey + '\x22 target=\x22_blank\x22>' +
             "<img src=\x22"+ shuffledArray[i].scenePostcardHalf +"\x22 class=\x22cropped1 img-fluid\x22></a>"+
             "<div class=\x22card-body\x22>"+
               "<p class=\x22card-text\x22><strong>"+shuffledArray[i].sceneTitle+"</strong></p>"+
@@ -58,8 +58,8 @@ function generateSuccessHTMLOutput(response) {
               "<p class=\x22card-text\x22><a href=\x22http://"+shuffledArray[i].sceneDomain+"\x22>"+shuffledArray[i].sceneDomain+"</a></p>"+
               "<div class=\x22d-flex justify-content-between align-items-center\x22>"+
                 "<div class=\x22btn-group\x22>"+
-                  "<a href=\x22https://smxr.net/landing/" +  shuffledArray[i].sceneKey + "\x22 target=\x22_blank\x22 type=\x22button\x22 class=\x22btn btn-sm btn-outline-secondary\x22>Landing</a>"+
-                  "<a href=\x22https://smxr.net/webxr/" +  shuffledArray[i].sceneKey + "\x22 target=\x22_blank\x22 type=\x22button\x22 class=\x22btn btn-sm btn-outline-secondary\x22>WebXR</a>"+
+                  "<a href=\x22/landing/" +  shuffledArray[i].sceneKey + "\x22 target=\x22_blank\x22 type=\x22button\x22 class=\x22btn btn-sm btn-outline-secondary\x22>Landing</a>"+
+                  "<a href=\x22/webxr/" +  shuffledArray[i].sceneKey + "\x22 target=\x22_blank\x22 type=\x22button\x22 class=\x22btn btn-sm btn-outline-secondary\x22>WebXR</a>"+
                   "<a href=\x22https://www.oculus.com/open_url/?url=https://smxr.net/webxr/" +  shuffledArray[i].sceneKey + "\x22 target=\x22_blank\x22 type=\x22button\x22 class=\x22btn btn-sm btn-outline-secondary\x22>Send to Quest</a>"+
                   // "<a href=\x22https://smxr.net/qrcode/" +  shuffledArray[i].sceneKey + "\x22 target=\x22_blank\x22 type=\x22button\x22 class=\x22btn btn-sm btn-outline-secondary\x22>QR Code</a>"+
                 "</div>"+
@@ -121,15 +121,15 @@ function showScenes(response) {
           "<div class=\x22card shadow-sm\x22>"+
             // "<svg class=\x22bd-placeholder-img card-img-top\x22 width=\x22100%\x22 height=\x22225\x22 xmlns=\x22http://www.w3.org/2000/svg\x22 role=\x22img\x22 aria-label=\x22Placeholder: Thumbnail\x22 "+
             // "preserveAspectRatio=\x22xMidYMid slice\x22 focusable=\x22false\x22><title>Placeholder</title><rect width=\x22100%\x22 height=\x22100%\x22 fill=\x22#55595c\x22/><text x=\x2250%\x22 y=\x2250%\x22 fill=\x22#eceeef\x22 dy=\x22.3em\x22>Thumbnail</text></svg>"+
-            '<a href=\x22https://smxr.net/landing/'+ arr[i].sceneKey + '\x22 target=\x22_blank\x22>' +
+            '<a href=\x22/landing/'+ arr[i].sceneKey + '\x22 target=\x22_blank\x22>' +
             "<img src=\x22"+ arr[i].scenePostcardHalf +"\x22 class=\x22cropped1 img-fluid\x22></a>"+
             "<div class=\x22card-body\x22>"+
               "<p class=\x22card-text\x22><strong>"+arr[i].sceneTitle+"</strong></p>"+
               "<p class=\x22card-text\x22>"+arr[i].sceneDescription+"</p>"+
               "<div class=\x22d-flex justify-content-between align-items-center\x22>"+
                 "<div class=\x22btn-group\x22>"+
-                  "<a href=\x22https://smxr.net/landing/" +  arr[i].sceneKey + "\x22 target=\x22_blank\x22 type=\x22button\x22 class=\x22btn btn-sm btn-outline-secondary\x22>Landing</a>"+
-                  "<a href=\x22https://smxr.net/webxr/" +  arr[i].sceneKey + "\x22 target=\x22_blank\x22 type=\x22button\x22 class=\x22btn btn-sm btn-outline-secondary\x22>WebXR</a>"+
+                  "<a href=\x22/landing/" +  arr[i].sceneKey + "\x22 target=\x22_blank\x22 type=\x22button\x22 class=\x22btn btn-sm btn-outline-secondary\x22>Landing</a>"+
+                  "<a href=\x22/webxr/" +  arr[i].sceneKey + "\x22 target=\x22_blank\x22 type=\x22button\x22 class=\x22btn btn-sm btn-outline-secondary\x22>WebXR</a>"+
                   "<a href=\x22https://smxr.net/qrcode/" +  arr[i].sceneKey + "\x22 target=\x22_blank\x22 type=\x22button\x22 class=\x22btn btn-sm btn-outline-secondary\x22>QR Code</a>"+
                 "</div>"+
                 // "<small class=\x22text-body-secondary\x22>9 mins</small>"+

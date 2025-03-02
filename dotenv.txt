@@ -16,8 +16,8 @@ MAPBOX_KEY="mapboxKey"
 
 STRIPE_KEY="stripeKey"
 
-S3_WEBSCRAPE_BUCKET_NAME="s3_BucketName"
-S3_ROOT_BUCKET_NAME="s3_BucketName"
+WEBSCRAPE_BUCKET_NAME="s3_BucketName"
+ROOT_BUCKET_NAME="s3_BucketName"
 
 AWSKEY="myAWSKey"
 AWSSECRET="myAWSSecret"
